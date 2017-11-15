@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@types/lodash": "^4.14.85",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "@types/ramda": "github:types/npm-ramda#dist",
+    "ramda": "^0.25.0"
+  }
+}
