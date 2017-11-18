@@ -132,15 +132,19 @@ const handlers = {
     if (state.stageState.playersGone === state.numPlayers) {
       // Next stage.
       state.stage = 'CITIES'
-      state.stageState.playersGone = 0
+      state.stageState = {
+        playersGone: 0,
+      }
       return
     }
   },
   CITIES: (state: GameState, action: any) => {
-    // Check valid purchase.
+    // Check valid purchase - compute costs.
 
     // Modify map
-    action.purchases.forEach(([city, value]) => {})
+    action.purchases.forEach(([city, index]) => {
+      state.map[city].plants[index] = action.player
+    })
 
     // Update stage
     state.stageState.playersGone++
