@@ -1,19 +1,27 @@
 import {Component} from 'react'
 import styled from 'styled-components'
+import {withProps} from 'recompose'
 import {Flex, Box} from 'grid-styled'
 import {range, toPairs} from 'lodash/fp'
 
+import pg, {CARDS, getInitialState} from '../../../../games/power-grid/src/index.ts'
+
+const INITIAL_STATE = getInitialState(['monsk', 'viz', 'nhkl'])
+
+console.log(INITIAL_STATE)
+
 const PlayerInfo = props => (
-  <Flex direction="column" mb={2}>
-    <Box>monsk</Box>
-    <Flex>
-      <Box>Money: 1</Box>
-      <Box>Cities: 1</Box>
+  <Flex direction="column" mb="20px">
+    <Flex align="center" mb="3px">
+      <Box flex="1 1 auto">{props.player}</Box>
+      <Box style={{fontFamily: 'SF Mono', fontSize: 13}}>10:00</Box>
     </Flex>
-    <Flex>
-      <Plant />
-      <Plant />
-      <Plant />
+    <Flex mb="3px">
+      <Box>Money: {props.game.playerState[props.player].money}</Box>
+      <Box>Cities: {props.game.playerState[props.player].cities.length}</Box>
+    </Flex>
+    <Flex style={{minHeight: 45}}>
+      {props.game.playerState[props.player].plants.map(plant => <Plant />)}
     </Flex>
   </Flex>
 )
@@ -34,29 +42,28 @@ const PlantWrapper = styled(Box)`
 
 const Plant = props => (
   <PlantWrapper>
-    <div>20</div>
-    <div>5C/3</div>
+    <div>{props.plant[0]}</div>
+    <div>
+      {props.plant[1]}/{props.plant[2]}
+    </div>
   </PlantWrapper>
 )
 
+Plant.defaultProps = {
+  plant: [20, '5C', 3],
+}
+
 const PlayerOrderCard = props => (
   <Flex direction="column" mx={1}>
-    <Box style={{maxWidth: 65, textOverflow: 'ellipsis', overflow: 'hidden'}}>monskkkkkk </Box>3c,
-    20p
+    <Box style={{maxWidth: 65, textOverflow: 'ellipsis', overflow: 'hidden'}}>
+      {props.player}
+    </Box>3c, 20p
   </Flex>
 )
 
 const PlayerOrder = props => (
   <Flex style={{fontSize: 14}}>
-    <Flex direction="column" mx={1}>
-      <Box>monsk </Box>3c, 20p
-    </Flex>
-    <Flex direction="column" mx={1}>
-      <Box>monsk </Box>3c, 20p
-    </Flex>
-    <PlayerOrderCard />
-    <PlayerOrderCard />
-    <PlayerOrderCard />
+    {props.game.players.map(player => <PlayerOrderCard key={player} player={player} />)}
   </Flex>
 )
 
@@ -76,14 +83,18 @@ class ValueTrack extends Component {
   setHovered = hovered => this.setState({hovered})
 
   render() {
-    const {values} = this.props
+    const {values, game, resource} = this.props
     const {hovered} = this.state
-    const nums = []
+    let nums = []
     values.forEach((value, i) => {
       range(0, value).forEach(() => nums.push(i + 1))
     })
+    const available = game.resourceAvailable[resource]
+    const pool = game.resourcePool[resource]
+    nums = nums.slice(nums.length - available)
     return (
       <Flex mb="4px" onMouseLeave={() => this.setHovered(-1)} style={{cursor: 'pointer'}}>
+        <Box w={20}>{pool}</Box>
         {nums.map((val, i) => (
           <Box
             onMouseEnter={() => this.setHovered(i)}
@@ -103,7 +114,7 @@ class ValueTrack extends Component {
 const ResourceTrack = props => (
   <div style={{fontSize: '13px'}}>
     {toPairs(RESOURCE_DISTROS).map(([resource, values]) => (
-      <ValueTrack key={resource} resource={resource} values={values} />
+      <ValueTrack key={resource} game={props.game} resource={resource} values={values} />
     ))}
   </div>
 )
@@ -187,6 +198,14 @@ const Map = props => (
   </svg>
 )
 
+const PlayerSidebar = props => (
+  <div>
+    {props.game.players.map(player => (
+      <PlayerInfo key={player} player={player} game={props.game} />
+    ))}
+  </div>
+)
+
 const PowerGrid = props => (
   <div>
     <Nav align="center" p={2}>
@@ -194,11 +213,7 @@ const PowerGrid = props => (
     </Nav>
     <Flex>
       <Box flex="0 0 230px" p={2} style={{borderRight: '1px solid #f3f3f3'}}>
-        <PlayerInfo />
-        <PlayerInfo />
-        <PlayerInfo />
-        <PlayerInfo />
-        <PlayerInfo />
+        <PlayerSidebar game={props.game} />
       </Box>
       <Flex flex="1 1 auto" direction="column">
         <Box p={1} m={1} style={{border: '1px solid #ccc'}}>
@@ -211,10 +226,9 @@ const PowerGrid = props => (
           </Flex>
           <Flex direction="column">
             <Flex direction="row">
-              <Plant />
-              <Plant />
-              <Plant />
-              <Plant />
+              {props.game.auctioningPlants
+                .slice(0, 4)
+                .map((plant, i) => <Plant key={i} plant={plant} />)}
             </Flex>
             <Flex direction="row" mt={1}>
               <Plant />
@@ -224,9 +238,9 @@ const PowerGrid = props => (
             </Flex>
           </Flex>
           <Flex direction="column">
-            <PlayerOrder />
+            <PlayerOrder game={props.game} />
             <Box px={2} my={1}>
-              <ResourceTrack />
+              <ResourceTrack game={props.game} />
             </Box>
           </Flex>
         </Flex>
@@ -253,4 +267,4 @@ const PowerGrid = props => (
   </div>
 )
 
-export default PowerGrid
+export default withProps(() => ({game: INITIAL_STATE}))(PowerGrid)

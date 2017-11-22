@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "sourceMap": true
+  },
+  "include": ["../games/power-grid/src/*.ts"]
+}

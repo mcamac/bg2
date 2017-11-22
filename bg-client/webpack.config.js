@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const path = require('path')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 module.exports = {
   devtool: 'source-map',
@@ -19,6 +20,15 @@ module.exports = {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        options: {
+          // disable type checker - we will use it in fork plugin
+          transpileOnly: true,
+        },
+      },
     ],
   },
+  plugins: [new ForkTsCheckerWebpackPlugin()],
 }
