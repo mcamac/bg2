@@ -1,14 +1,20 @@
 import {Component} from 'react'
+import {connect} from 'react-redux'
 import styled from 'styled-components'
-import {withProps} from 'recompose'
+import {withProps, withState} from 'recompose'
 import {Flex, Box} from 'grid-styled'
-import {range, toPairs} from 'lodash/fp'
+import {get, range, toPairs} from 'lodash/fp'
 
-import pg, {CARDS, getInitialState} from '../../../../games/power-grid/src/index.ts'
+import pg, {
+  CARDS,
+  getInitialState,
+} from '../../../../games/power-grid/src/index.ts'
 
 const INITIAL_STATE = getInitialState(['monsk', 'viz', 'nhkl'])
 
 console.log(INITIAL_STATE)
+
+const Icon = props => <i className={`icon icon-${props.g}`} />
 
 const PlayerInfo = props => (
   <Flex direction="column" mb="20px">
@@ -17,11 +23,18 @@ const PlayerInfo = props => (
       <Box style={{fontFamily: 'SF Mono', fontSize: 13}}>10:00</Box>
     </Flex>
     <Flex mb="3px">
-      <Box>Money: {props.game.playerState[props.player].money}</Box>
-      <Box>Cities: {props.game.playerState[props.player].cities.length}</Box>
+      <Box mr={1}>
+        <Icon g="money" /> {props.game.playerState[props.player].money}
+      </Box>
+      <Box>
+        <Icon g="city" />
+        {props.game.playerState[props.player].cities.length}
+      </Box>
     </Flex>
     <Flex style={{minHeight: 45}}>
-      {props.game.playerState[props.player].plants.map(plant => <Plant />)}
+      {props.game.playerState[props.player].plants.map((plant, i) => (
+        <Plant plant={plant} key={i} />
+      ))}
     </Flex>
   </Flex>
 )
@@ -41,7 +54,7 @@ const PlantWrapper = styled(Box)`
 `
 
 const Plant = props => (
-  <PlantWrapper>
+  <PlantWrapper onClick={props.onClick}>
     <div>{props.plant[0]}</div>
     <div>
       {props.plant[1]}/{props.plant[2]}
@@ -53,17 +66,32 @@ Plant.defaultProps = {
   plant: [20, '5C', 3],
 }
 
-const PlayerOrderCard = props => (
-  <Flex direction="column" mx={1}>
+let PlayerOrderCard = props => (
+  <Flex
+    direction="column"
+    mx={1}
+    style={{color: props.active ? 'black' : '#aaa'}}
+  >
     <Box style={{maxWidth: 65, textOverflow: 'ellipsis', overflow: 'hidden'}}>
       {props.player}
     </Box>3c, 20p
   </Flex>
 )
 
+PlayerOrderCard = connect(
+  (state, props) => ({
+    active:
+      !state.game.stageState.eligiblePlayers ||
+      state.game.stageState.eligiblePlayers.indexOf(props.player) >= 0,
+  }),
+  () => ({})
+)(PlayerOrderCard)
+
 const PlayerOrder = props => (
   <Flex style={{fontSize: 14}}>
-    {props.game.players.map(player => <PlayerOrderCard key={player} player={player} />)}
+    {props.game.players.map(player => (
+      <PlayerOrderCard key={player} player={player} />
+    ))}
   </Flex>
 )
 
@@ -77,13 +105,12 @@ const RESOURCE_DISTROS = {
 class ValueTrack extends Component {
   state = {
     hovered: -1,
-    chosen: -1,
   }
 
   setHovered = hovered => this.setState({hovered})
 
   render() {
-    const {values, game, resource} = this.props
+    const {values, game, chosen, resource} = this.props
     const {hovered} = this.state
     let nums = []
     values.forEach((value, i) => {
@@ -93,15 +120,26 @@ class ValueTrack extends Component {
     const pool = game.resourcePool[resource]
     nums = nums.slice(nums.length - available)
     return (
-      <Flex mb="4px" onMouseLeave={() => this.setHovered(-1)} style={{cursor: 'pointer'}}>
+      <Flex
+        mb="4px"
+        onMouseLeave={() => this.setHovered(-1)}
+        style={{cursor: 'pointer'}}
+      >
         <Box w={20}>{pool}</Box>
+        <Box w={20} onClick={() => this.props.onClick(0)}>
+          <Icon g={resource} />
+        </Box>
         {nums.map((val, i) => (
           <Box
+            key={`${val}${i}`}
             onMouseEnter={() => this.setHovered(i)}
-            onClick={() => console.log(i + 1)}
+            onClick={() => this.props.onClick(i + 1)}
             width={16}
             justify="center"
-            style={{backgroundColor: i <= hovered ? '#dedede' : null}}
+            style={{
+              backgroundColor:
+                i <= hovered ? '#dedede' : i < chosen ? 'yellow' : null,
+            }}
           >
             {val}
           </Box>
@@ -111,10 +149,30 @@ class ValueTrack extends Component {
   }
 }
 
+ValueTrack = connect(
+  (state, props) => ({
+    chosen: state.ui.resources ? state.ui.resources[props.resource] : 0,
+  }),
+  (dispatch, props) => ({
+    onClick: n => {
+      dispatch({
+        type: 'UI_SET_RESOURCE_BUY',
+        resource: props.resource,
+        n,
+      })
+    },
+  })
+)(ValueTrack)
+
 const ResourceTrack = props => (
   <div style={{fontSize: '13px'}}>
     {toPairs(RESOURCE_DISTROS).map(([resource, values]) => (
-      <ValueTrack key={resource} game={props.game} resource={resource} values={values} />
+      <ValueTrack
+        key={resource}
+        game={props.game}
+        resource={resource}
+        values={values}
+      />
     ))}
   </div>
 )
@@ -130,8 +188,20 @@ const City = props => (
       stroke="#555"
     />
     <circle cx={props.x} cy={20 + props.y} r={6} stroke="#555" fill="white" />
-    <circle cx={props.x + 16} cy={20 + props.y} r={6} stroke="#555" fill="white" />
-    <circle cx={props.x + 32} cy={20 + props.y} r={6} stroke="#555" fill="white" />
+    <circle
+      cx={props.x + 16}
+      cy={20 + props.y}
+      r={6}
+      stroke="#555"
+      fill="white"
+    />
+    <circle
+      cx={props.x + 32}
+      cy={20 + props.y}
+      r={6}
+      stroke="#555"
+      fill="white"
+    />
   </g>
 )
 
@@ -194,7 +264,9 @@ const Map = props => (
     <text x={100} y={32} textAnchor="middle" fontSize={12}>
       15
     </text>
-    {CITIES.map(([x, y, color], i) => <City key={i} x={x} y={y} color={color} />)}
+    {CITIES.map(([x, y, color], i) => (
+      <City key={i} x={x} y={y} color={color} />
+    ))}
   </svg>
 )
 
@@ -206,10 +278,177 @@ const PlayerSidebar = props => (
   </div>
 )
 
+let AuctionBlock = props => (
+  <Flex direction="column">
+    <Flex direction="row">
+      {props.game.auctioningPlants
+        .slice(0, 4)
+        .map((plant, i) => (
+          <Plant
+            key={i}
+            plant={plant}
+            onClick={() => props.onClickPlant(i, plant)}
+          />
+        ))}
+    </Flex>
+    <Flex direction="row" mt={1}>
+      {props.game.auctioningPlants
+        .slice(4)
+        .map((plant, i) => <Plant key={i} plant={plant} />)}
+    </Flex>
+  </Flex>
+)
+
+AuctionBlock = connect(
+  () => ({}),
+  (dispatch, props) => ({
+    onClickPlant: (i, plant) => {
+      console.log(i, plant)
+      dispatch({
+        type: 'AUCTION_CHOOSE_PLANT',
+        i,
+        plant,
+      })
+    },
+  })
+)(AuctionBlock)
+
+const Input = styled.input`
+  padding: 5px;
+  font-size: 1em;
+`
+
+const Button = styled.button`
+  background: white;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  font-size: 1em;
+  min-width: 50px;
+  transition: 0.2s background;
+  cursor: pointer;
+
+  &:hover {
+    background: #eee;
+  }
+`
+
+class BidInput extends Component {
+  state = {
+    bid: this.props.minBid,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.minBid !== this.props.minBid) {
+      this.setState({bid: nextProps.minBid})
+    }
+  }
+
+  onChangeBid = e => this.setState({bid: e.target.value})
+
+  onClickBid = () => {
+    this.props.onBid(this.state.bid)
+  }
+
+  render() {
+    const {bid} = this.state
+    return (
+      <div>
+        <Input
+          style={{maxWidth: 75}}
+          type="text"
+          value={bid}
+          onChange={this.onChangeBid}
+        />
+        <Button onClick={this.onClickBid}>Bid</Button>
+      </div>
+    )
+  }
+}
+
+const BuyResourcesActions = connect(
+  (state, props) => {
+    let cost = 0
+    toPairs(state.ui.resources).forEach(([resource, value]) => {
+      cost += value
+    })
+
+    return {
+      cost,
+    }
+  },
+  (dispatch, props) => ({
+    onBuy: () => {},
+    onPass: () => {
+      dispatch({
+        type: 'UI_RESOURCES_BUY',
+      })
+    },
+  })
+)(props => (
+  <div>
+    Resources: <Button onClick={props.onBuy}>Buy ({props.cost})</Button> or{' '}
+    <Button onClick={props.onPass}>Pass</Button>
+  </div>
+))
+
+let PlayerActions = props => (
+  <Box p={1} m={1}>
+    {props.ui.state === 'UI_AUCTION_CHOOSE' && (
+      <button onClick={props.onAuctionChoicePass}>Pass</button>
+    )}
+    {props.game.stage === 'AUCTION_CHOOSE' &&
+      props.ui.state === 'AUCTION_CHOOSE_INITIAL_BID' && (
+        <BidInput
+          minBid={props.ui.plant[0]}
+          onBid={b => props.onSetAuctionStartPrice(b, props.ui.i)}
+        />
+      )}
+    {props.game.stage === 'AUCTION_BID' && (
+      <Flex>
+        <BidInput minBid={props.ui.plant[0]} onBid={props.onAuctionBid} />
+        <Button onClick={props.onAuctionBidPass}>Pass</Button>
+      </Flex>
+    )}
+    {props.game.stage === 'RESOURCES_BUY' && <BuyResourcesActions />}
+  </Box>
+)
+
+PlayerActions = connect(
+  (state, props) => ({game: state.game, ui: state.ui}),
+  (dispatch, props) => ({
+    onSetAuctionStartPrice: (price, i) => {
+      dispatch({
+        type: 'AUCTION_CHOOSE',
+        price,
+        i,
+      })
+    },
+    onAuctionChoicePass: () => {
+      dispatch({
+        type: 'AUCTION_CHOOSE',
+        pass: true,
+      })
+    },
+    onAuctionBid: price => {
+      dispatch({
+        type: 'AUCTION_BID',
+        price,
+      })
+    },
+    onAuctionBidPass: () => {
+      dispatch({
+        type: 'AUCTION_BID_PASS',
+      })
+    },
+  })
+)(PlayerActions)
+
 const PowerGrid = props => (
   <div>
     <Nav align="center" p={2}>
       <div style={{fontSize: '24px'}}>Power Grid</div>
+      <Button onClick={props.onSaveState}>Save</Button>
+      <Button onClick={props.onLoadState}>Load</Button>
     </Nav>
     <Flex>
       <Box flex="0 0 230px" p={2} style={{borderRight: '1px solid #f3f3f3'}}>
@@ -217,26 +456,15 @@ const PowerGrid = props => (
       </Box>
       <Flex flex="1 1 auto" direction="column">
         <Box p={1} m={1} style={{border: '1px solid #ccc'}}>
-          Game Status: Waiting for monsk to
+          Game Status: {props.game.stage}, Waiting for {props.game.player} to
+          <PlayerActions />
         </Box>
         <Flex px={2}>
           <Flex direction="column" mr={1}>
             Step 1
             <PlantWrapper>50</PlantWrapper>
           </Flex>
-          <Flex direction="column">
-            <Flex direction="row">
-              {props.game.auctioningPlants
-                .slice(0, 4)
-                .map((plant, i) => <Plant key={i} plant={plant} />)}
-            </Flex>
-            <Flex direction="row" mt={1}>
-              <Plant />
-              <Plant />
-              <Plant />
-              <Plant />
-            </Flex>
-          </Flex>
+          <AuctionBlock game={props.game} />
           <Flex direction="column">
             <PlayerOrder game={props.game} />
             <Box px={2} my={1}>
@@ -247,9 +475,6 @@ const PowerGrid = props => (
 
         <Box flex="1 1 auto">
           <Map />
-        </Box>
-        <Box p={1} m={1}>
-          Player actions: Bid?
         </Box>
       </Flex>
       <Box flex="0 0 300px" p={2} style={{borderLeft: '1px solid #f3f3f3'}}>
@@ -267,4 +492,14 @@ const PowerGrid = props => (
   </div>
 )
 
-export default withProps(() => ({game: INITIAL_STATE}))(PowerGrid)
+export default connect(
+  (state, props) => ({game: state.game}),
+  (dispatch, props) => ({
+    onSaveState: () => {
+      dispatch({type: 'SAVE_STATE'})
+    },
+    onLoadState: () => {
+      dispatch({type: 'LOAD_STATE'})
+    },
+  })
+)(PowerGrid)
