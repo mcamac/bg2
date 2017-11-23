@@ -8,12 +8,13 @@ import {get, range, toPairs, sortBy} from 'lodash/fp'
 import pg, {
   CARDS,
   getInitialState,
+  computeCitiesCost,
+  CITIES,
+  CITIES_BY_NAME,
+  EDGES,
 } from '../../../../games/power-grid/src/index.ts'
-import {CITIES, CONNECTIONS, CITIES_BY_NAME, EDGES} from './constants'
 
 const INITIAL_STATE = getInitialState(['monsk', 'viz', 'nhkl'])
-
-console.log(INITIAL_STATE)
 
 const Icon = props => <i className={`icon icon-${props.g}`} />
 
@@ -34,7 +35,7 @@ const PlayerInfo = props => (
     </Flex>
     <Flex style={{minHeight: 45}}>
       {props.game.playerState[props.player].plants.map((plant, i) => (
-        <Plant plant={plant} key={i} />
+        <Plant plant={plant.plant} key={i} />
       ))}
     </Flex>
   </Flex>
@@ -179,16 +180,16 @@ const ResourceTrack = props => (
 )
 
 const City = props => (
-  <g>
+  <g onClick={() => props.onClick(props.name)}>
     <rect
       width={32}
       height={20}
       x={props.x}
       y={props.y}
-      fill={props.color || 'yellow'}
+      fill={props.color}
       stroke="#555"
     />
-    <circle cx={props.x} cy={20 + props.y} r={6} stroke="#555" fill="white" />
+    {/* <circle cx={props.x} cy={20 + props.y} r={6} stroke="#555" fill="white" />
     <circle
       cx={props.x + 16}
       cy={20 + props.y}
@@ -202,7 +203,7 @@ const City = props => (
       r={6}
       stroke="#555"
       fill="white"
-    />
+    /> */}
   </g>
 )
 
@@ -221,7 +222,7 @@ const getCorners = ([x1, y1]) => {
   ]
 }
 
-const Map = props => (
+let Map = props => (
   <svg height={450} width="100%">
     {EDGES.map(([c1, c2, v], i) => {
       if (!CITIES_BY_NAME[c1] || !CITIES_BY_NAME[c2]) {
@@ -240,8 +241,8 @@ const Map = props => (
         c2corners.forEach(ic2 => {
           const score =
             dist(ic1, ic2) +
-            dist([x1 + 16, y1 + 20], ic1) +
-            dist([x2 + 16, y2 + 20], ic2)
+            dist([x1 + 16, y1 + 10], ic1) +
+            dist([x2 + 16, y2 + 10], ic2)
           if (score < bdist) {
             bdist = score
             bc1 = ic1
@@ -254,10 +255,10 @@ const Map = props => (
       const [cx2, cy2] = bc2
 
       return [
-        <line x1={cx1} y1={cy1} x2={cx2} y2={cy2} stroke="black" key={i} />,
+        <line x1={cx1} y1={cy1} x2={cx2} y2={cy2} stroke="#777" key={i} />,
         <text
           key={`${i}text`}
-          x={(cx1 + cx2) / 2}
+          x={(cx1 + cx2) / 2 - (v >= 10 ? 5 : 3)}
           y={(cy1 + cy2) / 2 + 6}
           fontSize={12}
         >
@@ -265,11 +266,74 @@ const Map = props => (
         </text>,
       ]
     })}
-    {CITIES.map(([x, y, color], i) => (
-      <City key={i} x={x} y={y} color={color} />
+    {CITIES.map(([x, y, color, name], i) => (
+      <City
+        key={i}
+        x={x}
+        y={y}
+        color={color}
+        name={name}
+        onClick={props.onClickCity}
+      />
     ))}
+    <g>
+      {props.selectedCities.map((name, i) => {
+        const city = CITIES_BY_NAME[name]
+        return (
+          <g>
+            <rect
+              key={name}
+              width={32}
+              height={20}
+              x={city[0]}
+              y={city[1]}
+              fill={props.color}
+              stroke="#555"
+              style={{pointerEvents: 'none'}}
+            />
+            <text x={city[0] + 3} y={city[0] + 3} style={{fill: 'white'}}>
+              {i + 1}
+            </text>
+          </g>
+        )
+      })}
+    </g>
+    <g>
+      {props.cityPlants.map(([city, owners], i) => {
+        const [x, y] = CITIES_BY_NAME[city]
+        return (
+          <g key={city}>
+            {owners.map((owner, i) => (
+              <circle
+                key={i}
+                cx={x + 16 * i}
+                cy={20 + y}
+                r={6}
+                stroke="#555"
+                fill="white"
+              />
+            ))}
+          </g>
+        )
+      })}
+    </g>
   </svg>
 )
+
+Map = connect(
+  (state, props) => ({
+    selectedCities: state.ui.cities || [],
+    cityPlants: toPairs(state.game.cityPlants),
+  }),
+  (dispatch, props) => ({
+    onClickCity: city => {
+      dispatch({
+        type: 'UI_CLICK_CITY',
+        city,
+      })
+    },
+  })
+)(Map)
 
 const PlayerSidebar = props => (
   <div>
@@ -427,7 +491,7 @@ const BuyResourcesActions = connect(
     </Box>
     {props.game.playerState[props.game.player].plants.map((plant, i) => (
       <Flex key={i} mx={1}>
-        <Plant plant={plant} />
+        <Plant plant={plant.plant} />
         <Flex direction="column">
           {plant[3].map(resource => (
             <ResourceCounter resource={resource} key={resource} />
@@ -441,7 +505,8 @@ const BuyResourcesActions = connect(
 const CitiesActions = connect(
   (state, props) => {
     return {
-      cost: 0,
+      cost: computeCitiesCost(state.game, state.ui.cities || []),
+      cities: (state.ui.cities || []).join(', '),
     }
   },
   (dispatch, props) => ({
@@ -453,8 +518,9 @@ const CitiesActions = connect(
   })
 )(props => (
   <div>
-    Cities:{' '}
-    <Button onClick={props.onSubmit}>Place Selected ({props.cost})</Button>
+    Click on cities to connect to, in order.
+    <Button onClick={props.onSubmit}>Place Selected (cost {props.cost})</Button>
+    <div>{props.cities || 'No cities selected.'}</div>
   </div>
 ))
 
@@ -591,6 +657,9 @@ export default connect(
     },
     onLoadState: () => {
       dispatch({type: 'LOAD_STATE'})
+    },
+    onResetState: () => {
+      dispatch({type: 'RESET_STATE'})
     },
   })
 )(PowerGrid)

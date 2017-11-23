@@ -3,7 +3,41 @@ import {id, key, getl, setl} from 'lens.ts'
 import shuffleSeed from 'shuffle-seed'
 import {cloneDeep} from 'lodash'
 
+import {CITIES, EDGES, CITIES_BY_NAME} from './constants'
+export {CITIES, EDGES, CITIES_BY_NAME}
+
 const STAGES = ['AUCTION', 'RESOURCES', 'CITIES', 'POWER', 'REPLENISH']
+
+const getDistances = () => {
+  // Floyd-warshall
+  const CITY_NAMES = CITIES.map(c => c[3])
+  const d = {}
+  CITY_NAMES.forEach(city => {
+    d[city] = {}
+    CITY_NAMES.forEach(city2 => (d[city][city2] = 10000000))
+    d[city][city] = 0
+  })
+  EDGES.forEach(([c1, c2, v]) => {
+    d[c1][c2] = v
+    d[c2][c1] = v
+  })
+
+  CITY_NAMES.forEach(k => {
+    CITY_NAMES.forEach(i => {
+      CITY_NAMES.forEach(j => {
+        if (d[i][j] > d[i][k] + d[k][j]) {
+          d[i][j] = d[i][k] + d[k][j]
+        }
+      })
+    })
+  })
+
+  return d
+}
+
+// localStorage.distances = JSON.stringify(getDistances())
+
+const DISTANCES = JSON.parse(localStorage.distances)
 
 const STATES = [
   'AUCTION_CHOOSE',
@@ -112,15 +146,15 @@ interface ResourceCount {
 
 interface Plant {
   value: number
-  resourcesNeeded: [[string]] // Allow for half/half resources
+  resourcesNeeded: [number, [string]] // Allow for half/half resources
   cities: number
   heldResources: [string]
 }
 
 interface PlayerState {
-  plants: [Plant]
+  plants: Plant[]
   money: number
-  cities: [string]
+  cities: any[]
 }
 
 interface GameState {
@@ -135,6 +169,9 @@ interface GameState {
     [key: string]: any
   }
   map: {
+    [index: string]: any
+  }
+  cityPlants: {
     [index: string]: any
   }
   resourceAvailable: ResourceCount
@@ -185,6 +222,7 @@ export const getInitialState = (players: [string]): GameState => {
       oil: 14,
       uranium: 2,
     },
+    cityPlants: {},
     resourcePool: {
       coal: 4,
       gas: 6,
@@ -222,6 +260,26 @@ const getNextPlayerInAuction = state => {
   ]
 }
 
+const computeAddCityCost = (current, city) => {
+  console.log('compute add', current, city)
+  if (!current.length) return 0
+  const distances = current.map(c => DISTANCES[c][city]).sort()
+  return distances[0]
+}
+
+export const computeCitiesCost = (state, cities) => {
+  let totalCost = 0
+  let currentCities = [...state.playerState[state.player].cities]
+  cities.forEach(city => {
+    totalCost +=
+      computeAddCityCost(currentCities, city) +
+      10 +
+      (state.cityPlants[city] || []).length * 5
+    currentCities.push(city)
+  })
+  return totalCost
+}
+
 const finishAuction = state => {
   // End auction.
   const {stageState} = state
@@ -240,7 +298,15 @@ const finishAuction = state => {
   // Assign plants
   const plant = state.auctioningPlants[stageState.i]
   state.auctioningPlants.splice(stageState.i, 1)
-  state.playerState[winner].plants.push(plant)
+  state.playerState[winner].plants.push({
+    plant: plant,
+    resources: {
+      coal: 0,
+      gas: 0,
+      oil: 0,
+      uranium: 0,
+    },
+  })
   state.auctioningPlants.push(state.deck[0])
   state.auctioningPlants.sort((a, b) => a[0] - b[0])
   state.deck.splice(0, 1)
@@ -342,7 +408,7 @@ export const handlers = {
     })
 
     check(totalCost <= player.money, 'Not enough money')
-    console.log(totalResources)
+    console.log(totalResources, state.resourceAvailable)
     RESOURCES.forEach(resource => {
       check(
         totalResources[resource] <= state.resourceAvailable[resource],
@@ -351,7 +417,7 @@ export const handlers = {
     })
 
     RESOURCES.forEach(resource => {
-      state.resourceAvailable[resource] -= action.resources[resource]
+      state.resourceAvailable[resource] -= totalResources[resource]
     })
 
     console.log('here', totalCost)
@@ -374,10 +440,22 @@ export const handlers = {
   CITIES: (state: GameState, action: any) => {
     // Check valid purchase - compute costs.
 
+    const cost = computeCitiesCost(state, action.cities)
+    console.log(cost, 'cost')
+
+    check(cost <= state.playerState[state.player].money, 'Not enough money')
+    state.playerState[state.player].money -= cost
+
     // Modify map
-    action.cities.forEach(([city, index]) => {
-      state.map[city].plants[index] = action.player
+    action.cities.forEach(city => {
+      if (!state.cityPlants[city]) state.cityPlants[city] = []
+      state.cityPlants[city].push(state.player)
     })
+
+    // Modify player state
+    state.playerState[state.player].cities = state.playerState[
+      state.player
+    ].cities.concat(action.cities)
 
     state.player =
       state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
@@ -437,7 +515,7 @@ export const handleAction = (state: GameState, action: any) => {
   try {
     return handlers[action.type](state, action)
   } catch (e) {
-    console.error(e.message)
+    console.error(e.stack)
     return stateCopy
   }
 }

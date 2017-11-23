@@ -33,6 +33,22 @@ const uiHandlers = {
   UI_SET_RESOURCE_BUY: (state, action) => {
     return set(['resources', action.resource], action.n, state)
   },
+  UI_CLICK_CITY: (state, action) => {
+    const cities = state.cities || []
+    if (cities.length && cities[cities.length - 1] === action.city) {
+      return {
+        ...state,
+        cities: cities.slice(0, cities.length - 1),
+      }
+    }
+
+    if (cities.indexOf(action.city) >= 0) return state
+
+    return {
+      ...state,
+      cities: [...(state.cities || []), action.city],
+    }
+  },
   RESOURCES_BUY: (state, action) => {
     return {
       ...state,
@@ -42,6 +58,12 @@ const uiHandlers = {
         oil: 0,
         uranium: 0,
       },
+    }
+  },
+  CITIES: (state, action) => {
+    return {
+      ...state,
+      cities: [],
     }
   },
 }
@@ -54,6 +76,7 @@ const INITIAL_UI_STATE = {
     oil: 0,
     uranium: 0,
   },
+  cities: [],
 }
 
 export const uiReducer = (state = INITIAL_UI_STATE, action, game) => {
@@ -78,13 +101,17 @@ export const reducer = (state = INITIAL, action) => {
   if (action.type === 'LOAD_STATE') {
     return JSON.parse(localStorage.state)
   }
+  if (action.type === 'RESET_STATE') {
+    delete localStorage.state
+    return INITIAL
+  }
   if (action.type === 'UI_RESOURCES_BUY') {
     action.type = 'RESOURCES_BUY'
     action.resources = [] //state.ui.resources
   }
   if (action.type === 'UI_CITIES') {
     action.type = 'CITIES'
-    action.cities = []
+    action.cities = state.ui.cities
   }
   if (action.type === 'UI_POWER') {
     action.type = 'POWER'
