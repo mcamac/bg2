@@ -3,12 +3,13 @@ import {connect} from 'react-redux'
 import styled from 'styled-components'
 import {withProps, withState} from 'recompose'
 import {Flex, Box} from 'grid-styled'
-import {get, range, toPairs} from 'lodash/fp'
+import {get, range, toPairs, sortBy} from 'lodash/fp'
 
 import pg, {
   CARDS,
   getInitialState,
 } from '../../../../games/power-grid/src/index.ts'
+import {CITIES, CONNECTIONS, CITIES_BY_NAME, EDGES} from './constants'
 
 const INITIAL_STATE = getInitialState(['monsk', 'viz', 'nhkl'])
 
@@ -205,90 +206,65 @@ const City = props => (
   </g>
 )
 
-const CITIES = [
-  [50, 25],
-  [120, 25],
-  [10, 75],
-  [70, 75],
-  [195, 25],
-  [150, 75],
-  [10, 125],
-  [270, 25, 'yellow'],
-  [10, 175, 'cyan'],
-  [10, 225, 'cyan'],
-  [10, 275, 'cyan'],
-  [10, 325, 'cyan'],
-  [85, 175, 'cyan'],
-  [160, 200, 'cyan'],
-  [100, 260, 'cyan'],
-  [365, 25, 'brown'],
-  [365, 75, 'brown'],
-  [365, 125, 'brown'],
-  [365, 200, 'brown'],
-  [275, 200, 'brown'],
-  [275, 150, 'brown'],
-  [200, 150, 'brown'],
+const dist = ([x1, y1], [x2, y2]) => Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)
 
-  [450, 25, 'red'],
-  [525, 25, 'red'],
-  [450, 100, 'red'],
-  [450, 150, 'red'],
-  [525, 100, 'red'],
-  [545, 150, 'red'],
-  [545, 200, 'red'],
-  [630, 25, 'green'], // ottawa
-  [630, 100, 'green'], // new york
-  [630, 150, 'green'],
-  [700, 25, 'green'],
-  [700, 75, 'green'],
-  [700, 125, 'green'],
-
-  [200, 250, 'purple'],
-  [200, 300, 'purple'],
-  [200, 350, 'purple'],
-  [250, 400, 'purple'],
-  [300, 350, 'purple'],
-  [350, 400, 'purple'],
-  [370, 325, 'orange'],
-  [320, 275, 'orange'],
-  [450, 325, 'orange'],
-  [520, 325, 'orange'],
-  [560, 275, 'orange'],
-  [600, 325, 'orange'],
-  [650, 405, 'orange'],
-]
-
-const CONNECTIONS = [
-  // green
-  [716, 45, 716, 75, 5],
-  [716, 95, 716, 125, 9],
-  [716, 95, 716, 125],
-  [646, 120, 646, 150],
-  [646, 100, 646, 45],
-  [662, 45, 700, 75],
-  [662, 110, 700, 95],
-  [662, 110, 700, 125],
-]
+const getCorners = ([x1, y1]) => {
+  return [
+    [x1, y1],
+    [x1 + 16, y1],
+    [x1 + 32, y1],
+    [x1 + 32, y1 + 10],
+    [x1 + 32, y1 + 20],
+    [x1 + 16, y1 + 20],
+    [x1, y1 + 20],
+    [x1, y1 + 10],
+  ]
+}
 
 const Map = props => (
   <svg height={450} width="100%">
-    <line x1={82} y1={35} x2={120} y2={35} stroke="black" />
-    <line x1={50} y1={45} x2={26} y2={75} stroke="black" />
-    <line x1={26} y1={125} x2={26} y2={100} stroke="black" />
-    {CONNECTIONS.map(([x1, y1, x2, y2, v], i) => [
-      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" key={i} />,
-      <text
-        x={(x1 + x2) / 2}
-        y={(y1 + y2) / 2 + 6}
-        textAnchor="middle"
-        fontSize={12}
-      >
-        {v}
-      </text>,
-    ])}
-    <text x={100} y={32} textAnchor="middle" fontSize={12}>
-      15
-    </text>
+    {EDGES.map(([c1, c2, v], i) => {
+      if (!CITIES_BY_NAME[c1] || !CITIES_BY_NAME[c2]) {
+        console.log(c1, c2)
+      }
+      const [x1, y1] = CITIES_BY_NAME[c1]
+      const [x2, y2] = CITIES_BY_NAME[c2]
+
+      let bdist = 1000000
+      let bc1 = null
+      let bc2 = null
+
+      const c1corners = getCorners([x1, y1])
+      const c2corners = getCorners([x2, y2])
+      c1corners.forEach(ic1 => {
+        c2corners.forEach(ic2 => {
+          const score =
+            dist(ic1, ic2) +
+            dist([x1 + 16, y1 + 20], ic1) +
+            dist([x2 + 16, y2 + 20], ic2)
+          if (score < bdist) {
+            bdist = score
+            bc1 = ic1
+            bc2 = ic2
+          }
+        })
+      })
+
+      const [cx1, cy1] = bc1
+      const [cx2, cy2] = bc2
+
+      return [
+        <line x1={cx1} y1={cy1} x2={cx2} y2={cy2} stroke="black" key={i} />,
+        <text
+          key={`${i}text`}
+          x={(cx1 + cx2) / 2}
+          y={(cy1 + cy2) / 2 + 6}
+          fontSize={12}
+        >
+          {v}
+        </text>,
+      ]
+    })}
     {CITIES.map(([x, y, color], i) => (
       <City key={i} x={x} y={y} color={color} />
     ))}
@@ -390,6 +366,41 @@ class BidInput extends Component {
   }
 }
 
+class Counter extends Component {
+  onDecrement = () => {
+    this.props.onChange(this.props.value - 1)
+  }
+
+  onIncrement = () => {
+    this.props.onChange(this.props.value + 1)
+  }
+
+  render() {
+    return (
+      <Flex align="center" style={{fontSize: '13px'}}>
+        <Box>
+          <Button style={{minWidth: 15}} onClick={this.onDecrement}>
+            {'<'}
+          </Button>
+        </Box>
+        <Box px="3px">{this.props.value}</Box>
+        <Box>
+          <Button style={{minWidth: 15}} onClick={this.onIncrement}>
+            {'>'}
+          </Button>
+        </Box>
+      </Flex>
+    )
+  }
+}
+
+const ResourceCounter = props => (
+  <Flex align="center" style={{fontSize: '13px'}}>
+    <Icon g={props.resource} />
+    <Counter value={0} onChange={e => console.log(e)} />
+  </Flex>
+)
+
 const BuyResourcesActions = connect(
   (state, props) => {
     let cost = 0
@@ -417,15 +428,10 @@ const BuyResourcesActions = connect(
     {props.game.playerState[props.game.player].plants.map((plant, i) => (
       <Flex key={i} mx={1}>
         <Plant plant={plant} />
-        <Flex align="center" style={{fontSize: '13px'}}>
-          <Icon g="gas" />
-          <Box>
-            <Button style={{minWidth: 15}}>{'<'}</Button>
-          </Box>
-          <Box px="3px">0</Box>
-          <Box>
-            <Button style={{minWidth: 15}}>{'>'}</Button>
-          </Box>
+        <Flex direction="column">
+          {plant[3].map(resource => (
+            <ResourceCounter resource={resource} key={resource} />
+          ))}
         </Flex>
       </Flex>
     ))}
@@ -532,6 +538,7 @@ const PowerGrid = props => (
       <div style={{fontSize: '24px'}}>Power Grid</div>
       <Button onClick={props.onSaveState}>Save</Button>
       <Button onClick={props.onLoadState}>Load</Button>
+      <Button onClick={props.onResetState}>Reset</Button>
     </Nav>
     <Flex>
       <Box flex="0 0 230px" p={2} style={{borderRight: '1px solid #f3f3f3'}}>

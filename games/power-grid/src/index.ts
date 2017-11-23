@@ -24,6 +24,13 @@ const log = obj => console.log(obj)
 
 const RESOURCES = ['coal', 'gas', 'oil', 'uranium']
 
+const ABBREV = {
+  C: 'coal',
+  G: 'gas',
+  O: 'oil',
+  U: 'uranium',
+}
+
 export const CARDS = [
   [3, '2C', 1],
   [4, '2C', 1],
@@ -67,7 +74,11 @@ export const CARDS = [
   [44, '0W', 6],
   [46, '2G', 7],
   [50, '2U', 7],
-]
+].map(card => {
+  let abbrevs = (card[1] as string).slice(1)
+  let resources = abbrevs === 'W' ? [] : abbrevs.split('').map(c => ABBREV[c])
+  return [...card, resources]
+})
 
 const MONEY_FOR_CITY_POWER = [11]
 
@@ -201,7 +212,7 @@ interface AuctionChoice {
 
 interface ResourceBuy {
   player: string
-  resources: ResourceCount
+  resources: [ResourceCount] // per plant
 }
 
 const getNextPlayerInAuction = state => {
@@ -322,12 +333,20 @@ export const handlers = {
     // Update player resources and resource pool.
     // let newState = set(lensPath([]))
     const totalCost = 0
+    const totalResources = {}
+    RESOURCES.forEach(resource => {
+      totalResources[resource] = 0
+      action.resources.forEach(plant => {
+        totalResources[resource] += plant[resource]
+      })
+    })
 
     check(totalCost <= player.money, 'Not enough money')
+    console.log(totalResources)
     RESOURCES.forEach(resource => {
       check(
-        action.resources[resource] <= state.resourceAvailable[resource],
-        'Not enough resources'
+        totalResources[resource] <= state.resourceAvailable[resource],
+        'Not enough resources' + resource
       )
     })
 

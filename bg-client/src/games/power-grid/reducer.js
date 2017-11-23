@@ -80,7 +80,7 @@ export const reducer = (state = INITIAL, action) => {
   }
   if (action.type === 'UI_RESOURCES_BUY') {
     action.type = 'RESOURCES_BUY'
-    action.resources = state.ui.resources
+    action.resources = [] //state.ui.resources
   }
   if (action.type === 'UI_CITIES') {
     action.type = 'CITIES'
