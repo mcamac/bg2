@@ -22,7 +22,7 @@ class PowerGrid {
 
 const log = obj => console.log(obj)
 
-const RESOURCES = ['coal', 'gas', 'oil']
+const RESOURCES = ['coal', 'gas', 'oil', 'uranium']
 
 export const CARDS = [
   [3, '2C', 1],
@@ -69,23 +69,26 @@ export const CARDS = [
   [50, '2U', 7],
 ]
 
-const MONEY_FOR_CITY_POWER = []
+const MONEY_FOR_CITY_POWER = [11]
 
 const RESOURCES_PER_PHASE = [
   {
     coal: 4,
     gas: 2,
     oil: 4,
+    uranium: 1,
   },
   {
     coal: 4,
     gas: 2,
     oil: 4,
+    uranium: 1,
   },
   {
     coal: 4,
     gas: 2,
     oil: 4,
+    uranium: 1,
   },
 ]
 
@@ -257,7 +260,6 @@ export const handlers = {
       state.player = nextPlayer
       return state
     }
-    console.log(action)
 
     // Player chose a plant to bid on.
     state.stageState = {
@@ -340,49 +342,53 @@ export const handlers = {
     state.player =
       state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
 
-    return state
-
-    if (state.stageState.playersGone === state.numPlayers) {
+    if (!state.player) {
       // Next stage.
       state.stage = 'CITIES'
-      state.stageState = {
-        playersGone: 0,
-      }
-      return
+      state.stageState = {}
+      state.player = state.playerOrder[state.playerOrder.length - 1]
+      return state
     }
+
+    return state
   },
   CITIES: (state: GameState, action: any) => {
     // Check valid purchase - compute costs.
 
     // Modify map
-    action.purchases.forEach(([city, index]) => {
+    action.cities.forEach(([city, index]) => {
       state.map[city].plants[index] = action.player
     })
 
-    // Update stage
-    state.stageState.playersGone++
+    state.player =
+      state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
 
-    if (state.stageState.playersGone === state.numPlayers) {
+    if (!state.player) {
       // Next stage.
       state.stage = 'POWER'
-      state.stageState.playersGone = 0
-      return
+      state.stageState = {}
+      state.player = state.playerOrder[state.playerOrder.length - 1]
+      return state
     }
+    return state
   },
   POWER: (state: GameState, action: any) => {
-    const player = action.player
     // Choose how many cities to power and which plants to use.
-    state.stageState.playerChoice[action.player] = {
-      citiesToPower: action.citiesToPower,
-      resourcesToUse: action.resourcesToUse,
-    }
-    state.stageState.playersGone++
-    state.playerState[player].money +=
-      MONEY_FOR_CITY_POWER[state.stageState.playerChoice[player].citiesToPower]
+    // state.stageState.playerChoice[action.player] = {
+    //   // citiesToPower: action.citiesToPower,
+    //   plantsToUse: action.resourcesToUse,
+    // }
+    state.playerState[state.player].money += MONEY_FOR_CITY_POWER[0]
 
-    if (state.stageState.playersGone === state.numPlayers) {
-      // Next stage.
+    state.player =
+      state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
+
+    if (!state.player) {
+      // Next stage
+      return handlers.BUREAUCRACY(state)
     }
+
+    return state
   },
   BUREAUCRACY: (state: GameState) => {
     const shouldReplenish = RESOURCES_PER_PHASE[state.phase]
@@ -398,6 +404,12 @@ export const handlers = {
     // Turn end.
 
     state.turn++
+    state.stage = 'AUCTION_CHOOSE'
+    state.player = state.playerOrder[0]
+    state.stageState = {
+      eligiblePlayers: cloneDeep(state.players),
+    }
+    return state
   },
 }
 

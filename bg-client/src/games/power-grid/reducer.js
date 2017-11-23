@@ -33,6 +33,17 @@ const uiHandlers = {
   UI_SET_RESOURCE_BUY: (state, action) => {
     return set(['resources', action.resource], action.n, state)
   },
+  RESOURCES_BUY: (state, action) => {
+    return {
+      ...state,
+      resources: {
+        coal: 0,
+        gas: 0,
+        oil: 0,
+        uranium: 0,
+      },
+    }
+  },
 }
 
 const INITIAL_UI_STATE = {
@@ -70,6 +81,14 @@ export const reducer = (state = INITIAL, action) => {
   if (action.type === 'UI_RESOURCES_BUY') {
     action.type = 'RESOURCES_BUY'
     action.resources = state.ui.resources
+  }
+  if (action.type === 'UI_CITIES') {
+    action.type = 'CITIES'
+    action.cities = []
+  }
+  if (action.type === 'UI_POWER') {
+    action.type = 'POWER'
+    action.plantsUsed = []
   }
   const game = cloneDeep(gameReducer(state.game, action))
   const ui = uiReducer(state.ui, action, game)

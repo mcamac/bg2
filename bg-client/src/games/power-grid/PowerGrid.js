@@ -236,8 +236,8 @@ const CITIES = [
   [525, 100, 'red'],
   [545, 150, 'red'],
   [545, 200, 'red'],
-  [630, 25, 'green'],
-  [630, 100, 'green'],
+  [630, 25, 'green'], // ottawa
+  [630, 100, 'green'], // new york
   [630, 150, 'green'],
   [700, 25, 'green'],
   [700, 75, 'green'],
@@ -258,9 +258,34 @@ const CITIES = [
   [650, 405, 'orange'],
 ]
 
+const CONNECTIONS = [
+  // green
+  [716, 45, 716, 75, 5],
+  [716, 95, 716, 125, 9],
+  [716, 95, 716, 125],
+  [646, 120, 646, 150],
+  [646, 100, 646, 45],
+  [662, 45, 700, 75],
+  [662, 110, 700, 95],
+  [662, 110, 700, 125],
+]
+
 const Map = props => (
   <svg height={450} width="100%">
     <line x1={82} y1={35} x2={120} y2={35} stroke="black" />
+    <line x1={50} y1={45} x2={26} y2={75} stroke="black" />
+    <line x1={26} y1={125} x2={26} y2={100} stroke="black" />
+    {CONNECTIONS.map(([x1, y1, x2, y2, v], i) => [
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" key={i} />,
+      <text
+        x={(x1 + x2) / 2}
+        y={(y1 + y2) / 2 + 6}
+        textAnchor="middle"
+        fontSize={12}
+      >
+        {v}
+      </text>,
+    ])}
     <text x={100} y={32} textAnchor="middle" fontSize={12}>
       15
     </text>
@@ -374,20 +399,76 @@ const BuyResourcesActions = connect(
 
     return {
       cost,
+      game: state.game,
     }
   },
   (dispatch, props) => ({
-    onBuy: () => {},
-    onPass: () => {
+    onBuy: () => {
       dispatch({
         type: 'UI_RESOURCES_BUY',
       })
     },
   })
 )(props => (
+  <Flex align="center">
+    <Box>
+      <Button onClick={props.onBuy}>Buy ({props.cost})</Button>
+    </Box>
+    {props.game.playerState[props.game.player].plants.map((plant, i) => (
+      <Flex key={i} mx={1}>
+        <Plant plant={plant} />
+        <Flex align="center" style={{fontSize: '13px'}}>
+          <Icon g="gas" />
+          <Box>
+            <Button style={{minWidth: 15}}>{'<'}</Button>
+          </Box>
+          <Box px="3px">0</Box>
+          <Box>
+            <Button style={{minWidth: 15}}>{'>'}</Button>
+          </Box>
+        </Flex>
+      </Flex>
+    ))}
+  </Flex>
+))
+
+const CitiesActions = connect(
+  (state, props) => {
+    return {
+      cost: 0,
+    }
+  },
+  (dispatch, props) => ({
+    onSubmit: () => {
+      dispatch({
+        type: 'UI_CITIES',
+      })
+    },
+  })
+)(props => (
   <div>
-    Resources: <Button onClick={props.onBuy}>Buy ({props.cost})</Button> or{' '}
-    <Button onClick={props.onPass}>Pass</Button>
+    Cities:{' '}
+    <Button onClick={props.onSubmit}>Place Selected ({props.cost})</Button>
+  </div>
+))
+
+const PowerActions = connect(
+  (state, props) => {
+    return {
+      cities: 0,
+    }
+  },
+  (dispatch, props) => ({
+    onSubmit: () => {
+      dispatch({
+        type: 'UI_POWER',
+      })
+    },
+  })
+)(props => (
+  <div>
+    Click on power plants to use.{' '}
+    <Button onClick={props.onSubmit}>Submit ({props.cities} cities)</Button>
   </div>
 ))
 
@@ -410,6 +491,8 @@ let PlayerActions = props => (
       </Flex>
     )}
     {props.game.stage === 'RESOURCES_BUY' && <BuyResourcesActions />}
+    {props.game.stage === 'CITIES' && <CitiesActions />}
+    {props.game.stage === 'POWER' && <PowerActions />}
   </Box>
 )
 
@@ -456,12 +539,13 @@ const PowerGrid = props => (
       </Box>
       <Flex flex="1 1 auto" direction="column">
         <Box p={1} m={1} style={{border: '1px solid #ccc'}}>
-          Game Status: {props.game.stage}, Waiting for {props.game.player} to
+          Game Status: {props.game.stage}, {props.game.player}
           <PlayerActions />
         </Box>
         <Flex px={2}>
           <Flex direction="column" mr={1}>
-            Step 1
+            <div>Step {props.game.phase}</div>
+            <div>Turn {props.game.turn}</div>
             <PlantWrapper>50</PlantWrapper>
           </Flex>
           <AuctionBlock game={props.game} />
