@@ -3,6 +3,7 @@
     "@types/lodash": "^4.14.85",
     "lens.ts": "^0.1.1",
     "lodash": "^4.17.4",
+    "random-seed": "^0.3.0",
     "shuffle-seed": "^1.1.6"
   },
   "devDependencies": {

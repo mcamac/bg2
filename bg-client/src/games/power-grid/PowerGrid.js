@@ -3,20 +3,30 @@ import {connect} from 'react-redux'
 import styled from 'styled-components'
 import {withProps, withState} from 'recompose'
 import {Flex, Box} from 'grid-styled'
-import {get, range, toPairs, sortBy} from 'lodash/fp'
+import {get, range, toPairs, sortBy, sum} from 'lodash/fp'
 
 import pg, {
   CARDS,
   getInitialState,
   computeCitiesCost,
+  getCitiesToPower,
   CITIES,
   CITIES_BY_NAME,
   EDGES,
 } from '../../../../games/power-grid/src/index.ts'
 
-const INITIAL_STATE = getInitialState(['monsk', 'viz', 'nhkl'])
-
 const Icon = props => <i className={`icon icon-${props.g}`} />
+
+const PlantResources = ({plant}) => (
+  <Flex>
+    {plant.plant[3].map(resource => (
+      <Box align="center">
+        <Icon g={resource} />
+        {plant.resources[resource]}
+      </Box>
+    ))}
+  </Flex>
+)
 
 const PlayerInfo = props => (
   <Flex direction="column" mb="20px">
@@ -35,7 +45,10 @@ const PlayerInfo = props => (
     </Flex>
     <Flex style={{minHeight: 45}}>
       {props.game.playerState[props.player].plants.map((plant, i) => (
-        <Plant plant={plant.plant} key={i} />
+        <Flex key={i} direction="column">
+          <Plant plant={plant.plant} />
+          <PlantResources plant={plant} />
+        </Flex>
       ))}
     </Flex>
   </Flex>
@@ -56,7 +69,7 @@ const PlantWrapper = styled(Box)`
 `
 
 const Plant = props => (
-  <PlantWrapper onClick={props.onClick}>
+  <PlantWrapper onClick={props.onClick} style={props.style}>
     <div>{props.plant[0]}</div>
     <div>
       {props.plant[1]}/{props.plant[2]}
@@ -91,7 +104,7 @@ PlayerOrderCard = connect(
 
 const PlayerOrder = props => (
   <Flex style={{fontSize: 14}}>
-    {props.game.players.map(player => (
+    {props.game.playerOrder.map(player => (
       <PlayerOrderCard key={player} player={player} />
     ))}
   </Flex>
@@ -122,11 +135,7 @@ class ValueTrack extends Component {
     const pool = game.resourcePool[resource]
     nums = nums.slice(nums.length - available)
     return (
-      <Flex
-        mb="4px"
-        onMouseLeave={() => this.setHovered(-1)}
-        style={{cursor: 'pointer'}}
-      >
+      <Flex mb="4px">
         <Box w={20}>{pool}</Box>
         <Box w={20} onClick={() => this.props.onClick(0)}>
           <Icon g={resource} />
@@ -134,7 +143,6 @@ class ValueTrack extends Component {
         {nums.map((val, i) => (
           <Box
             key={`${val}${i}`}
-            onMouseEnter={() => this.setHovered(i)}
             onClick={() => this.props.onClick(i + 1)}
             width={16}
             justify="center"
@@ -153,7 +161,9 @@ class ValueTrack extends Component {
 
 ValueTrack = connect(
   (state, props) => ({
-    chosen: state.ui.resources ? state.ui.resources[props.resource] : 0,
+    chosen: state.ui.plantResources
+      ? sum(state.ui.plantResources.map(r => r[props.resource]))
+      : 0,
   }),
   (dispatch, props) => ({
     onClick: n => {
@@ -461,7 +471,7 @@ class Counter extends Component {
 const ResourceCounter = props => (
   <Flex align="center" style={{fontSize: '13px'}}>
     <Icon g={props.resource} />
-    <Counter value={0} onChange={e => console.log(e)} />
+    <Counter value={props.value} onChange={props.onChange} />
   </Flex>
 )
 
@@ -474,6 +484,7 @@ const BuyResourcesActions = connect(
 
     return {
       cost,
+      plantResources: state.ui.plantResources,
       game: state.game,
     }
   },
@@ -481,6 +492,14 @@ const BuyResourcesActions = connect(
     onBuy: () => {
       dispatch({
         type: 'UI_RESOURCES_BUY',
+      })
+    },
+    onSetResource: (i, resource, v) => {
+      dispatch({
+        type: 'UI_SET_RESOURCE',
+        i,
+        resource,
+        v,
       })
     },
   })
@@ -491,10 +510,18 @@ const BuyResourcesActions = connect(
     </Box>
     {props.game.playerState[props.game.player].plants.map((plant, i) => (
       <Flex key={i} mx={1}>
-        <Plant plant={plant.plant} />
         <Flex direction="column">
-          {plant[3].map(resource => (
-            <ResourceCounter resource={resource} key={resource} />
+          <Plant plant={plant.plant} />
+          <PlantResources plant={plant} />
+        </Flex>
+        <Flex direction="column">
+          {plant.plant[3].map(resource => (
+            <ResourceCounter
+              resource={resource}
+              value={props.plantResources[i][resource]}
+              key={resource}
+              onChange={v => props.onSetResource(i, resource, v)}
+            />
           ))}
         </Flex>
       </Flex>
@@ -527,7 +554,9 @@ const CitiesActions = connect(
 const PowerActions = connect(
   (state, props) => {
     return {
-      cities: 0,
+      cities: getCitiesToPower(state.game, state.ui.toPower),
+      game: state.game,
+      toPower: state.ui.toPower,
     }
   },
   (dispatch, props) => ({
@@ -536,19 +565,125 @@ const PowerActions = connect(
         type: 'UI_POWER',
       })
     },
+    onClickPlant: i => {
+      dispatch({
+        type: 'UI_POWER_SELECT_PLANT',
+        i,
+      })
+    },
+    onSetResource: (i, resource, v) => {
+      dispatch({
+        type: 'UI_POWER_SELECT_PLANT_RESOURCE',
+        i,
+        resource,
+        v,
+      })
+    },
   })
 )(props => (
   <div>
     Click on power plants to use.{' '}
     <Button onClick={props.onSubmit}>Submit ({props.cities} cities)</Button>
+    {props.game.playerState[props.game.player].plants.map((plant, i) => (
+      <Flex key={i}>
+        <Flex direction="column">
+          <Plant
+            plant={plant.plant}
+            onClick={() => props.onClickPlant(i)}
+            style={{background: props.toPower[i] ? 'yellow' : null}}
+          />
+          <PlantResources plant={plant} />
+        </Flex>
+        {props.toPower[i] &&
+          plant.plant[3].length > 1 && (
+            <Flex direction="column">
+              {plant.plant[3].map(resource => (
+                <ResourceCounter
+                  resource={resource}
+                  value={props.toPower[i][resource]}
+                  key={resource}
+                  onChange={v => props.onSetResource(i, resource, v)}
+                />
+              ))}
+            </Flex>
+          )}
+      </Flex>
+    ))}
+  </div>
+))
+
+const DiscardPlantActions = connect(
+  (state, props) => {
+    return {
+      game: state.game,
+      plantResourcesDiscard: state.ui.plantResourcesDiscard,
+      toDiscard: state.ui.toDiscard,
+      plants: state.game.playerState[state.game.player].plants,
+    }
+  },
+  (dispatch, props) => ({
+    onSubmit: () => {
+      dispatch({
+        type: 'UI_DISCARD',
+      })
+    },
+    onClickPlant: i => {
+      dispatch({
+        type: 'UI_DISCARD_SELECT_PLANT',
+        i,
+      })
+    },
+    onSetResource: (i, resource, v) => {
+      dispatch({
+        type: 'UI_DISCARD_SELECT_PLANT_RESOURCE',
+        i,
+        resource,
+        v,
+      })
+    },
+  })
+)(props => (
+  <div>
+    <Button onClick={props.onSubmit}>Submit</Button>
+    Click on power plant to discard and select assign its resources to other
+    plants.
+    <Flex>
+      {props.plants.map((plant, i) => (
+        <Flex key={i}>
+          <Flex direction="column">
+            <Plant
+              plant={plant.plant}
+              onClick={() =>
+                i < props.plants.length - 1 && props.onClickPlant(i)}
+              style={{background: i === props.toDiscard ? 'yellow' : null}}
+            />
+            <PlantResources plant={plant} />
+          </Flex>
+          <Flex direction="column">
+            {plant.plant[3].map(resource => (
+              <ResourceCounter
+                resource={resource}
+                value={props.plantResourcesDiscard[i][resource]}
+                key={resource}
+                onChange={v => props.onSetResource(i, resource, v)}
+              />
+            ))}
+          </Flex>
+        </Flex>
+      ))}
+    </Flex>
   </div>
 ))
 
 let PlayerActions = props => (
   <Box p={1} m={1}>
-    {props.ui.state === 'UI_AUCTION_CHOOSE' && (
-      <button onClick={props.onAuctionChoicePass}>Pass</button>
-    )}
+    {props.game.stage === 'AUCTION_CHOOSE' &&
+      props.game.turn !== 1 && (
+        <Box>
+          <Button onClick={props.onAuctionChoicePass}>Skip Buying</Button>
+          or click on a plant below.
+        </Box>
+      )}
     {props.game.stage === 'AUCTION_CHOOSE' &&
       props.ui.state === 'AUCTION_CHOOSE_INITIAL_BID' && (
         <BidInput
@@ -561,6 +696,9 @@ let PlayerActions = props => (
         <BidInput minBid={props.ui.plant[0]} onBid={props.onAuctionBid} />
         <Button onClick={props.onAuctionBidPass}>Pass</Button>
       </Flex>
+    )}
+    {props.game.stage === 'AUCTION_CHOOSE_DISCARDED_PLANT' && (
+      <DiscardPlantActions />
     )}
     {props.game.stage === 'RESOURCES_BUY' && <BuyResourcesActions />}
     {props.game.stage === 'CITIES' && <CitiesActions />}
@@ -617,7 +755,7 @@ const PowerGrid = props => (
         </Box>
         <Flex px={2}>
           <Flex direction="column" mr={1}>
-            <div>Step {props.game.phase}</div>
+            <div>Step {props.game.step}</div>
             <div>Turn {props.game.turn}</div>
             <PlantWrapper>50</PlantWrapper>
           </Flex>
@@ -644,13 +782,14 @@ const PowerGrid = props => (
         <div>
           <span style={{color: 'green'}}>viz</span> bid 24.
         </div>
+        {props.log && props.log.map(log => <div>{JSON.stringify(log)}</div>)}
       </Box>
     </Flex>
   </div>
 )
 
 export default connect(
-  (state, props) => ({game: state.game}),
+  (state, props) => ({game: state.game, log: state.log}),
   (dispatch, props) => ({
     onSaveState: () => {
       dispatch({type: 'SAVE_STATE'})

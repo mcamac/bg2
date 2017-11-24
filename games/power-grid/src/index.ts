@@ -1,7 +1,8 @@
 import {lensPath, set, toPairs, fromPairs, remove} from 'ramda'
 import {id, key, getl, setl} from 'lens.ts'
-import shuffleSeed from 'shuffle-seed'
-import {cloneDeep} from 'lodash'
+import {shuffle} from 'shuffle-seed'
+import {create as createRand} from 'random-seed'
+import {cloneDeep, sum} from 'lodash'
 
 import {CITIES, EDGES, CITIES_BY_NAME} from './constants'
 export {CITIES, EDGES, CITIES_BY_NAME}
@@ -54,7 +55,12 @@ class PowerGrid {
   }
 }
 
-const log = obj => console.log(obj)
+let LOG = []
+
+const log = obj => {
+  console.log(obj)
+  LOG.push(obj)
+}
 
 const RESOURCES = ['coal', 'gas', 'oil', 'uranium']
 
@@ -65,7 +71,7 @@ const ABBREV = {
   U: 'uranium',
 }
 
-export const CARDS = [
+export const CARDS: any[][] = [
   [3, '2C', 1],
   [4, '2C', 1],
   [5, '2G', 1],
@@ -114,7 +120,29 @@ export const CARDS = [
   return [...card, resources]
 })
 
-const MONEY_FOR_CITY_POWER = [11]
+const MONEY_FOR_CITY_POWER = [
+  10,
+  22,
+  33,
+  44,
+  54,
+  64,
+  73,
+  82,
+  90,
+  98,
+  105,
+  112,
+  118,
+  124,
+  129,
+  134,
+  138,
+  142,
+  145,
+  148,
+  150,
+]
 
 const RESOURCES_PER_PHASE = [
   {
@@ -148,11 +176,13 @@ interface Plant {
   value: number
   resourcesNeeded: [number, [string]] // Allow for half/half resources
   cities: number
-  heldResources: [string]
 }
 
 interface PlayerState {
-  plants: Plant[]
+  plants: {
+    plant: Plant
+    resources: ResourceCount
+  }[]
   money: number
   cities: any[]
 }
@@ -163,7 +193,7 @@ interface GameState {
   players: [string]
   playerOrder: [string]
   turn: number
-  phase: number // 1, 2, 3
+  step: number // 1, 2, 3
   stage: string
   stageState: {
     [key: string]: any
@@ -183,15 +213,22 @@ interface GameState {
   }
 }
 
-const getInitialDeck = (): [Object] => {
+const SEED = 'griddle'
+
+const getInitialDeck = (): [Object, Object] => {
   let darkCards = CARDS.slice(0, 13)
-  const setAsideIndex = Math.floor(Math.random() * 13)
+  const rand = createRand(SEED)
+  const setAsideIndex = rand(darkCards.length)
   const setAside = darkCards[setAsideIndex]
   darkCards.splice(setAsideIndex, 1)
-  const deck = shuffleSeed(darkCards, 'k').concat(
-    shuffleSeed(CARDS.slice(13), 'k')
+  const auctioning = darkCards.slice(0, 8).sort((a, b) => a[0] - b[0])
+  const remainingDark = darkCards.slice(8)
+
+  const deck = shuffle(remainingDark, SEED).concat(
+    shuffle(CARDS.slice(13), SEED)
   )
-  return deck
+  deck.push(['STEP3'])
+  return [auctioning, deck]
 }
 
 export const getInitialState = (players: [string]): GameState => {
@@ -204,13 +241,16 @@ export const getInitialState = (players: [string]): GameState => {
     }
   })
 
+  const [auctioning, deck] = getInitialDeck()
+  console.log(deck)
+
   return {
     numPlayers: players.length,
     player: players[0],
     players,
     playerOrder: cloneDeep(players),
     turn: 1,
-    phase: 1,
+    step: 1,
     stage: 'AUCTION_CHOOSE',
     stageState: {
       eligiblePlayers: cloneDeep(players),
@@ -229,8 +269,8 @@ export const getInitialState = (players: [string]): GameState => {
       oil: 6,
       uranium: 10,
     },
-    auctioningPlants: CARDS.slice(0, 8),
-    deck: CARDS.slice(8),
+    auctioningPlants: auctioning,
+    deck: deck,
     playerState,
   }
 }
@@ -280,6 +320,17 @@ export const computeCitiesCost = (state, cities) => {
   return totalCost
 }
 
+export const getCitiesToPower = (state, toPower) => {
+  return Math.min(
+    sum(
+      state.playerState[state.player].plants
+        .filter((plant, i) => toPower[i])
+        .map(plant => plant.plant[2])
+    ),
+    state.playerState[state.player].cities.length
+  )
+}
+
 const finishAuction = state => {
   // End auction.
   const {stageState} = state
@@ -293,11 +344,17 @@ const finishAuction = state => {
   )
   state.stage = 'AUCTION_CHOOSE'
   // Cycle to next player to auction
+  const currentPlayer = state.player
   state.player = stageState.eligiblePlayers[0]
 
   // Assign plants
   const plant = state.auctioningPlants[stageState.i]
   state.auctioningPlants.splice(stageState.i, 1)
+
+  state.auctioningPlants.push(state.deck[0])
+  state.auctioningPlants.sort((a, b) => a[0] - b[0])
+  state.deck.splice(0, 1)
+
   state.playerState[winner].plants.push({
     plant: plant,
     resources: {
@@ -307,9 +364,12 @@ const finishAuction = state => {
       uranium: 0,
     },
   })
-  state.auctioningPlants.push(state.deck[0])
-  state.auctioningPlants.sort((a, b) => a[0] - b[0])
-  state.deck.splice(0, 1)
+
+  if (state.playerState[winner].plants.length >= 4) {
+    console.log('discard')
+    state.stage = 'AUCTION_CHOOSE_DISCARDED_PLANT'
+    state.player = winner
+  }
 
   return state
 }
@@ -351,6 +411,7 @@ export const handlers = {
 
     if (state.stageState.auctioningPlayers.length === 1) {
       state = finishAuction(state)
+      if (state.stage === 'AUCTION_CHOOSE_DISCARDED_PLANT') return state
       state.stage = 'RESOURCES_BUY'
       state.player = next.playerOrder[next.players.length - 1]
       state.stageState = {}
@@ -393,11 +454,23 @@ export const handlers = {
       player: nextPlayer,
     }
   },
+  AUCTION_CHOOSE_DISCARDED_PLANT: (state: GameState, action: any) => {
+    log({player: state.player, action})
+    state.playerState[state.player].plants.splice(action.i, 1)
+    state.player = state.stageState.eligiblePlayers[0]
+    if (!state.player) {
+      state.stage = 'RESOURCES_BUY'
+      state.player = state.playerOrder[state.players.length - 1]
+      state.stageState = {}
+      return state
+    }
+    state.stage = 'AUCTION_CHOOSE'
+    return state
+  },
   RESOURCES_BUY: (state: GameState, action: ResourceBuy) => {
     const player = state.playerState[state.player]
     // Check valid purchase.
     // Update player resources and resource pool.
-    // let newState = set(lensPath([]))
     const totalCost = 0
     const totalResources = {}
     RESOURCES.forEach(resource => {
@@ -418,6 +491,12 @@ export const handlers = {
 
     RESOURCES.forEach(resource => {
       state.resourceAvailable[resource] -= totalResources[resource]
+    })
+
+    state.playerState[state.player].plants.forEach((plant, i) => {
+      RESOURCES.forEach(resource => {
+        plant.resources[resource] += action.resources[i][resource]
+      })
     })
 
     console.log('here', totalCost)
@@ -465,7 +544,20 @@ export const handlers = {
       state.stage = 'POWER'
       state.stageState = {}
       state.player = state.playerOrder[state.playerOrder.length - 1]
+      state = handlers.BEFORE_POWER(state)
       return state
+    }
+    return state
+  },
+  BEFORE_POWER: (state: GameState) => {
+    if (state.step === 1) {
+      for (let i in state.players) {
+        if (state.playerState[state.players[i]].plants.length >= 6) {
+          state.step = 2
+          log({step: 2})
+          return state
+        }
+      }
     }
     return state
   },
@@ -475,7 +567,25 @@ export const handlers = {
     //   // citiesToPower: action.citiesToPower,
     //   plantsToUse: action.resourcesToUse,
     // }
-    state.playerState[state.player].money += MONEY_FOR_CITY_POWER[0]
+    let citiesPowerPlants = 0
+    state.playerState[state.player].plants.forEach((plant, i) => {
+      if (action.toPower[i]) {
+        RESOURCES.forEach(resource => {
+          plant.resources[resource] -= action.toPower[i][resource]
+          state.resourcePool[resource] += action.toPower[i][resource]
+        })
+        citiesPowerPlants += plant.plant[2]
+      }
+    })
+
+    const citiesPowered = Math.min(
+      state.playerState[state.player].cities.length,
+      citiesPowerPlants
+    )
+    log({player: state.player, citiesPowered})
+
+    state.playerState[state.player].money +=
+      MONEY_FOR_CITY_POWER[Math.min(citiesPowered, 20)]
 
     state.player =
       state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
@@ -488,7 +598,7 @@ export const handlers = {
     return state
   },
   BUREAUCRACY: (state: GameState) => {
-    const shouldReplenish = RESOURCES_PER_PHASE[state.phase]
+    const shouldReplenish = RESOURCES_PER_PHASE[state.step]
     RESOURCES.forEach(resource => {
       const toReplenish = Math.min(
         state.resourcePool[resource],
@@ -497,8 +607,34 @@ export const handlers = {
       state.resourceAvailable[resource] += toReplenish
       state.resourcePool[resource] -= toReplenish
     })
-
     // Turn end.
+
+    if (state.step === 1 || state.step === 2) {
+      // remove highest plant
+      const highestPlant =
+        state.auctioningPlants[state.auctioningPlants.length - 1]
+      state.auctioningPlants.splice(state.auctioningPlants.length - 1, 1)
+      const newPlant = state.deck[0]
+      state.auctioningPlants.push(state.deck[0])
+      state.auctioningPlants = state.auctioningPlants.sort(
+        (a, b) => a[0] - b[0]
+      )
+      state.deck.splice(0, 1)
+      state.deck.push(highestPlant)
+      log({discard: highestPlant, new: newPlant})
+    }
+
+    state.playerOrder = state.playerOrder.sort((a, b) => {
+      const as = state.playerState[a]
+      const bs = state.playerState[b]
+      if (as.plants.length !== bs.plants.length) {
+        return bs.plants.length - as.plants.length
+      }
+      const ap = as.plants[as.plants.length - 1].plant[0]
+      const bp = bs.plants[bs.plants.length - 1].plant[0]
+      return bp - ap
+    })
+    console.log('new player', state.playerOrder)
 
     state.turn++
     state.stage = 'AUCTION_CHOOSE'
@@ -511,12 +647,13 @@ export const handlers = {
 }
 
 export const handleAction = (state: GameState, action: any) => {
+  LOG = []
   const stateCopy = cloneDeep(state)
   try {
-    return handlers[action.type](state, action)
+    return [handlers[action.type](state, action), null, LOG]
   } catch (e) {
     console.error(e.stack)
-    return stateCopy
+    return [stateCopy, e.message, LOG || []]
   }
 }
 
