@@ -29,6 +29,7 @@ module.exports = {
         },
       },
     ],
+    noParse: [/node_modules\/ws/],
   },
   resolve: {
     extensions: ['.ts', '.js', '.json'],

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "auth0-js": "^8.11.3",
     "babel-plugin-import": "^1.6.0",
     "file-loader": "^1.1.4",
+    "firebase": "^4.6.0",
     "grid-styled": "^2.0.0-11",
     "lodash": "^4.17.4",
     "react": "^16.0.0",
@@ -12,9 +14,14 @@
     "react-redux": "^5.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
+    "react-router-redux": "^5.0.0-alpha.8",
+    "react-select": "^1.0.1",
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
-    "styled-components": "^2.2.0"
+    "shortid": "^2.2.8",
+    "styled-components": "^2.2.0",
+    "uuid": "^3.1.0",
+    "ws": "^3.3.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -35,5 +42,9 @@
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --hot --history-api-fallback",
     "build": "NODE_ENV=production webpack"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^3.0.3",
+    "utf-8-validate": "^3.0.4"
   }
 }

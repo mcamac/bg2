@@ -32,13 +32,14 @@ const getDistances = () => {
       })
     })
   })
+  // localStorage.distances = JSON.stringify(d)
 
   return d
 }
 
 // localStorage.distances = JSON.stringify(getDistances())
 
-const DISTANCES = JSON.parse(localStorage.distances)
+const DISTANCES = getDistances()
 
 const STATES = [
   'AUCTION_CHOOSE',
@@ -117,7 +118,7 @@ export const CARDS: any[][] = [
 ].map(card => {
   let abbrevs = (card[1] as string).slice(1)
   let resources = abbrevs === 'W' ? [] : abbrevs.split('').map(c => ABBREV[c])
-  return [...card, resources]
+  return [...card, {resources}]
 })
 
 const MONEY_FOR_CITY_POWER = [
@@ -224,9 +225,7 @@ const getInitialDeck = (): [Object, Object] => {
   const auctioning = darkCards.slice(0, 8).sort((a, b) => a[0] - b[0])
   const remainingDark = darkCards.slice(8)
 
-  const deck = shuffle(remainingDark, SEED).concat(
-    shuffle(CARDS.slice(13), SEED)
-  )
+  const deck = shuffle(remainingDark, SEED).concat(shuffle(CARDS.slice(13), SEED))
   deck.push(['STEP3'])
   return [auctioning, deck]
 }
@@ -295,9 +294,7 @@ interface ResourceBuy {
 
 const getNextPlayerInAuction = state => {
   const {auctioningPlayers} = state.stageState
-  return auctioningPlayers[
-    (auctioningPlayers.indexOf(state.player) + 1) % auctioningPlayers.length
-  ]
+  return auctioningPlayers[(auctioningPlayers.indexOf(state.player) + 1) % auctioningPlayers.length]
 }
 
 const computeAddCityCost = (current, city) => {
@@ -312,9 +309,7 @@ export const computeCitiesCost = (state, cities) => {
   let currentCities = [...state.playerState[state.player].cities]
   cities.forEach(city => {
     totalCost +=
-      computeAddCityCost(currentCities, city) +
-      10 +
-      (state.cityPlants[city] || []).length * 5
+      computeAddCityCost(currentCities, city) + 10 + (state.cityPlants[city] || []).length * 5
     currentCities.push(city)
   })
   return totalCost
@@ -338,10 +333,7 @@ const finishAuction = state => {
   log(winner)
 
   state.playerState[winner].money -= stageState.price
-  stageState.eligiblePlayers.splice(
-    stageState.eligiblePlayers.indexOf(winner),
-    1
-  )
+  stageState.eligiblePlayers.splice(stageState.eligiblePlayers.indexOf(winner), 1)
   state.stage = 'AUCTION_CHOOSE'
   // Cycle to next player to auction
   const currentPlayer = state.player
@@ -379,9 +371,7 @@ export const handlers = {
     let next = state
     if (action.pass) {
       const nextPlayer =
-        state.stageState.eligiblePlayers[
-          state.stageState.eligiblePlayers.indexOf(next.player) + 1
-        ]
+        state.stageState.eligiblePlayers[state.stageState.eligiblePlayers.indexOf(next.player) + 1]
       // Remove player
       if (!nextPlayer) {
         state.stage = 'RESOURCES_BUY'
@@ -503,8 +493,7 @@ export const handlers = {
     player.money -= totalCost
 
     // state.stageState.playersGone++
-    state.player =
-      state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
+    state.player = state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
 
     if (!state.player) {
       // Next stage.
@@ -532,12 +521,11 @@ export const handlers = {
     })
 
     // Modify player state
-    state.playerState[state.player].cities = state.playerState[
-      state.player
-    ].cities.concat(action.cities)
+    state.playerState[state.player].cities = state.playerState[state.player].cities.concat(
+      action.cities
+    )
 
-    state.player =
-      state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
+    state.player = state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
 
     if (!state.player) {
       // Next stage.
@@ -578,17 +566,12 @@ export const handlers = {
       }
     })
 
-    const citiesPowered = Math.min(
-      state.playerState[state.player].cities.length,
-      citiesPowerPlants
-    )
+    const citiesPowered = Math.min(state.playerState[state.player].cities.length, citiesPowerPlants)
     log({player: state.player, citiesPowered})
 
-    state.playerState[state.player].money +=
-      MONEY_FOR_CITY_POWER[Math.min(citiesPowered, 20)]
+    state.playerState[state.player].money += MONEY_FOR_CITY_POWER[Math.min(citiesPowered, 20)]
 
-    state.player =
-      state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
+    state.player = state.playerOrder[state.playerOrder.indexOf(state.player) - 1]
 
     if (!state.player) {
       // Next stage
@@ -600,10 +583,7 @@ export const handlers = {
   BUREAUCRACY: (state: GameState) => {
     const shouldReplenish = RESOURCES_PER_PHASE[state.step]
     RESOURCES.forEach(resource => {
-      const toReplenish = Math.min(
-        state.resourcePool[resource],
-        shouldReplenish[resource]
-      )
+      const toReplenish = Math.min(state.resourcePool[resource], shouldReplenish[resource])
       state.resourceAvailable[resource] += toReplenish
       state.resourcePool[resource] -= toReplenish
     })
@@ -611,14 +591,11 @@ export const handlers = {
 
     if (state.step === 1 || state.step === 2) {
       // remove highest plant
-      const highestPlant =
-        state.auctioningPlants[state.auctioningPlants.length - 1]
+      const highestPlant = state.auctioningPlants[state.auctioningPlants.length - 1]
       state.auctioningPlants.splice(state.auctioningPlants.length - 1, 1)
       const newPlant = state.deck[0]
       state.auctioningPlants.push(state.deck[0])
-      state.auctioningPlants = state.auctioningPlants.sort(
-        (a, b) => a[0] - b[0]
-      )
+      state.auctioningPlants = state.auctioningPlants.sort((a, b) => a[0] - b[0])
       state.deck.splice(0, 1)
       state.deck.push(highestPlant)
       log({discard: highestPlant, new: newPlant})

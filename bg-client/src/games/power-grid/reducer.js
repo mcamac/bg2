@@ -4,13 +4,14 @@ import pg, {
   handleAction,
   handlers,
 } from '../../../../games/power-grid/src/index.ts'
-import {cloneDeep, set, unset} from 'lodash/fp'
+import {cloneDeep, get, set, unset} from 'lodash/fp'
 const INITIAL_STATE = getInitialState(['monsk', 'viz'])
+import {socket} from '../../network'
+import {db} from '../../firebase'
 
-export const gameReducer = (state = INITIAL_STATE, action) => {
+export const gameReducer = (state = INITIAL_STATE, action, lobby) => {
   if (handlers[action.type]) {
-    const [newState, error, log] = handleAction(state, action)
-    return [newState, true, log]
+    socket.send({action: 'ROOM_MOVE', move: action, room: lobby.id})
   }
   return [state, false, null]
 }
@@ -81,12 +82,9 @@ const uiHandlers = {
         uranium: 0,
       }
 
-      const plantResources =
-        game.playerState[game.player].plants[action.i].plant[3]
+      const plantResources = game.playerState[game.player].plants[action.i].plant[3].resources
       if (plantResources.length === 1) {
-        resources[plantResources[0]] = +game.playerState[game.player].plants[
-          action.i
-        ].plant[1][0]
+        resources[plantResources[0]] = +game.playerState[game.player].plants[action.i].plant[1][0]
       }
       return set(['toPower', action.i], resources, state)
     } else {
@@ -100,11 +98,7 @@ const uiHandlers = {
     return set(['toPower', action.i, action.resource], action.v, state)
   },
   UI_DISCARD_SELECT_PLANT_RESOURCE: (state, action, game) => {
-    return set(
-      ['plantResourcesDiscard', action.i, action.resource],
-      action.v,
-      state
-    )
+    return set(['plantResourcesDiscard', action.i, action.resource], action.v, state)
   },
   MOVED_AUCTION_CHOOSE_DISCARDED_PLANT: (state, action, game) => {
     return {
@@ -154,13 +148,56 @@ const INITIAL_UI_STATE = {
 
 export const uiReducer = (state = INITIAL_UI_STATE, action, game) => {
   // if (handlers[action.type]) game = handleAction(state, action)
-  if (uiHandlers[action.type])
-    return uiHandlers[action.type](state, action, game)
+  if (uiHandlers[action.type]) return uiHandlers[action.type](state, action, game)
   return state
 }
 
 export const logReducer = (state, log) => {
   return [...state, ...log]
+}
+
+const lobbyHandlers = {
+  LOBBY_START: (state, action) => {
+    socket.send({action: 'START_ROOM', room: action.room})
+    return state
+  },
+  LOBBY_JOIN: (state, action) => {
+    socket.send({action: 'JOIN_ROOM', room: action.room})
+    return state
+  },
+  LOBBY_LEAVE: (state, action) => {
+    socket.send({action: 'LEAVE_ROOM', room: action.room})
+    return state
+  },
+  SERVER_MESSAGE: (state, action) => {
+    console.log('server message', action)
+    if (action.data.type === 'ROOM_UPDATE') {
+      console.log('room update', action.data.room)
+      return {
+        ...state,
+        ...action.data.room,
+      }
+    }
+    return state
+  },
+  FIREBASE_UPDATE: (state, action) => {
+    console.log('reducer firebase message', action)
+    const data = action.data
+    if (data.game) {
+      data.game = JSON.parse(data.game)
+    }
+
+    return {
+      ...state,
+      ...data,
+    }
+    return state
+  },
+}
+
+const lobbyReducer = (state, action) => {
+  if (lobbyHandlers[action.type]) return lobbyHandlers[action.type](state, action)
+  return state
 }
 
 const INITIAL = localStorage.state
@@ -179,11 +216,11 @@ export const reducer = (state = INITIAL, action) => {
     return JSON.parse(localStorage.state)
   }
   if (action.type === 'RESET_STATE') {
-    delete localStorage.state
-    return {
-      game: INITIAL_STATE,
-      ui: INITIAL_UI_STATE,
-    }
+    // delete localStorage.state
+    // return {
+    //   game: INITIAL_STATE,
+    //   ui: INITIAL_UI_STATE,
+    // }
   }
   if (action.type === 'UI_RESOURCES_BUY') {
     action.type = 'RESOURCES_BUY'
@@ -202,7 +239,10 @@ export const reducer = (state = INITIAL, action) => {
     action.plantResourcesDiscard = state.ui.plantResourcesDiscard
     action.toDiscard = state.ui.toDiscard
   }
-  let [game, moved, log] = gameReducer(state.game, action)
+  if (action.type === 'RESET_STATE') {
+    socket.send({action: 'RESET_STATE', room: state.lobby.id})
+  }
+  let [game, moved, log] = gameReducer({}, action, state.lobby || {})
   console.log(game, moved)
   game = cloneDeep(game)
   let newLog = state.log || []
@@ -212,9 +252,19 @@ export const reducer = (state = INITIAL, action) => {
     ui = uiReducer(ui, {type: `MOVED_${game.stage}`}, game)
     newLog = logReducer(state.log, log)
   }
+
+  let lobby = lobbyReducer(state.lobby || {}, action)
+  if (action.type === 'SERVER_MESSAGE' && action.data.type === 'ROOM_UPDATE' && lobby.game) {
+    const g = lobby.game
+    ui = uiReducer(ui, {type: `MOVED_${g.stage}`}, g)
+  }
+  if (get(['data', 'message'], action) === 'JOIN_ROOM') {
+    const g = lobby.game
+    ui = uiReducer(ui, {type: `MOVED_${g.stage}`}, g)
+  }
   return {
-    game,
     ui,
     log: newLog,
+    lobby,
   }
 }
