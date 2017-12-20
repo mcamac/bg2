@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "random-seed": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.85",
+    "@types/ramda": "github:types/npm-ramda#dist",
+    "ava": "^0.23.0"
+  },
+  "scripts": {
+    "test": "tsc && ava ./test/*.js"
+  }
+}
