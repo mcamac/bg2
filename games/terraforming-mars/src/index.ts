@@ -4,17 +4,17 @@ interface ResourceState {
 }
 
 const enum Tag {
-  Science = 'science',
-  Building = 'building',
-  Space = 'space',
-  Animal = 'animal',
-  Microbe = 'microbe',
-  Plant = 'plant',
-  City = 'city',
-  Jovian = 'jovian',
-  Earth = 'earth',
-  Power = 'power',
-  Event = 'event',
+  Science = 'Science',
+  Building = 'Building',
+  Space = 'Space',
+  Animal = 'Animal',
+  Microbe = 'Microbe',
+  Plant = 'Plant',
+  City = 'City',
+  Jovian = 'Jovian',
+  Earth = 'Earth',
+  Power = 'Power',
+  Event = 'Event',
 }
 
 interface Card {
@@ -30,12 +30,12 @@ type Player = string
 type Transform = (state: GameState, action?: any) => GameState
 
 const enum ResourceType {
-  Money = 'money',
-  Steel = 'steel',
-  Titanium = 'titanium',
-  Plant = 'plant',
-  Energy = 'energy',
-  Heat = 'heat',
+  Money = 'Money',
+  Steel = 'Steel',
+  Titanium = 'Titanium',
+  Plant = 'Plant',
+  Energy = 'Energy',
+  Heat = 'Heat',
 }
 
 type ResourcesState = {[resource in ResourceType]: ResourceState}
@@ -62,9 +62,9 @@ interface MapState {
 }
 
 enum GlobalType {
-  Oxygen = 'oxygen',
-  Heat = 'heat',
-  Oceans = 'oceans',
+  Oxygen = 'Oxygen',
+  Heat = 'Heat',
+  Oceans = 'Oceans',
 }
 
 type GlobalParameters = {[p in GlobalType]: number}
