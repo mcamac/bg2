@@ -1,3 +1,40 @@
+import {
+  DecreaseAnyProduction,
+  DecreaseAnyInventory,
+  ChangeInventory,
+  ChangeProduction,
+  ChangeAnyCardResource,
+  IncreaseTR,
+  Draw,
+  Choice,
+  IncreaseTemperature,
+  PlaceOceans,
+  PlaceNoctis,
+  PlaceResearchOutpost,
+  ChangeCardResource,
+  Discount,
+  PlaceCity,
+  AfterCard,
+  RaiseOxygen,
+  Branch,
+  HasTags,
+  GetTags,
+  PlaceGreeneryOnOcean,
+  LandClaim,
+  RoboticWorkforce,
+  GetCities,
+  GetOpponentTags,
+  GetAllTags,
+  ArtificialLake,
+  UrbanizedArea,
+  GetCitiesOnMars,
+  Mohole,
+  GetX,
+  Neg,
+  PlaceGreenery,
+} from './utils'
+import {ResourceType, CardResource, Tag} from './types'
+
 const CARDS = [
   {
     name: 'Colonizer Training Camp',
@@ -15,7 +52,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Oxygen must be 5% or less.',
-    resourceHeld: null,
+    effects: [],
   },
   {
     name: 'Asteroid Mining Consortium',
@@ -34,7 +71,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires that you have titanium production. Decrease any titanium production 1 step and increase your own 1 step.',
-    resourceHeld: null,
+    effects: [DecreaseAnyProduction(-1, 'titanium'), ChangeProduction(1, 'titanium')],
   },
   {
     name: 'Deep Well Heating',
@@ -52,7 +89,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 1 step. Increase temperature 1 step.',
-    resourceHeld: null,
+    effects: [ChangeProduction(1, ResourceType.Energy), IncreaseTemperature(1)],
   },
   {
     name: 'Cloud Seeding',
@@ -71,6 +108,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 3 ocean tiles. Decrease your MC production 1 step and any heat production 1 step.  Increase your plant production 2 steps.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Money),
+      DecreaseAnyProduction(1, ResourceType.Heat),
+      ChangeProduction(2, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -125,6 +167,7 @@ const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: 'Action: Spend 1 energy to gain 1 MC for each city tile ON MARS.',
+    actions: [],
     effectText: '',
     resourceHeld: null,
   },
@@ -183,6 +226,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Raise temperature 1 step and place an ocean tile. Remove up to 3 plants from any player.',
+    effects: [IncreaseTemperature(1), PlaceOceans(1), DecreaseAnyInventory(3, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -202,6 +246,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Raise temperature 2 steps and gain 4 titanium. Remove up to 4 plants from any player.',
+    effects: [
+      IncreaseTemperature(2),
+      ChangeInventory(4, ResourceType.Titanium),
+      DecreaseAnyInventory(4, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -236,10 +285,10 @@ const CARDS = [
     terraforming: {Temperature: 0, Oxygen: 0, Ocean: 0},
     TR: 0,
     vp: 2,
-    placeTiles: false,
     actionText: 'Action: Spend 1 steel to gain 5 MC',
     effectText: 'Increase your titanium production 1 step.',
-    resourceHeld: null,
+    actions: [[ChangeInventory(-1, ResourceType.Titanium), ChangeInventory(5, ResourceType.Money)]],
+    effect: [ChangeProduction(1, ResourceType.Titanium)],
   },
   {
     name: 'Development Center',
@@ -254,10 +303,9 @@ const CARDS = [
     terraforming: {Temperature: 0, Oxygen: 0, Ocean: 0},
     TR: 0,
     vp: 0,
-    placeTiles: false,
     actionText: 'Action: Spend 1 energy to draw a card.',
+    actions: [[ChangeInventory(-1, ResourceType.Energy), Draw(1)]],
     effectText: '',
-    resourceHeld: null,
   },
   {
     name: 'Equatorial Magnetizer',
@@ -276,6 +324,7 @@ const CARDS = [
     actionText:
       'Action: Decrease your energy production 1 step to increase your terraforming rating 1 step.',
     effectText: '',
+    actions: [[ChangeProduction(-1, ResourceType.Energy), IncreaseTR(1)]],
     resourceHeld: null,
   },
   {
@@ -314,6 +363,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 1 step and increase your MC production 3 steps. Place a tile ON THE RESERVED AREA, disregarding normal placement restrictions.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Energy),
+      ChangeProduction(3, ResourceType.Money),
+      PlaceNoctis,
+    ],
     resourceHeld: null,
   },
   {
@@ -333,6 +387,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 2% oxygen. Increase your heat production 2 steps and your plant production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Heat), ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -352,6 +407,14 @@ const CARDS = [
     actionText: '',
     effectText:
       'Gain 3 plants, or add 3 microbes or 2 animals to ANOTHER card. Place an ocean tile.',
+    effects: [
+      Choice(
+        ChangeInventory(3, ResourceType.Plant),
+        ChangeAnyCardResource(3, 'Microbes'),
+        ChangeAnyCardResource(2, 'Animals')
+      ),
+      PlaceOceans(1),
+    ],
     resourceHeld: null,
   },
   {
@@ -370,6 +433,7 @@ const CARDS = [
     placeTiles: true,
     actionText: 'Effect: When you play a card, you pay 1 MC less for it.',
     effectText: 'Place a city tile NEXT TO NO OTHER TILE.',
+    effects: [PlaceResearchOutpost],
     resourceHeld: null,
   },
   {
@@ -408,6 +472,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Place an ocean tile. Decrease your MC production 2 steps and increase your heat production 3 steps.',
+    effects: [
+      PlaceOceans(1),
+      ChangeProduction(-2, ResourceType.Money),
+      ChangeProduction(3, ResourceType.Heat),
+    ],
     resourceHeld: null,
   },
   {
@@ -426,6 +495,8 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When anyone places an ocean tile, gain 2 plants.',
     effectText: 'It must be -12\u00b0C or colder to play. Gain 1 plant.',
+    triggers: [],
+    effect: [ChangeInventory(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -444,6 +515,12 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Remove 1 animal from any card and add it to this card.',
     effectText: 'Requires 11% oxygen. 1 VP per animal on this card.',
+    action: [
+      [
+        ChangeAnyCardResource(-1, CardResource.Animals),
+        ChangeCardResource(1, CardResource.Animals),
+      ],
+    ],
     resourceHeld: 'Animals',
   },
   {
@@ -462,7 +539,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: '',
-    resourceHeld: null,
+    triggers: [Discount(2, [Tag.Space])],
   },
   {
     name: 'Eos Chasma National Park',
@@ -480,7 +557,12 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText:
-      'Requires -128\u00b0C  or warmer. Add 1 animal TO ANY ANIMAL CARD. Gain 3 plants. Increase your MC production 2 steps.',
+      'Requires -12C  or warmer. Add 1 animal TO ANY ANIMAL CARD. Gain 3 plants. Increase your MC production 2 steps.',
+    effects: [
+      ChangeAnyCardResource(1, CardResource.Animals),
+      ChangeInventory(3, ResourceType.Plant),
+      ChangeProduction(2, ResourceType.Money),
+    ],
     resourceHeld: null,
   },
   {
@@ -495,7 +577,7 @@ const CARDS = [
     inventory: {},
     terraforming: {Temperature: 0, Oxygen: 0, Ocean: 0},
     TR: 0,
-    vp: 0,
+    vp: 4,
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 5 science tags.',
@@ -517,6 +599,9 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 1 titanium to add 1 fighter resource to this card.',
     effectText: '1 VP for each fighter resource on this card.',
+    actions: [
+      [ChangeInventory(-1, ResourceType.Titanium), ChangeCardResource(1, CardResource.Fighters)],
+    ],
     resourceHeld: 'Fighters',
   },
   {
@@ -536,6 +621,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Oxygen must be 9% or less. Place a city tile. Decrease your energy production 1 step and increase your MC production 3 steps.',
+    effects: [
+      PlaceCity,
+      ChangeProduction(-1, ResourceType.Energy),
+      ChangeProduction(3, ResourceType.Money),
+    ],
     resourceHeld: null,
   },
   {
@@ -555,6 +645,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your MC production 2 steps and increase your heat production and energy production 2 steps each.',
+    effects: [
+      ChangeProduction(-2, ResourceType.Money),
+      ChangeProduction(2, ResourceType.Heat),
+      ChangeProduction(2, ResourceType.Energy),
+    ],
     resourceHeld: null,
   },
   {
@@ -573,6 +668,12 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you place a space event, you gain 3 MC and 3 heat.',
     effectText: '',
+    triggers: [
+      AfterCard(
+        [Tag.Space],
+        [ChangeInventory(3, ResourceType.Money), ChangeInventory(3, ResourceType.Heat)]
+      ),
+    ],
     resourceHeld: null,
   },
   {
@@ -592,6 +693,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Place a city tile. Decrease your energy production 2 steps and increase your steel production 2 steps.',
+    effects: [
+      PlaceCity,
+      ChangeProduction(-2, ResourceType.Energy),
+      ChangeProduction(2, ResourceType.Steel),
+    ],
     resourceHeld: null,
   },
   {
@@ -611,6 +717,10 @@ const CARDS = [
     actionText:
       'Action: Add 1 microbe to this card, or remove 2 microbe from this card to raise oxygen level 1 step.',
     effectText: '',
+    actions: [
+      [ChangeCardResource(1, CardResource.Microbes)],
+      [ChangeCardResource(-2, CardResource.Microbes), RaiseOxygen(1)],
+    ],
     resourceHeld: 'Microbes',
   },
   {
@@ -629,6 +739,10 @@ const CARDS = [
     placeTiles: false,
     actionText:
       'Action: Add 1 microbe to this card, or remove 2 microbes to raise temperature 1 step.',
+    actions: [
+      [ChangeCardResource(1, CardResource.Microbes)],
+      [ChangeCardResource(-2, CardResource.Microbes), IncreaseTemperature(1)],
+    ],
     effectText: 'Requires 4% oxygen.',
     resourceHeld: 'Microbes',
   },
@@ -649,6 +763,12 @@ const CARDS = [
     actionText: 'Action: Remove 1 microbe from any card to add 1 to this card.',
     effectText: 'Requires 4% oxygen. 1 VP per 2 microbes on this card.',
     resourceHeld: 'Microbes',
+    action: [
+      [
+        ChangeAnyCardResource(-1, CardResource.Microbes),
+        ChangeCardResource(1, CardResource.Microbes),
+      ],
+    ],
   },
   {
     name: 'Release of Inert Gases',
@@ -666,6 +786,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Raise your terraform rating 2 steps.',
+    effects: [IncreaseTR(2)],
     resourceHeld: null,
   },
   {
@@ -685,6 +806,15 @@ const CARDS = [
     actionText: '',
     effectText:
       'Raise your terraforming rating 2 steps and temperature 1 step. Increase your plant production 1 step, or 4 steps if you have 3 plant tags.',
+    effects: [
+      IncreaseTR(2),
+      IncreaseTemperature(1),
+      Branch(
+        HasTags(3, Tag.Plant),
+        ChangeProduction(4, ResourceType.Plant),
+        ChangeProduction(1, ResourceType.Plant)
+      ),
+    ],
     resourceHeld: null,
   },
   {
@@ -703,6 +833,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When any city tile is placed, gain 2 MC',
     effectText: '',
+    triggers: [],
     resourceHeld: null,
   },
   {
@@ -722,6 +853,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Raise temperature 3 steps and gain 4 steel. Remove up to 8 plants from any player.',
+    effects: [
+      IncreaseTemperature(3),
+      ChangeInventory(4, ResourceType.Steel),
+      DecreaseAnyInventory(8, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -740,6 +876,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your titanium production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Titanium)],
     resourceHeld: null,
   },
   {
@@ -758,6 +895,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your plant production 1 step and increase your MC production 4 steps.',
+    effects: [ChangeProduction(-1, ResourceType.Plant), ChangeProduction(4, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -776,6 +914,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'It must be -18\u00b0C or colder. Increase your plant production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -794,6 +933,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your energy production 1 step and increase your heat production 3 steps.',
+    effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(3, ResourceType.Heat)],
     resourceHeld: null,
   },
   {
@@ -831,6 +971,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your MC production 2 steps and increase your energy production 3 steps.',
+    effects: [ChangeProduction(-2, ResourceType.Money), ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -850,6 +991,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 3 science tags. Increase your energy production and your MC production 1 step each.',
+    effects: [ChangeProduction(1, ResourceType.Energy), ChangeProduction(1, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -868,6 +1010,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 5 ocean tiles. Gain 1 plant and increase your plant production 2 steps.',
+    effects: [ChangeInventory(1, ResourceType.Plant), ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -886,6 +1029,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your plant production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -904,6 +1048,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Add 1 microbe to this card.',
     effectText: '1 VP per 4 microbes on this card.',
+    actions: [[ChangeCardResource(1, CardResource.Microbes)]],
     resourceHeld: 'Microbes',
   },
   {
@@ -922,6 +1067,12 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Remove up to 2 animals or 5 plants from any player.',
+    effects: [
+      Choice(
+        ChangeAnyCardResource(2, CardResource.Animals),
+        DecreaseAnyInventory(5, ResourceType.Plant)
+      ),
+    ],
     resourceHeld: null,
   },
   {
@@ -940,6 +1091,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 1 step for each Earth tag you have.',
+    effects: [ChangeProduction(GetTags(Tag.Earth), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -959,6 +1111,8 @@ const CARDS = [
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
       'Requires 2\u00b0C or warmer. Decrease any plant production 1 step. 1 VP for each animal on this card.',
+    actions: [[ChangeCardResource(1, CardResource.Animals)]],
+    effects: [DecreaseAnyProduction(1, ResourceType.Plant)],
     resourceHeld: 'Animals',
   },
   {
@@ -977,6 +1131,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Requires 0\u00b0C or warmer. Place 2 ocean tiles.',
+    effects: [PlaceOceans(2)],
     resourceHeld: null,
   },
   {
@@ -996,6 +1151,8 @@ const CARDS = [
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
       'Requires 6% oxygen. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
+    actions: [[ChangeCardResource(1, CardResource.Animals)]],
+    effects: [DecreaseAnyProduction(1, ResourceType.Plant)],
     resourceHeld: 'Animals',
   },
   {
@@ -1015,6 +1172,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 6 ocean tiles. Increase your MC production 2 steps and your plant production 3 steps. Gain 2 plants.',
+    effects: [
+      ChangeProduction(2, ResourceType.Money),
+      ChangeProduction(3, ResourceType.Plant),
+      ChangeInventory(2, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -1033,6 +1195,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your steel production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Steel)],
     resourceHeld: null,
   },
   {
@@ -1051,6 +1214,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your titanium production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Titanium)],
     resourceHeld: null,
   },
   {
@@ -1070,6 +1234,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires a Jovian tag. Increase your heat production and energy production 3 steps each.',
+    effects: [ChangeProduction(3, ResourceType.Heat), ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -1089,6 +1254,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires +4\u00b0C or warmer. Place a Greenery tile ON AN AREA RESERVED FOR OCEAN and raise oxygen 1 step. Disregard normal placement restrictions for this.',
+    effects: [PlaceGreeneryOnOcean],
     resourceHeld: null,
   },
   {
@@ -1108,6 +1274,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -4\u00b0C or warmer. Increase your plant production 3 steps. Gain 1 plant.',
+    effects: [ChangeProduction(3, ResourceType.Plant), ChangeInventory(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -1127,6 +1294,10 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires that you have steel production. Decrease any steel production 1 step and increase your own 1 step',
+    effects: [
+      DecreaseAnyProduction(1, ResourceType.Steel),
+      ChangeProduction(1, ResourceType.Steel),
+    ],
     resourceHeld: null,
   },
   {
@@ -1145,6 +1316,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Gain 5 steel.',
+    effects: [ChangeInventory(5, ResourceType.Steel)],
     resourceHeld: null,
   },
   {
@@ -1163,6 +1335,11 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Raise oxygen 1 step. Remove 2 plants from any player. Gain 2 steel.',
+    effects: [
+      RaiseOxygen(1),
+      DecreaseAnyInventory(2, ResourceType.Plant),
+      ChangeInventory(2, ResourceType.Steel),
+    ],
     resourceHeld: null,
   },
   {
@@ -1201,6 +1378,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 1 step and increase your steel production 2 steps.',
+    effect: [ChangeProduction(1, ResourceType.Energy), ChangeProduction(2, ResourceType.Steel)],
     resourceHeld: null,
   },
   {
@@ -1219,6 +1397,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Place your marker on a non-reserved area. Only you may place a tile here',
+    effect: [LandClaim],
     resourceHeld: null,
   },
   {
@@ -1256,6 +1435,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 2  steps.',
+    effects: [ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1274,6 +1454,13 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 1 plant or 1 steel to gain 7 MC',
     effectText: 'Oxygen must be 8% or less. Decrease your energy production 1 step.',
+    effects: [ChangeProduction(-1, ResourceType.Energy)],
+    actions: [
+      [
+        Choice(ChangeInventory(1, ResourceType.Plant), ChangeInventory(1, ResourceType.Steel)),
+        ChangeInventory(7, ResourceType.Money),
+      ],
+    ],
     resourceHeld: null,
   },
   {
@@ -1292,6 +1479,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: '',
+    triggers: [Discount(2)],
     resourceHeld: null,
   },
   {
@@ -1311,6 +1499,7 @@ const CARDS = [
     actionText:
       'Effect: Each titanium you have is worth 1MC extra. Each steel you have is worth 1 MC extra.',
     effectText: '',
+    // TODO
     resourceHeld: null,
   },
   {
@@ -1330,6 +1519,8 @@ const CARDS = [
     actionText: 'Action: Add an animal to this card.',
     effectText:
       'Requires 13% oxygen. Decrease any plant production 2 steps. 1 VP for each animal on this card',
+    actions: [[ChangeCardResource(1, CardResource.Animals)]],
+    effects: [DecreaseAnyProduction(2, ResourceType.Plant)],
     resourceHeld: 'Animals',
   },
   {
@@ -1368,6 +1559,7 @@ const CARDS = [
     actionText:
       'Effect: When you play a plant, microbe, or an animal tag, including this, gain 1 plant or add 1 resource TO THAT CARD.',
     effectText: '',
+    // TODO,
     resourceHeld: null,
   },
   {
@@ -1386,6 +1578,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Gain 2 plants. Raise oxygen level 1 step and place an ocean tile.',
+    effects: [ChangeInventory(2, ResourceType.Plant), RaiseOxygen(1), PlaceOceans(1)],
     resourceHeld: null,
   },
   {
@@ -1404,6 +1597,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 7MC to increase your energy production 1 step.',
     effectText: '',
+    actions: [[ChangeInventory(7, ResourceType.Money), ChangeProduction(1, ResourceType.Energy)]],
     resourceHeld: null,
   },
   {
@@ -1422,6 +1616,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 1 step and gain 2 titanium.',
+    effects: [ChangeProduction(1, ResourceType.Energy), ChangeInventory(2, ResourceType.Titanium)],
     resourceHeld: null,
   },
   {
@@ -1440,6 +1635,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Place 2 ocean tiles.',
+    effects: [PlaceOceans(2)],
     resourceHeld: null,
   },
   {
@@ -1458,6 +1654,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it',
     effectText: '',
+    triggers: [Discount(2, [Tag.Space])],
     resourceHeld: null,
   },
   {
@@ -1477,6 +1674,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Raise temperature 2 steps and place 2 ocean tiles. Remove up to 6 plants from any plyer.',
+    effects: [IncreaseTemperature(2), PlaceOceans(2), DecreaseAnyProduction(6, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -1496,6 +1694,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Place a city tile ON THE RESERVED AREA [for Ganymede Colony]. 1 VP per Jovian tag you have.',
+    // TODO
     resourceHeld: null,
   },
   {
@@ -1514,6 +1713,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 3 steps.',
+    effects: [ChangeProduction(3, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1532,6 +1732,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 3 steps.',
+    effects: [ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -1551,6 +1752,7 @@ const CARDS = [
     actionText: '',
     effectText: '',
     resourceHeld: null,
+    // TODO wat
   },
   {
     name: 'Commercial District',
@@ -1570,6 +1772,7 @@ const CARDS = [
     effectText:
       'Decrease your energy production 1 step and increase your MC production 4 steps. Place [the commercial district] tile. 1 VP PER ADJACENT CITY TILE.',
     resourceHeld: null,
+    // TODO wat
   },
   {
     name: 'Robotic Workforce',
@@ -1594,6 +1797,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Duplicate only the production box of one of your building cards.',
+    effects: [RoboticWorkforce],
     resourceHeld: null,
   },
   {
@@ -1613,6 +1817,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -16\u00b0C or warmer. Increase your plant production 1 step. Gain 3 plants.',
+    effects: [ChangeProduction(1, ResourceType.Plant), ChangeInventory(3, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -1632,6 +1837,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -14\u00b0C or warmer. Increase your plant production 1 step. Gain 1 plant.',
+    effects: [ChangeProduction(1, ResourceType.Plant), ChangeInventory(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -1650,6 +1856,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your MC production 1 step and increase your energy production 2 steps.',
+    effects: [ChangeProduction(-1, ResourceType.Money), ChangeInventory(2, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -1657,7 +1864,7 @@ const CARDS = [
     cost: 11,
     type: 'Automated',
     deck: 'Corporate',
-    tags: ['Science'],
+    tags: ['Science', 'Science'],
     globalRequirements: {},
     requirements: {},
     production: {},
@@ -1668,6 +1875,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Counts as playing 2 science cards. Draw 2 cards.',
+    effects: [Draw(2)],
     resourceHeld: null,
   },
   {
@@ -1686,6 +1894,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 3 science tags. Increase your MC production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1705,6 +1914,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Increase your titanium production 2 steps and your MC production 2 steps. 1 VP per Jovian tag you have.',
+    effects: [ChangeProduction(2, ResourceType.Titanium), ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1724,6 +1934,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -10\u00b0C or warmer. Increase your plant production 2 steps. Gain 2 plants.',
+    effects: [ChangeProduction(2, ResourceType.Plant), ChangeInventory(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -1742,6 +1953,8 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: 'Requires 5 science tags. Increase your energy production 6 steps.',
+    triggers: [Discount(2, [Tag.Space])],
+    effects: [ChangeProduction(6, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -1760,6 +1973,9 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 6 energy to add a science resource to this card.',
     effectText: '2 VP for each science resource on this card.',
+    actions: [
+      [ChangeInventory(-6, ResourceType.Energy), ChangeCardResource(1, CardResource.Science)],
+    ],
     resourceHeld: 'Science',
   },
   {
@@ -1778,6 +1994,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Gain 1 plant for each city tile in play.',
+    effects: [ChangeInventory(GetCities(), ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -1797,6 +2014,7 @@ const CARDS = [
     actionText: '',
     effectText: 'Place [the nuclear zone] tile and raise the temperature 2 steps.',
     resourceHeld: null,
+    // TODO
   },
   {
     name: 'Tropical Resort',
@@ -1814,6 +2032,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your heat production 2 steps and increase your MC production 3 steps.',
+    effects: [ChangeProduction(-2, ResourceType.Heat), ChangeProduction(3, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1832,6 +2051,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 1 step for each space tag your OPPONENTS have.',
+    effects: [ChangeProduction(GetOpponentTags(Tag.Space), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1850,6 +2070,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your MC production 1 step and increase your energy production 1 step.',
+    effects: [ChangeProduction(-1, ResourceType.Money), ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -1868,6 +2089,13 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 4 energy to gain 1 steel and increase oxygen 1 step.',
     effectText: '',
+    actions: [
+      [
+        ChangeInventory(-4, ResourceType.Energy),
+        ChangeInventory(1, ResourceType.Steel),
+        RaiseOxygen(1),
+      ],
+    ],
     resourceHeld: null,
   },
   {
@@ -1888,6 +2116,7 @@ const CARDS = [
     effectText:
       'Increase your energy production 1 step for each power tag you have, including this.)',
     resourceHeld: null,
+    effects: [ChangeProduction(GetTags(Tag.Power), ResourceType.Energy)],
   },
   {
     name: 'Steelworks',
@@ -1905,6 +2134,13 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 4 energy to gain 2 steel and increase oxygen 1 step.',
     effectText: '',
+    actions: [
+      [
+        ChangeInventory(-4, ResourceType.Energy),
+        ChangeInventory(2, ResourceType.Steel),
+        RaiseOxygen(1),
+      ],
+    ],
     resourceHeld: null,
   },
   {
@@ -1924,6 +2160,13 @@ const CARDS = [
     actionText: 'Action: Spend 4 energy to gain 1 titanium and increase oxygen 1 step.',
     effectText: '',
     resourceHeld: null,
+    actions: [
+      [
+        ChangeInventory(-4, ResourceType.Energy),
+        ChangeInventory(1, ResourceType.Steel),
+        RaiseOxygen(1),
+      ],
+    ],
   },
   {
     name: 'Earth Office',
@@ -1941,6 +2184,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play an Earth tag, you pay 3 MC less for it.',
     effectText: '',
+    triggers: [Discount(3, [Tag.Earth])],
     resourceHeld: null,
   },
   {
@@ -1959,6 +2203,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 3 steps.',
+    effects: [ChangeProduction(3, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1977,6 +2222,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Gain 1 MC for each event EVER PLAYED by all players',
+    effects: [ChangeInventory(GetAllTags(Tag.Event), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -1996,6 +2242,12 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 12% oxygen. Decrease your energy production 1 step and increase your MC production 4 steps. Gain 2 plants and place a city tile.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Energy),
+      ChangeProduction(4, ResourceType.Money),
+      ChangeInventory(2, ResourceType.Plant),
+      PlaceCity,
+    ],
     resourceHeld: null,
   },
   {
@@ -2014,7 +2266,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: After you play an event card, you gain 3MC',
     effectText: '',
-    resourceHeld: null,
+    triggers: [AfterCard([Tag.Event], [ChangeInventory(3, ResourceType.Money)])],
   },
   {
     name: 'Business Network',
@@ -2032,6 +2284,8 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Look at the top card and either buy it or discard it',
     effectText: 'Decrease your MC production 1 step.',
+    // TODO act
+    effects: [ChangeProduction(-1, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -2052,6 +2306,7 @@ const CARDS = [
     effectText:
       'Look at the top 4 cards from the deck. Take 2 of them into hand and discard the other 2',
     resourceHeld: null,
+    // TODO
   },
   {
     name: 'Bribed Committee',
@@ -2069,6 +2324,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Raise your terraform rating 2 steps.',
+    effects: [IncreaseTR(2)],
     resourceHeld: null,
   },
   {
@@ -2087,6 +2343,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2123,6 +2380,9 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your plant production 1 step or your energy production 2 steps.',
+    effects: [
+      Choice(ChangeProduction(1, ResourceType.Plant), ChangeProduction(2, ResourceType.Energy)),
+    ],
     resourceHeld: null,
   },
   {
@@ -2142,6 +2402,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -6\u00b0C or warmer. Place 1 ocean tile ON AN AREA NOT RESERVED FOR OCEAN.',
+    effects: [ArtificialLake],
     resourceHeld: null,
   },
   {
@@ -2160,6 +2421,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2179,6 +2441,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires +4\u00b0C or warmer. Increase your MC production 2 steps and your plant production 2 steps. Gain 2 plants.',
+    effects: [
+      ChangeProduction(2, ResourceType.Money),
+      ChangeProduction(2, ResourceType.Plant),
+      ChangeInventory(2, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -2216,6 +2483,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 1 step and increase your MC production 2 steps. Place a city tile ADJACENT TO AT LEAST 2 OTHER CITY TILES.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Energy),
+      ChangeProduction(2, ResourceType.Money),
+      UrbanizedArea,
+    ],
     resourceHeld: null,
   },
   {
@@ -2234,6 +2506,13 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Remove up to 3 titanium from any player, or 4 steel, or 7 MC.',
+    effects: [
+      Choice(
+        DecreaseAnyInventory(3, ResourceType.Titanium),
+        DecreaseAnyInventory(4, ResourceType.Steel),
+        DecreaseAnyInventory(7, ResourceType.Money)
+      ),
+    ],
     resourceHeld: null,
   },
   {
@@ -2253,6 +2532,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 3 ocean tiles and that you lose 1 plant. Increase your plant production 1 step.',
+    effects: [ChangeInventory(-1, ResourceType.Plant), ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -2271,6 +2551,7 @@ const CARDS = [
     placeTiles: true,
     actionText: 'Action: Spend 7 MC to increase your steel production 1 step.',
     effectText: 'Place [the Industrial Center] tile ADJACENT TO A CITY TILE.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -2289,6 +2570,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Steal up to 2 steel, or 3MC from any player.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -2308,6 +2590,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 1 step and any MC production 2 steps. Increase your MC production 2 steps.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Energy),
+      DecreaseAnyProduction(2, ResourceType.Money),
+      ChangeProduction(2, ResourceType.Money),
+    ],
     resourceHeld: null,
   },
   {
@@ -2326,6 +2613,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your energy production 1 step and increase your heat production 4 steps.',
+    effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(4, ResourceType.Heat)],
     resourceHeld: null,
   },
   {
@@ -2344,6 +2632,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Place 1 ocean tile.',
+    effects: [PlaceOceans(1)],
     resourceHeld: null,
   },
   {
@@ -2364,6 +2653,8 @@ const CARDS = [
       'Effect: When you play an animal or a plant tag (including these 2), add an animal to this card.',
     effectText:
       'Requires that you have a greenery tile. Place [the Ecological Zone] tile ADJACENT TO ANY GREENERY TILE. 1 VP per 2 animals on this card.',
+    //TODO
+
     resourceHeld: 'Animals',
   },
   {
@@ -2383,6 +2674,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 5% oxygen. Increase your MC production 1 step for each city tile ON MARS.',
+    effects: [ChangeProduction(GetCitiesOnMars(), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -2402,6 +2694,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 4% oxygen. Increase your plant production 1 step for every 2 microbe tags you have, including this.',
+    effects: [ChangeProduction(GetTags(Tag.Microbe, 2), ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -2421,6 +2714,7 @@ const CARDS = [
     actionText:
       'Effect: When you play an animal, plant, or microbe tag, including this, add a microbe to this card.',
     effectText: 'Requires 3# oxygen. 1 VP per 3 microbes on this card.',
+    // todo
     resourceHeld: 'Microbes',
   },
   {
@@ -2439,6 +2733,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 2 power tags. Increase your energy production 3 steps.',
+    effects: [ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2457,6 +2752,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Add a microbe to ANOTHER card.',
     effectText: 'Requires -14\u00b0C or warmer.',
+    actions: [[ChangeAnyCardResource(1, CardResource.Microbes)]],
     resourceHeld: null,
   },
   {
@@ -2474,6 +2770,14 @@ const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: 'Action: Gain 1 plant or add 2 microbes to ANOTHER card.',
+    actions: [
+      [
+        Choice(
+          ChangeInventory(1, ResourceType.Plant),
+          ChangeAnyCardResource(2, CardResource.Microbes)
+        ),
+      ],
+    ],
     effectText: 'It must be -10\u00b0C or colder.',
     resourceHeld: null,
   },
@@ -2511,6 +2815,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 4 ocean tiles. Increase your energy production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2529,6 +2834,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 1 step for each Earth tag you have, including this.',
+    effects: [ChangeProduction(GetTags(Tag.Earth), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -2548,6 +2854,12 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 2 steps. Increase your steel production 2 steps and your titanium production 1 step. Raise oxygen 2 steps.',
+    effects: [
+      ChangeProduction(-2, ResourceType.Energy),
+      ChangeProduction(2, ResourceType.Steel),
+      ChangeProduction(1, ResourceType.Titanium),
+      RaiseOxygen(2),
+    ],
     resourceHeld: null,
   },
   {
@@ -2566,6 +2878,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 3 ocean tiles. Increase your energy production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2585,6 +2898,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Raise the temperature 2 steps and place this [the Lava Flow] tile ON EITHER THARSIS THOLUS, ASCRAEUS MONS, PAVONIS MONS OR ARSIA MONS.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -2603,6 +2917,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2622,6 +2937,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Increase your heat production 4 steps. Place [the Mohole Area] tile ON AN AREA RESERVED FOR OCEAN.',
+    effects: [ChangeProduction(4, ResourceType.Heat), Mohole],
     resourceHeld: null,
   },
   {
@@ -2641,6 +2957,14 @@ const CARDS = [
     actionText: '',
     effectText:
       'Place an ocean tile and draw 2 cards. Gain 5 plants, or add 4 animals to ANOTHER card.',
+    effects: [
+      PlaceOceans(1),
+      Draw(2),
+      Choice(
+        ChangeInventory(5, ResourceType.Plant),
+        ChangeAnyCardResource(4, CardResource.Animals)
+      ),
+    ],
     resourceHeld: null,
   },
   {
@@ -2659,6 +2983,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your titanium production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Titanium)],
     resourceHeld: null,
   },
   {
@@ -2677,6 +3002,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 2 science tags. Increase your energy production 3 steps.',
+    effects: [ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -2696,6 +3022,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 3 ocean tiles and that you lose 2 plants. Increase your plant production 2 steps.',
+    effects: [ChangeInventory(-2, ResourceType.Plant), ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -2715,6 +3042,7 @@ const CARDS = [
     actionText: 'Effect: When you place a greenery tile, add an animal to this card.',
     effectText:
       'Requires 8% oxygen. Add 1 animal to this card. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
+    // todo
     resourceHeld: 'Animals',
   },
   {
@@ -2734,6 +3062,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 6% oxygen. Increase your plant production 1 step for each plant tag you have.',
+    effects: [ChangeProduction(GetTags(Tag.Plant), ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -2752,6 +3081,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Add 1 resource to a card with at least 1 resource on it.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -2770,6 +3100,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: 'Requires 7 science tags.',
+    triggers: [Discount(2)],
     resourceHeld: null,
   },
   {
@@ -2788,6 +3119,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your MC production 1 step. Gain 10 MC.',
+    effects: [ChangeProduction(-1, ResourceType.Money), ChangeInventory(10, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -2807,6 +3139,10 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your heat production any number of steps and increase your MC production the same number of steps.',
+    effects: [
+      ChangeProduction(Neg(GetX), ResourceType.Heat),
+      ChangeProduction(GetX, ResourceType.Money),
+    ],
     resourceHeld: null,
   },
   {
@@ -2826,6 +3162,7 @@ const CARDS = [
     actionText: 'Effect: Your global requirements are +2 or -2 steps, your choice in each case.',
     effectText: '',
     resourceHeld: null,
+    // todo
   },
   {
     name: 'Caretaker Contract',
@@ -2843,6 +3180,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 8 heat to increase your terraforming rating 1 step.',
     effectText: 'Requires 0\u00b0C or warmer.',
+    actions: [[ChangeInventory(-8, ResourceType.Heat), IncreaseTR(1)]],
     resourceHeld: null,
   },
   {
@@ -2861,6 +3199,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'It must be -14\u00b0C or colder. Increase your plant production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -2881,6 +3220,7 @@ const CARDS = [
       'Effect: After you pay for a standard project, except selling patents, you gain 3 MC.',
     effectText: '',
     resourceHeld: null,
+    // TODO
   },
   {
     name: 'Nitrite Reducing Bacteria',
@@ -2899,7 +3239,10 @@ const CARDS = [
     actionText:
       'Action: Add 1 microbe to this card, or remove 3 microbes to increase your TR 1 step.',
     effectText: 'Add 3 microbes to this card.',
+    actions: [[Choice(ChangeCardResource(1, CardResource.Microbes))]],
+    effects: [ChangeCardResource(3, CardResource.Microbes)],
     resourceHeld: 'Microbes',
+    // todo
   },
   {
     name: 'Industrial Microbes',
@@ -2917,6 +3260,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production and your steel production 1 step each.',
+    effects: [ChangeProduction(1, ResourceType.Energy), ChangeProduction(1, ResourceType.Steel)],
     resourceHeld: null,
   },
   {
@@ -2935,6 +3279,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires -24\u00b0C or warmer. Increase your plant production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -2954,6 +3299,10 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 2 power tags. Decrease any energy production 1 step and increase your own 1 step.',
+    effects: [
+      DecreaseAnyProduction(1, ResourceType.Energy),
+      ChangeProduction(1, ResourceType.Energy),
+    ],
     resourceHeld: null,
   },
   {
@@ -2972,6 +3321,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Place 1 ocean tile and draw 1 card.',
+    effects: [PlaceOceans(1), Draw(1)],
     resourceHeld: null,
   },
   {
@@ -2989,7 +3339,8 @@ const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: '',
-    effectText: 'Increase your heat production 1 step and gain 3 hear.',
+    effectText: 'Increase your heat production 1 step and gain 3 heat.',
+    effects: [ChangeProduction(1, ResourceType.Heat), ChangeInventory(3, ResourceType.Heat)],
     resourceHeld: null,
   },
   {
@@ -2998,18 +3349,17 @@ const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Earth', 'Event'],
-    globalRequirements: {},
-    requirements: {},
-    production: {},
-    inventory: {Plant: '4'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 0},
     TR: 1,
     vp: 0,
-    placeTiles: false,
     actionText: '',
     effectText:
       'Raise your TR 1 step and gain 4 plants. Add 3 microbes to ANOTHER card and 2 animals to ANOTHER card.',
-    resourceHeld: null,
+    effects: [
+      IncreaseTR(1),
+      ChangeInventory(4, ResourceType.Plant),
+      ChangeAnyCardResource(3, CardResource.Microbes),
+      ChangeAnyCardResource(2, CardResource.Animals),
+    ],
   },
   {
     name: 'Micro-Mills',
@@ -3027,6 +3377,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your heat production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Heat)],
     resourceHeld: null,
   },
   {
@@ -3046,6 +3397,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 4 steps and increase your plant production 2 steps. Raise your TR 3 steps.',
+    effects: [
+      ChangeProduction(-4, ResourceType.Energy),
+      ChangeProduction(2, ResourceType.Plant),
+      IncreaseTR(3),
+    ],
     resourceHeld: null,
   },
   {
@@ -3065,6 +3421,7 @@ const CARDS = [
     actionText: 'Effect: When you play a space card, you pay 2MC less for it.',
     effectText:
       'Requires 5% oxygen. Decrease your energy production 1 step and increase your MC production 2 steps.',
+    effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -3083,6 +3440,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your heat production 2 steps.',
+    effects: [ChangeProduction(2, ResourceType.Heat)],
     resourceHeld: null,
   },
   {
@@ -3101,6 +3459,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 7% oxygen. Increase your energy production 1 step.',
+    effectd: [ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -3120,6 +3479,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -6\u00b0C or warmer. Increase your plant production 1 step and your MC production 2 steps. Gain 1 plant.',
+    effects: [
+      ChangeProduction(1, ResourceType.Plant),
+      ChangeProduction(2, ResourceType.Money),
+      ChangeInventory(1, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -3139,6 +3503,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Add 2 microbes to ANOTHER card. Increase your heat production 3 steps and your plant production 1 step.',
+    effects: [
+      ChangeAnyCardResource(2, CardResource.Microbes),
+      ChangeProduction(3, ResourceType.Heat),
+      ChangeProduction(1, ResourceType.Plant),
+    ],
     resourceHeld: null,
   },
   {
@@ -3158,6 +3527,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 2 steps and increase your plant production 1 step. Raise your terraform rating 1 step.',
+    effects: [
+      ChangeProduction(-2, ResourceType.Energy),
+      ChangeProduction(1, ResourceType.Plant),
+      IncreaseTR(1),
+    ],
     resourceHeld: null,
   },
   {
@@ -3178,6 +3552,7 @@ const CARDS = [
       'Effect: When any city tile is placed, add an animal to this card. Animals may not be removed from this card.',
     effectText: 'Add 1 animal to this card. 1 VP per 2 animals here.',
     resourceHeld: 'Animals',
+    // todo
   },
   {
     name: 'Protected Habitats',
@@ -3196,6 +3571,7 @@ const CARDS = [
     actionText: '[Effect: ]Opponents may not remove your [plants, animals or microbes]',
     effectText: '',
     resourceHeld: null,
+    // todo
   },
   {
     name: 'Protected Valley',
@@ -3214,6 +3590,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Increase your MC production 2 steps. Place a greenery tile ON AN AREA RESERVED FOR OCEAN, disregarding normal placement restrictions, and increase oxygen 1 step.',
+    effects: [ChangeProduction(2, ResourceType.Money), PlaceGreeneryOnOcean],
     resourceHeld: null,
   },
   {
@@ -3233,6 +3610,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Increase your MC production 1 step for each space tag you have, including this one.',
+    effects: [ChangeProduction(GetTags(Tag.Space), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -3252,6 +3630,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires -20\u00b0C or warmer. Increase your MC production 1 step and gain 2 plants.',
+    effects: [ChangeProduction(1, ResourceType.Money), ChangeInventory(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -3270,6 +3649,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 3 energy to raise oxygen 1 step.',
     effectText: 'Requires 2 ocean tiles.',
+    actions: [[ChangeInventory(-3, ResourceType.Energy), RaiseOxygen(1)]],
     resourceHeld: null,
   },
   {
@@ -3288,6 +3668,10 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease any heat production 2 steps and increase your energy production 1 step.',
+    effects: [
+      DecreaseAnyProduction(2, ResourceType.Heat),
+      ChangeProduction(1, ResourceType.Energy),
+    ],
     resourceHeld: null,
   },
   {
@@ -3306,6 +3690,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your energy production 1 step and increase your plant production 1 step.',
+    effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -3325,6 +3710,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decreases your energy production 1 step and increase your titanium and your MC production 1 step each.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Energy),
+      ChangeProduction(1, ResourceType.Titanium),
+      ChangeProduction(1, ResourceType.Money),
+    ],
     resourceHeld: null,
   },
   {
@@ -3343,6 +3733,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Requires +2\u00b0C or warmer. Place 1 ocean tile.',
+    effects: [PlaceOceans(1)],
     resourceHeld: null,
   },
   {
@@ -3362,6 +3753,11 @@ const CARDS = [
     actionText: '',
     effectText:
       'Decrease your energy production 1 step and increase your MC production 3 steps. Place a city tile.',
+    effects: [
+      ChangeProduction(-1, ResourceType.Energy),
+      ChangeProduction(3, ResourceType.Money),
+      PlaceCity,
+    ],
     resourceHeld: null,
   },
   {
@@ -3381,6 +3777,10 @@ const CARDS = [
     actionText: '',
     effectText:
       'Requires 6% oxygen. Decrease any plant production 1 step and increase your energy production 2 steps.',
+    effects: [
+      DecreaseAnyProduction(1, ResourceType.Plant),
+      ChangeProduction(2, ResourceType.Energy),
+    ],
     resourceHeld: null,
   },
   {
@@ -3400,6 +3800,8 @@ const CARDS = [
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
       'Requires 9% oxygen. Decrease your plant production 1 step and increase your MC production 2 steps. 1 VP for each animal on this card.',
+    actions: [[ChangeCardResource(1, CardResource.Animals)]],
+    effects: [ChangeProduction(-1, ResourceType.Plant), ChangeProduction(2, ResourceType.Money)],
     resourceHeld: 'Animals',
   },
   {
@@ -3420,6 +3822,7 @@ const CARDS = [
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     effectText: '',
     resourceHeld: 'Science',
+    // todo
   },
   {
     name: 'Rad-Suits',
@@ -3437,6 +3840,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Requires 2 cities in play. Increase your MC production 1 step.',
+    effects: [ChangeProduction(1, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -3456,6 +3860,7 @@ const CARDS = [
     actionText:
       'Action: Spend 8 MC to place 1 ocean tile. STEEL MAY BE USED as if you were playing a building card.',
     effectText: '',
+    // todo
     resourceHeld: null,
   },
   {
@@ -3475,6 +3880,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Place an ocean tile. IF THERE ARE TILES ADJACENT TO THIS OCEAN TILE, YOU MAY REMOVE 4 MC FROM THE OWNER OF ONE OF THOSE TILES.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -3493,6 +3899,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your energy production 1 step for each city tile in play.',
+    effects: [ChangeProduction(GetCities, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -3511,6 +3918,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Spend 5 heat to either gain 4 plants, or to add 2 animals to ANOTHER card.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -3529,6 +3937,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Requires -8\u00b0C or warmer. Place 1 ocean tile.',
+    effects: [PlaceOceans(1)],
     resourceHeld: null,
   },
   {
@@ -3548,6 +3957,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Look at the top 3 cards from the deck. Take 1 of them into hand and discard the other 2',
+    //todo
     resourceHeld: null,
   },
   {
@@ -3566,6 +3976,7 @@ const CARDS = [
     placeTiles: true,
     actionText: '',
     effectText: 'Requires 2 science tags. Place a greenery tile and raise oxygen 1 step.',
+    effects: [PlaceGreenery],
     resourceHeld: null,
   },
   {
@@ -3584,6 +3995,9 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend any amount of energy to gain that amount of MC.',
     effectText: '',
+    actions: [
+      [ChangeInventory(Neg(GetX), ResourceType.Energy), ChangeInventory(GetX, ResourceType.Money)],
+    ],
     resourceHeld: null,
   },
   {
@@ -3603,6 +4017,7 @@ const CARDS = [
     actionText: '',
     effectText: 'The next card you play this generation costs 8MC less.',
     resourceHeld: null,
+    // todo
   },
   {
     name: 'Lagrange Observatory',
@@ -3620,6 +4035,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Draw 1 card.',
+    effects: [Draw(1)],
     resourceHeld: null,
   },
   {
@@ -3638,6 +4054,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Raise your TR 1 step for each Jovian tag you have, including this.',
+    effects: [IncreaseTR(GetTags(Tag.Jovian))],
     resourceHeld: null,
   },
   {
@@ -3656,6 +4073,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your MC production 5 steps. 1 VP for every 3rd city in play.',
+    effects: [ChangeProduction(5, ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -3674,6 +4092,7 @@ const CARDS = [
     placeTiles: true,
     actionText: 'Action: Spend 2MC to draw a card.',
     effectText: 'Place [the restricted area] tile.',
+    // todo
     resourceHeld: null,
   },
   {
@@ -3694,6 +4113,7 @@ const CARDS = [
       'Effect: Each time a city tile is placed, including this, increase your MC production 1 step.',
     effectText:
       'Decrease your energy production 1 step and decrease your MC production 2 steps. Place a city tile.',
+    //todo
     resourceHeld: null,
   },
   {
@@ -3712,6 +4132,10 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease any energy production 1 step and increase your own 1 step.',
+    effects: [
+      DecreaseAnyProduction(1, ResourceType.Energy),
+      ChangeProduction(1, ResourceType.Energy),
+    ],
     resourceHeld: null,
   },
   {
@@ -3730,6 +4154,7 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Spend 10 MC to increase your heat production 2 steps.',
     effectText: '',
+    actions: [[ChangeInventory(-10, ResourceType.Money), ChangeProduction(2, ResourceType.Heat)]],
     resourceHeld: null,
   },
   {
@@ -3748,6 +4173,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Increase your heat production 7 steps.',
+    effects: [ChangeProduction(7, ResourceType.Heat)],
     resourceHeld: null,
   },
   {
@@ -3766,6 +4192,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Draw 2 cards.',
+    effects: [Draw(2)],
     resourceHeld: null,
   },
   {
@@ -3784,6 +4211,7 @@ const CARDS = [
     placeTiles: false,
     actionText: '',
     effectText: 'Decrease your energy production 1 step. Raise your terraform rating 2 steps.',
+    effects: [ChangeProduction(-1, ResourceType.Energy), IncreaseTR(2)],
     resourceHeld: null,
   },
   {
@@ -3804,6 +4232,7 @@ const CARDS = [
     effectText:
       'The next card you play this generation is +2 or -2 in global requirements, your choice.',
     resourceHeld: null,
+    // todo
   },
   {
     name: 'Medical Lab',
@@ -3822,6 +4251,7 @@ const CARDS = [
     actionText: '',
     effectText:
       'Increase your MC production 1 step for every 2 building tags you have, including this.',
+    effects: [ChangeProduction(GetTags(Tag.Building, 2), ResourceType.Money)],
     resourceHeld: null,
   },
   {
@@ -3840,6 +4270,8 @@ const CARDS = [
     placeTiles: false,
     actionText: 'Action: Draw 2 cards.',
     effectText: 'Requires 3 science tags to play. Decrease your energy production 1 step.',
+    actions: [[Draw(2)]],
+    effects: [ChangeProduction(-1, ResourceType.Energy)],
     resourceHeld: null,
   },
   {
@@ -3857,8 +4289,8 @@ const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: '',
-    effectText:
-      'Terraforming Mars Promo. Increase temperature 1 step. Remove up to 2 plants from any player.',
+    effectText: 'Increase temperature 1 step. Remove up to 2 plants from any player.',
+    effects: [IncreaseTemperature(1), DecreaseAnyInventory(2, ResourceType.Plant)],
     resourceHeld: null,
   },
   {
@@ -3878,6 +4310,7 @@ const CARDS = [
     actionText:
       'Action: Reveal and place a SPACE OR BUILDING card here from hand, and place 2 resources on it, OR double the resources on a card here. Effect: Cards here may be played as if from hand with its cost reduced by the number of resources on it.',
     effectText: 'Requires 2 science tags.',
+    // todo,
     resourceHeld: null,
   },
   {
@@ -3898,6 +4331,7 @@ const CARDS = [
     effectText:
       'Requires 2 oceans. Increase your plant production and your heat production 1 step each.',
     resourceHeld: null,
+    // todo
   },
 ]
 export default CARDS
