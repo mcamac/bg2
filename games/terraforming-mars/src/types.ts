@@ -19,6 +19,7 @@ export const enum Tag {
 
 export interface Card {
   cost: number
+  name: string
   requirements: any
   production: any
   inventory: any
@@ -53,6 +54,7 @@ export interface PlayerState {
   resources: ResourcesState
   TR: number
   hand: Card[]
+  hasIncreasedTRThisGeneration: boolean // For UN.
 }
 
 export const enum TileType {
@@ -85,6 +87,11 @@ export const enum State {
   FinalGreenery = 'finalGreenery',
 }
 
+export interface PlayerDraftState {
+  taken: Card[]
+  queued: Card[][]
+}
+
 export interface GameState {
   generation: number
   players: Player[]
@@ -92,14 +99,22 @@ export interface GameState {
   playerState: {
     [key: string]: PlayerState
   }
+  passed: {
+    [key: string]: boolean
+  }
   player: Player
   map: MapState
   deck: Card[]
+  discards: Card[]
   milestones: any
   awards: any
   globalParameters: GlobalParameters
 
-  log(): void
+  draft: {
+    [key: string]: PlayerDraftState
+  }
+
+  // log(): void
 }
 
 export const enum CardResource {
@@ -107,4 +122,11 @@ export const enum CardResource {
   Fighters = 'Fighters',
   Animals = 'Animals',
   Science = 'Science',
+}
+
+export const enum ResourceBonus {
+  Card = 'Card',
+  Plant = 'Plant',
+  Titanium = 'Titanium',
+  Steel = 'Steel',
 }

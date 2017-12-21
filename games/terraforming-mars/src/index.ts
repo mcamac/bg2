@@ -1,4 +1,5 @@
-import {Transform, ResourceType, TileType, GameState, Card, RESOURCE_TYPES} from './types'
+import {Transform, ResourceType, TileType, GameState, Card, RESOURCE_TYPES, Player} from './types'
+import {CARDS} from './cards'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -74,6 +75,16 @@ const generationProduction: Transform = state => {
   return state
 }
 
+const resetBeforeGeneration: Transform = state => {
+  state.passed = {}
+  state.draft = {}
+  state.players.forEach(player => {
+    const playerState = state.playerState[player]
+    playerState.hasIncreasedTRThisGeneration = false
+  })
+  return state
+}
+
 const standardProjects = {
   SELL_CARDS: (state: GameState, cards: Card[]) => {},
   POWER_PLANT: c(costs(11, ResourceType.Money), changeProduction(1, ResourceType.Money)),
@@ -91,6 +102,74 @@ const normalProduction = {
 const handlers = {
   STANDARD_PROJECT: () => {},
   PLAY_CARD: () => {},
+}
+
+const draw = (n: number, state: GameState): [Card[], GameState] => {
+  return [[], state]
+}
+
+const setupDraft: Transform = state => {
+  const draft = state.draft
+  const drawResult = draw(16, state)
+  const cards = drawResult[0]
+  state = drawResult[1]
+
+  state.players.forEach((player, i) => {
+    draft[player] = {
+      taken: [],
+      queued: [cards.slice(4 * i, 4 * (i + 1))],
+    }
+  })
+
+  return state
+}
+
+const handlePlayerChoice = (state: GameState, player: Player, choice: Card): GameState => {
+  const playerIndex = state.players.indexOf(player)
+  const currentChoices = state.draft[player].queued[0]
+  const chosenIndex = currentChoices.findIndex(c => c.name === choice.name)
+  state.draft[player].taken.push(choice)
+  state.draft[player].queued.splice(0, 1)
+
+  // Pass rest of cards to next player.
+  const choicesLeft = currentChoices.splice(chosenIndex, 1)
+  const nextPlayer =
+    state.players[
+      (playerIndex + (state.generation % 0 === 1 ? 1 : -1) + state.players.length) %
+        state.players.length
+    ]
+  state.draft[nextPlayer].queued.push(choicesLeft)
+
+  return state
+}
+
+const checkDraftFinished = (state: GameState): boolean => {
+  return state.players.map(player => state.draft[player].taken.length === 4).every(x => x)
+}
+
+const getInitialGameState = (players: Player[]): GameState => {
+  const playerState = {}
+
+  return {
+    generation: 0,
+    players,
+    firstPlayer: players[0],
+    playerState,
+    passed: {},
+    player: players[0],
+    map: null,
+    deck: CARDS as Card[], // TODO: Nope
+    discards: [],
+    milestones: null,
+    awards: null,
+    globalParameters: {
+      Oxygen: 0,
+      Oceans: 0,
+      Heat: -30,
+    },
+
+    draft: {},
+  }
 }
 
 export const handleAction = {}

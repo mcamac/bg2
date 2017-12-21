@@ -42,7 +42,7 @@ import {
 } from './utils'
 import {ResourceType, CardResource, Tag} from './types'
 
-const CARDS = [
+export const CARDS = [
   {
     name: 'Colonizer Training Camp',
     cost: 8,
@@ -4220,4 +4220,3 @@ const CARDS = [
     // todo
   },
 ]
-export default CARDS
