@@ -37,6 +37,7 @@ import {
   MinOxygen,
   MaxHeat,
   MinHeat,
+  HasCitiesOnMars,
 } from './utils'
 import {ResourceType, CardResource, Tag} from './types'
 
@@ -596,6 +597,7 @@ const CARDS = [
     actionText: '',
     effectText: 'Requires 5 science tags.',
     resourceHeld: null,
+    requires: [HasTags(5, Tag.Science)]
   },
   {
     name: 'Security Fleet',
@@ -1012,6 +1014,7 @@ const CARDS = [
       'Requires 3 science tags. Increase your energy production and your MC production 1 step each.',
     effects: [ChangeProduction(1, ResourceType.Energy), ChangeProduction(1, ResourceType.Money)],
     resourceHeld: null,
+    requires: [HasTags(3, Tag.Science)]
   },
   {
     name: 'Algae',
@@ -1259,6 +1262,7 @@ const CARDS = [
       'Requires a Jovian tag. Increase your heat production and energy production 3 steps each.',
     effects: [ChangeProduction(3, ResourceType.Heat), ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [HasTags(1, Tag.Jovian)]
   },
   {
     name: 'Mangrove',
@@ -1683,6 +1687,7 @@ const CARDS = [
     effectText: '',
     triggers: [Discount(2, [Tag.Space])],
     resourceHeld: null,
+    requires: [HasTags(4, Tag.Science)]
   },
   {
     name: 'Giant Ice Asteroid',
@@ -1925,6 +1930,7 @@ const CARDS = [
     effectText: 'Requires 3 science tags. Increase your MC production 2 steps.',
     effects: [ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
+    requires: [HasTags(3, Tag.Science)]
   },
   {
     name: 'Io Mining Industries',
@@ -1986,6 +1992,7 @@ const CARDS = [
     triggers: [Discount(2, [Tag.Space])],
     effects: [ChangeProduction(6, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [HasTags(5, Tag.Science)]
   },
   {
     name: 'Physics Complex',
@@ -2774,6 +2781,7 @@ const CARDS = [
     effectText: 'Requires 2 power tags. Increase your energy production 3 steps.',
     effects: [ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [HasTags(2, Tag.Power)]
   },
   {
     name: 'Symbiotic Fungus',
@@ -2839,6 +2847,7 @@ const CARDS = [
     actionText: '',
     effectText: 'Requires a plant tag, a microbe tag, and an animal tag.',
     resourceHeld: null,
+    requires: [HasTags(1, Tag.Microbe), HasTags(1, Tag.Plant), HasTags(1, Tag.Animal)]
   },
   {
     name: 'Great Dam',
@@ -3047,6 +3056,7 @@ const CARDS = [
     effectText: 'Requires 2 science tags. Increase your energy production 3 steps.',
     effects: [ChangeProduction(3, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [HasTags(2, Tag.Science)]
   },
   {
     name: 'Nitrophilic Moss',
@@ -3148,6 +3158,7 @@ const CARDS = [
     effectText: 'Requires 7 science tags.',
     triggers: [Discount(2)],
     resourceHeld: null,
+    requires: [HasTags(7, Tag.Science)]
   },
   {
     name: 'Investment Loan',
@@ -3352,6 +3363,7 @@ const CARDS = [
       ChangeProduction(1, ResourceType.Energy),
     ],
     resourceHeld: null,
+    requires: [HasTags(2, Tag.Power)]
   },
   {
     name: 'Convoy From Europa',
@@ -3898,6 +3910,7 @@ const CARDS = [
     effectText: 'Requires 2 cities in play. Increase your MC production 1 step.',
     effects: [ChangeProduction(1, ResourceType.Money)],
     resourceHeld: null,
+    requires: [HasCitiesOnMars(1)]
   },
   {
     name: 'Aquifer Pumping',
@@ -4035,6 +4048,7 @@ const CARDS = [
     effectText: 'Requires 2 science tags. Place a greenery tile and raise oxygen 1 step.',
     effects: [PlaceGreenery],
     resourceHeld: null,
+    requires: [HasTags(2, Tag.Science)]
   },
   {
     name: 'Power Infrastructure',
@@ -4330,6 +4344,7 @@ const CARDS = [
     actions: [[Draw(2)]],
     effects: [ChangeProduction(-1, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [HasTags(3, Tag.Science)]
   },
   {
     name: 'Small Asteroid',
@@ -4369,6 +4384,7 @@ const CARDS = [
     effectText: 'Requires 2 science tags.',
     // todo,
     resourceHeld: null,
+    requires: [HasTags(2, Tag.Science)]
   },
   {
     name: 'Snow Algae',

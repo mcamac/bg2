@@ -74,6 +74,10 @@ export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boole
   return state => true
 }
 
+export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
+  return state => true
+}
+
 export const GetTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
   return state => 0
 }
