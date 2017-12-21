@@ -124,7 +124,7 @@ export const CARDS = [
     actionText:
       'Action: Spend 1 MC to reveal and discard the top card of the draw deck. If that card has a microbe tag, add a science resource here.',
     effectText: 'Oxygen must be 6% or less. 3 VPs if you have one or more science resource here.',
-    resourceHeld: 'Science',
+    resourceHeld: CardResource.Science,
     requires: [MaxOxygen(6)],
   },
   {
@@ -397,7 +397,7 @@ export const CARDS = [
     effects: [
       Choice(
         ChangeInventory(3, ResourceType.Plant),
-        ChangeAnyCardResource(3, 'Microbes'),
+        ChangeAnyCardResource(3, CardResource.Microbes),
         ChangeAnyCardResource(2, 'Animals')
       ),
       PlaceOceans(1),
@@ -505,7 +505,7 @@ export const CARDS = [
         ChangeCardResource(1, CardResource.Animals),
       ],
     ],
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     requires: [MinOxygen(11)],
   },
   {
@@ -585,7 +585,7 @@ export const CARDS = [
     actions: [
       [ChangeInventory(-1, ResourceType.Titanium), ChangeCardResource(1, CardResource.Fighters)],
     ],
-    resourceHeld: 'Fighters',
+    resourceHeld: CardResource.Fighters,
   },
   {
     name: 'Cupola City',
@@ -701,7 +701,7 @@ export const CARDS = [
       [ChangeCardResource(1, CardResource.Microbes)],
       [ChangeCardResource(-2, CardResource.Microbes), RaiseOxygen(1)],
     ],
-    resourceHeld: 'Microbes',
+    resourceHeld: CardResource.Microbes,
   },
   {
     name: 'GHG Producing Bacteria',
@@ -724,7 +724,7 @@ export const CARDS = [
       [ChangeCardResource(-2, CardResource.Microbes), IncreaseTemperature(1)],
     ],
     effectText: 'Requires 4% oxygen.',
-    resourceHeld: 'Microbes',
+    resourceHeld: CardResource.Microbes,
     requires: [MinOxygen(4)],
   },
   {
@@ -742,7 +742,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Action: Remove 1 microbe from any card to add 1 to this card.',
     effectText: 'Requires 4% oxygen. 1 VP per 2 microbes on this card.',
-    resourceHeld: 'Microbes',
+    resourceHeld: CardResource.Microbes,
     action: [
       [
         ChangeAnyCardResource(-1, CardResource.Microbes),
@@ -1022,7 +1022,7 @@ export const CARDS = [
     actionText: 'Action: Add 1 microbe to this card.',
     effectText: '1 VP per 4 microbes on this card.',
     actions: [[ChangeCardResource(1, CardResource.Microbes)]],
-    resourceHeld: 'Microbes',
+    resourceHeld: CardResource.Microbes,
   },
   {
     name: 'Virus',
@@ -1083,7 +1083,7 @@ export const CARDS = [
       'Requires 2\u00b0C or warmer. Decrease any plant production 1 step. 1 VP for each animal on this card.',
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [DecreaseAnyProduction(1, ResourceType.Plant)],
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     requires: [MinHeat(2)],
   },
   {
@@ -1123,7 +1123,7 @@ export const CARDS = [
       'Requires 6% oxygen. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [DecreaseAnyProduction(1, ResourceType.Plant)],
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     requires: [MinOxygen(6)],
   },
   {
@@ -1481,7 +1481,7 @@ export const CARDS = [
       'Requires 13% oxygen. Decrease any plant production 2 steps. 1 VP for each animal on this card',
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [DecreaseAnyProduction(2, ResourceType.Plant)],
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     requires: [MinOxygen(13)],
   },
   {
@@ -1923,7 +1923,7 @@ export const CARDS = [
     actions: [
       [ChangeInventory(-6, ResourceType.Energy), ChangeCardResource(1, CardResource.Science)],
     ],
-    resourceHeld: 'Science',
+    resourceHeld: CardResource.Science,
   },
   {
     name: 'Greenhouses',
@@ -2581,7 +2581,7 @@ export const CARDS = [
       'Requires that you have a greenery tile. Place [the Ecological Zone] tile ADJACENT TO ANY GREENERY TILE. 1 VP per 2 animals on this card.',
     //TODO
 
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
   },
   {
     name: 'Zeppelins',
@@ -2640,7 +2640,7 @@ export const CARDS = [
       'Effect: When you play an animal, plant, or microbe tag, including this, add a microbe to this card.',
     effectText: 'Requires 3# oxygen. 1 VP per 3 microbes on this card.',
     // todo
-    resourceHeld: 'Microbes',
+    resourceHeld: CardResource.Microbes,
     requires: [MinOxygen(3)],
   },
   {
@@ -2964,7 +2964,7 @@ export const CARDS = [
     effectText:
       'Requires 8% oxygen. Add 1 animal to this card. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
     // todo
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     requires: [MinOxygen(8)],
   },
   {
@@ -3156,7 +3156,7 @@ export const CARDS = [
     effectText: 'Add 3 microbes to this card.',
     actions: [[Choice(ChangeCardResource(1, CardResource.Microbes))]],
     effects: [ChangeCardResource(3, CardResource.Microbes)],
-    resourceHeld: 'Microbes',
+    resourceHeld: CardResource.Microbes,
     // todo
   },
   {
@@ -3458,7 +3458,7 @@ export const CARDS = [
     actionText:
       'Effect: When any city tile is placed, add an animal to this card. Animals may not be removed from this card.',
     effectText: 'Add 1 animal to this card. 1 VP per 2 animals here.',
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     // todo
   },
   {
@@ -3704,7 +3704,7 @@ export const CARDS = [
       'Requires 9% oxygen. Decrease your plant production 1 step and increase your MC production 2 steps. 1 VP for each animal on this card.',
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [ChangeProduction(-1, ResourceType.Plant), ChangeProduction(2, ResourceType.Money)],
-    resourceHeld: 'Animals',
+    resourceHeld: CardResource.Animals,
     requires: [MinOxygen(9)],
   },
   {
@@ -3723,7 +3723,7 @@ export const CARDS = [
     actionText:
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     effectText: '',
-    resourceHeld: 'Science',
+    resourceHeld: CardResource.Science,
     // todo
   },
   {
