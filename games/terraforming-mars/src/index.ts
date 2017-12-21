@@ -207,4 +207,21 @@ const awardFns: {[key: string]: ((s: GameState, player: Player) => number)} = {
     state.playerState[player].resources[ResourceType.Titanium].count,
 }
 
+const claimMilestone = (state: GameState, milestone: Milestones): GameState => {
+  const ok = state.milestones.length < 3 && milestoneChecks[milestone](state)
+  state.milestones.push({player: state.player, milestone})
+  return state
+}
+
+const AWARD_COSTS = [8, 14, 20]
+const fundAward = (state: GameState, award: Awards): GameState => {
+  const cost = AWARD_COSTS[state.awards.length]
+  state.playerState[state.player].resources[ResourceType.Money].count -= cost
+  state.awards.push({
+    player: state.player,
+    award,
+  })
+  return state
+}
+
 export const handleAction = {}

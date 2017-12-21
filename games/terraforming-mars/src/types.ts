@@ -94,6 +94,16 @@ export interface PlayerDraftState {
   queued: Card[][]
 }
 
+export interface MilestoneClaim {
+  player: Player
+  milestone: Milestones
+}
+
+export interface AwardFunding {
+  player: Player
+  award: Awards
+}
+
 export interface GameState {
   generation: number
   players: Player[]
@@ -108,8 +118,8 @@ export interface GameState {
   map: MapState
   deck: Card[]
   discards: Card[]
-  milestones: any
-  awards: any
+  milestones: MilestoneClaim[]
+  awards: AwardFunding[]
   globalParameters: GlobalParameters
 
   draft: {
