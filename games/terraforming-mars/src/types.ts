@@ -38,6 +38,15 @@ export const enum ResourceType {
   Heat = 'Heat',
 }
 
+export const RESOURCE_TYPES = [
+  ResourceType.Money,
+  ResourceType.Steel,
+  ResourceType.Titanium,
+  ResourceType.Plant,
+  ResourceType.Energy,
+  ResourceType.Heat,
+]
+
 export type ResourcesState = {[resource in ResourceType]: ResourceState}
 
 export interface PlayerState {

@@ -67,7 +67,7 @@ const hexPoints = (x, y, radius) => {
 const RADIUS = 28
 
 const Grid = () => (
-  <svg width={500} height={420}>
+  <svg width={470} height={420}>
     <g>
       {range(0, 9).map(row =>
         range(
@@ -92,8 +92,8 @@ const Grid = () => (
 
 const Leaderboard = () => (
   <Box style={{fontSize: 14}}>
-    <Box mb="3px" style={{borderBottom: '1px solid black'}}>
-      Terraforming Rating
+    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
+      Terraforming Ratings
     </Box>
     {['abe', 'bas', 'cab'].map(player => (
       <Flex key={player}>
@@ -104,33 +104,93 @@ const Leaderboard = () => (
   </Box>
 )
 
+const GlobalParams = () => (
+  <Box style={{fontSize: 14}} mb={3}>
+    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
+      Globals
+    </Box>
+    {['Oceans', 'Temp', 'Oxygen'].map(param => (
+      <Flex key={param}>
+        <Box w={120} flex="1 1 auto">
+          {param}
+        </Box>
+        <Box>0 (9 left)</Box>
+      </Flex>
+    ))}
+  </Box>
+)
+
+const PlayerCard = () => (
+  <Box mb={2}>
+    <Flex>viz</Flex>
+    <Flex>
+      <Flex>
+        <Circle color="yellow">C</Circle>
+        2
+      </Flex>
+      <Flex>
+        <Circle color="brown">S</Circle>
+        2
+      </Flex>
+      <Circle color="black">T</Circle>
+    </Flex>
+    <Flex>
+      <Circle color="green">P</Circle>
+      <Circle color="purple">E</Circle>
+      <Circle color="red">H</Circle>
+    </Flex>
+  </Box>
+)
+
 const TerraformingMars = () => (
   <Wrapper>
     <div style={{fontFamily: 'Rubik Mono One'}}>Terraforming Mars</div>
-    <Box>Oceans: 0 (9 left), Temp: -20C (14 left) , Oxygen: 4 (13 left)</Box>
     <Flex>
-      <Grid />
-      <Leaderboard />
-    </Flex>
-    <Flex>
-      Events
-      <Box mr={1}>
-        <Card cost={23} name="Development Center" />
-        <Card cost={23} name="Development Center" />
-        <Card cost={23} name="Development Center" />
-        <Card cost={23} name="Development Center" />
-        <Card cost={23} name="Development Center" />
+      <Box w={200} style={{minWidth: 200}}>
+        <PlayerCard />
+        <PlayerCard />
+        <PlayerCard />
       </Box>
-      <Box mr={1}>
-        <Card cost={23} name="Development Center" collapsed />
-        <Card cost={23} name="Development Center" collapsed />
-        <Card cost={23} name="Development Center" collapsed />
-        <Card cost={23} name="Development Center" collapsed />
-        <Card cost={23} name="Development Center" collapsed />
+      <Box flex="1 1 auto">
+        <Flex>
+          <Box>
+            <GlobalParams />
+            <Leaderboard />
+          </Box>
+          <Box flex="1 1 auto" style={{textAlign: 'center'}}>
+            <Grid />
+          </Box>
+        </Flex>
+        <Flex>
+          <Box mr={1}>
+            <Card cost={23} name="Development Center" />
+            <Card cost={23} name="Development Center" />
+            <Card cost={23} name="Development Center" />
+            <Card cost={23} name="Development Center" />
+            <Card cost={23} name="Development Center" />
+          </Box>
+          <Box mr={1}>
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+          </Box>
+          <Box>
+            <Card cost={23} name="Development Center" type="Active" />
+            <Card cost={23} name="Development Center" type="Active" />
+          </Box>
+        </Flex>
       </Box>
       <Box>
-        <Card cost={23} name="Development Center" type="Active" />
-        <Card cost={23} name="Development Center" type="Active" />
+        Hand
+        <Box>
+          <Card cost={23} name="Development Center" />
+          <Card cost={23} name="Development Center" />
+          <Card cost={23} name="Development Center" />
+          <Card cost={23} name="Development Center" />
+          <Card cost={23} name="Development Center" />
+        </Box>
       </Box>
     </Flex>
   </Wrapper>

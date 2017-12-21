@@ -1,4 +1,4 @@
-import {Transform, ResourceType, TileType, GameState, Card} from './types'
+import {Transform, ResourceType, TileType, GameState, Card, RESOURCE_TYPES} from './types'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -23,9 +23,10 @@ const costs = (cost: number, resource: ResourceType): Transform => changeProduct
 const ocean = state => state
 const raiseHeat = state => state
 
+const MAX_OXYGEN = 14
+
 const raiseOxygen: Transform = state => {
-  // state.
-  if (true) {
+  if (state.globalParameters.Oxygen < MAX_OXYGEN) {
     state.globalParameters.Oxygen += 1
     state.playerState[state.player].TR += 1
   }
@@ -41,10 +42,35 @@ const placeGreenery = (state, action) => {
 }
 
 const placeCity = (state, action) => {
+  // TODO: Check validity.
+
   state.map[action.position] = {
     type: TileType.City,
     owner: state.player,
   }
+  return state
+}
+
+const generationProduction: Transform = state => {
+  state.players.forEach(player => {
+    const playerState = state.playerState[player]
+
+    // Convert energy into heat.
+    playerState.resources[ResourceType.Heat].count +=
+      playerState.resources[ResourceType.Energy].count
+
+    playerState.resources[ResourceType.Energy].count = 0
+
+    // Produce each resource.
+    RESOURCE_TYPES.forEach(resource => {
+      let production = playerState.resources[resource].production
+      if (resource === ResourceType.Money) {
+        production += playerState.TR
+      }
+      playerState.resources[resource].count += playerState.resources[resource].production
+    })
+  })
+
   return state
 }
 
