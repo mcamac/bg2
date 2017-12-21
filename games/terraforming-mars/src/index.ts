@@ -1,5 +1,17 @@
-import {Transform, ResourceType, TileType, GameState, Card, RESOURCE_TYPES, Player} from './types'
+import {
+  Transform,
+  ResourceType,
+  TileType,
+  GameState,
+  Card,
+  RESOURCE_TYPES,
+  Player,
+  Milestones,
+  Tag,
+  Awards,
+} from './types'
 import {CARDS} from './cards'
+import {HasTags, GetPlayerTags} from './utils'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -170,6 +182,29 @@ const getInitialGameState = (players: Player[]): GameState => {
 
     draft: {},
   }
+}
+
+const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
+  [Milestones.Terraformer]: state => state.playerState[state.player].TR >= 35,
+  [Milestones.Mayor]: null,
+  [Milestones.Gardener]: null,
+  [Milestones.Builder]: HasTags(8, Tag.Building),
+  [Milestones.Planner]: state => state.playerState[state.player].hand.length >= 16,
+}
+
+const awardFns: {[key: string]: ((s: GameState, player: Player) => number)} = {
+  [Awards.Landlord]: (state, player) =>
+    Object.keys(state.map)
+      .map(key => state.map[key].owner)
+      .filter(owner => owner === player).length,
+  [Awards.Banker]: (state, player) =>
+    state.playerState[player].resources[ResourceType.Money].production,
+  [Awards.Scientist]: (state, player) => GetPlayerTags(Tag.Science, player)(state),
+  [Awards.Thermalist]: (state, player) =>
+    state.playerState[player].resources[ResourceType.Heat].count,
+  [Awards.Miner]: (state, player) =>
+    state.playerState[player].resources[ResourceType.Steel].count +
+    state.playerState[player].resources[ResourceType.Titanium].count,
 }
 
 export const handleAction = {}

@@ -1,4 +1,4 @@
-import {GameState, Transform, Tag, GlobalType} from './types'
+import {GameState, Transform, Tag, GlobalType, Player} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
@@ -40,8 +40,13 @@ export const GetGlobalTypeValue = (global: GlobalType): ((state: GameState) => n
   return state => 0
 }
 
-export const GlobalTypeWithinRange = (global: GlobalType, min: number, max: number): ((state: GameState) => boolean) => {
-  return state => (GetGlobalTypeValue(global)(state) >= min) && (GetGlobalTypeValue(global)(state) <= max)
+export const GlobalTypeWithinRange = (
+  global: GlobalType,
+  min: number,
+  max: number
+): ((state: GameState) => boolean) => {
+  return state =>
+    GetGlobalTypeValue(global)(state) >= min && GetGlobalTypeValue(global)(state) <= max
 }
 
 export const MinOxygen = (thresh: number): ((state: GameState) => boolean) => {
@@ -83,6 +88,10 @@ export const GetTags = (tag: Tag, ratio?: number): ((state: GameState) => number
 }
 
 export const GetAllTags = (tag: Tag): ((state: GameState) => number) => {
+  return state => 0
+}
+
+export const GetPlayerTags = (tag: Tag, player: Player): ((state: GameState) => number) => {
   return state => 0
 }
 

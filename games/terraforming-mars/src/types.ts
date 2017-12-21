@@ -132,3 +132,19 @@ export const enum ResourceBonus {
   Titanium = 'Titanium',
   Steel = 'Steel',
 }
+
+export const enum Milestones {
+  Terraformer = 'Terraformer',
+  Mayor = 'Mayor',
+  Gardener = 'Gardener',
+  Builder = 'Builder',
+  Planner = 'Planner',
+}
+
+export const enum Awards {
+  Landlord,
+  Banker,
+  Scientist,
+  Thermalist,
+  Miner,
+}
