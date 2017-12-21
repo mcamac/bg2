@@ -32,6 +32,11 @@ import {
   GetX,
   Neg,
   PlaceGreenery,
+  MaxOxygen,
+  MinOceans,
+  MinOxygen,
+  MaxHeat,
+  MinHeat,
 } from './utils'
 import {ResourceType, CardResource, Tag} from './types'
 
@@ -53,6 +58,7 @@ const CARDS = [
     actionText: '',
     effectText: 'Oxygen must be 5% or less.',
     effects: [],
+    requires: [MaxOxygen(5)]
   },
   {
     name: 'Asteroid Mining Consortium',
@@ -114,6 +120,7 @@ const CARDS = [
       ChangeProduction(2, ResourceType.Plant),
     ],
     resourceHeld: null,
+    requires: [MinOceans(3)]
   },
   {
     name: 'Search For Life',
@@ -133,6 +140,7 @@ const CARDS = [
       'Action: Spend 1 MC to reveal and discard the top card of the draw deck. If that card has a microbe tag, add a science resource here.',
     effectText: 'Oxygen must be 6% or less. 3 VPs if you have one or more science resource here.',
     resourceHeld: 'Science',
+    requires: [MaxOxygen(6)]
   },
   {
     name: "Inventors' Guild",
@@ -189,6 +197,7 @@ const CARDS = [
     effectText:
       'Requires 4 ocean tiles. Place [the capital city] tile. Decrease your energy production 2 steps and increase your MC production 5 steps. 1 ADDITIONAL VP FOR EACH OCEAN TILE ADJACENT TO THIS CITY TILE.',
     resourceHeld: null,
+    requires: [MinOceans(4)]
   },
   {
     name: 'Asteroid',
@@ -345,6 +354,7 @@ const CARDS = [
     effectText:
       'Oxygen must be 7% or less. Gain 3 plants and place a city tile. Decrease your energy production 1 step and increase MC production 3 steps.',
     resourceHeld: null,
+    requires: [MaxOxygen(7)]
   },
   {
     name: 'Noctis City',
@@ -389,6 +399,7 @@ const CARDS = [
       'Requires 2% oxygen. Increase your heat production 2 steps and your plant production 2 steps.',
     effects: [ChangeProduction(2, ResourceType.Heat), ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinOxygen(2)]
   },
   {
     name: 'Imported Hydrogen',
@@ -498,6 +509,7 @@ const CARDS = [
     triggers: [],
     effect: [ChangeInventory(1, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MaxHeat[-12]]
   },
   {
     name: 'Predators',
@@ -522,6 +534,7 @@ const CARDS = [
       ],
     ],
     resourceHeld: 'Animals',
+    requires: [MinOxygen(11)]
   },
   {
     name: 'Space Station',
@@ -564,6 +577,7 @@ const CARDS = [
       ChangeProduction(2, ResourceType.Money),
     ],
     resourceHeld: null,
+    requires: [MinHeat(-12)]
   },
   {
     name: 'Interstellar Colony Ship',
@@ -627,6 +641,7 @@ const CARDS = [
       ChangeProduction(3, ResourceType.Money),
     ],
     resourceHeld: null,
+    requires: [MaxOxygen(9)]
   },
   {
     name: 'Lunar Beam',
@@ -745,6 +760,7 @@ const CARDS = [
     ],
     effectText: 'Requires 4% oxygen.',
     resourceHeld: 'Microbes',
+    requires: [MinOxygen(4)]
   },
   {
     name: 'Ants',
@@ -769,6 +785,7 @@ const CARDS = [
         ChangeCardResource(1, CardResource.Microbes),
       ],
     ],
+    requires: [MinOxygen(4)]
   },
   {
     name: 'Release of Inert Gases',
@@ -916,6 +933,7 @@ const CARDS = [
     effectText: 'It must be -18\u00b0C or colder. Increase your plant production 1 step.',
     effects: [ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MaxHeat(-18)]
   },
   {
     name: 'Carbonate Processing',
@@ -954,6 +972,7 @@ const CARDS = [
     effectText:
       'Oxygen must be 4% or less. Place this tile NEXT TO NO OTHER TILE. Increase your MC production 1 step.',
     resourceHeld: null,
+    requires: [MaxOxygen(4)]
   },
   {
     name: 'Nuclear Power',
@@ -1012,6 +1031,7 @@ const CARDS = [
     effectText: 'Requires 5 ocean tiles. Gain 1 plant and increase your plant production 2 steps.',
     effects: [ChangeInventory(1, ResourceType.Plant), ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinOceans[5]]
   },
   {
     name: 'Adapted Lichen',
@@ -1114,6 +1134,7 @@ const CARDS = [
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [DecreaseAnyProduction(1, ResourceType.Plant)],
     resourceHeld: 'Animals',
+    requires: [MinHeat(2)]
   },
   {
     name: 'Lake Marineris',
@@ -1154,6 +1175,7 @@ const CARDS = [
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [DecreaseAnyProduction(1, ResourceType.Plant)],
     resourceHeld: 'Animals',
+    requires: [MinOxygen(6)]
   },
   {
     name: 'Kelp Farming',
@@ -1178,6 +1200,7 @@ const CARDS = [
       ChangeInventory(2, ResourceType.Plant),
     ],
     resourceHeld: null,
+    requries: [MinOceans(6)]
   },
   {
     name: 'Mine',
@@ -1256,6 +1279,7 @@ const CARDS = [
       'Requires +4\u00b0C or warmer. Place a Greenery tile ON AN AREA RESERVED FOR OCEAN and raise oxygen 1 step. Disregard normal placement restrictions for this.',
     effects: [PlaceGreeneryOnOcean],
     resourceHeld: null,
+    requires: [MinHeat(4)]
   },
   {
     name: 'Trees',
@@ -1276,6 +1300,7 @@ const CARDS = [
       'Requires -4\u00b0C or warmer. Increase your plant production 3 steps. Gain 1 plant.',
     effects: [ChangeProduction(3, ResourceType.Plant), ChangeInventory(1, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinHeat(-4)]
   },
   {
     name: 'Great Escarpment Consortium',
@@ -1462,6 +1487,7 @@ const CARDS = [
       ],
     ],
     resourceHeld: null,
+    requires: [MaxOxygen(8)]
   },
   {
     name: 'Earth Catapult',
@@ -1522,6 +1548,7 @@ const CARDS = [
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [DecreaseAnyProduction(2, ResourceType.Plant)],
     resourceHeld: 'Animals',
+    requires: [MinOxygen(13)]
   },
   {
     name: 'Mars University',
@@ -1819,6 +1846,7 @@ const CARDS = [
       'Requires -16\u00b0C or warmer. Increase your plant production 1 step. Gain 3 plants.',
     effects: [ChangeProduction(1, ResourceType.Plant), ChangeInventory(3, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinHeat(-16)]
   },
   {
     name: 'Heather',
@@ -1839,6 +1867,7 @@ const CARDS = [
       'Requires -14\u00b0C or warmer. Increase your plant production 1 step. Gain 1 plant.',
     effects: [ChangeProduction(1, ResourceType.Plant), ChangeInventory(1, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinHeat(-14)]
   },
   {
     name: 'Peroxide Power',
@@ -1936,6 +1965,7 @@ const CARDS = [
       'Requires -10\u00b0C or warmer. Increase your plant production 2 steps. Gain 2 plants.',
     effects: [ChangeProduction(2, ResourceType.Plant), ChangeInventory(2, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinHeat(-10)]
   },
   {
     name: 'Mass Converter',
@@ -2249,6 +2279,7 @@ const CARDS = [
       PlaceCity,
     ],
     resourceHeld: null,
+    requires: [MinOxygen(12)]
   },
   {
     name: 'Media Group',
@@ -2363,6 +2394,7 @@ const CARDS = [
     actionText: '',
     effectText: 'Requires 7% oxygen.',
     resourceHeld: null,
+    requires: [MinOxygen(7)]
   },
   {
     name: 'Artificial Photosynthesis',
@@ -2404,6 +2436,7 @@ const CARDS = [
       'Requires -6\u00b0C or warmer. Place 1 ocean tile ON AN AREA NOT RESERVED FOR OCEAN.',
     effects: [ArtificialLake],
     resourceHeld: null,
+    requires: [MinHeat(-6)]
   },
   {
     name: 'Geothermal Power',
@@ -2447,6 +2480,7 @@ const CARDS = [
       ChangeInventory(2, ResourceType.Plant),
     ],
     resourceHeld: null,
+    requires: [MinHeat(4)]
   },
   {
     name: 'Dust Seals',
@@ -2465,6 +2499,7 @@ const CARDS = [
     actionText: '',
     effectText: 'Requires 3 or less ocean tiles.',
     resourceHeld: null,
+    requires: [MaxOceans(3)]
   },
   {
     name: 'Urbanized Area',
@@ -2534,6 +2569,7 @@ const CARDS = [
       'Requires 3 ocean tiles and that you lose 1 plant. Increase your plant production 1 step.',
     effects: [ChangeInventory(-1, ResourceType.Plant), ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinOceans(3)]
   },
   {
     name: 'Industrial Center',
@@ -2676,6 +2712,7 @@ const CARDS = [
       'Requires 5% oxygen. Increase your MC production 1 step for each city tile ON MARS.',
     effects: [ChangeProduction(GetCitiesOnMars(), ResourceType.Money)],
     resourceHeld: null,
+    requires: [MinOxygen(5)]
   },
   {
     name: 'Worms',
@@ -2696,6 +2733,7 @@ const CARDS = [
       'Requires 4% oxygen. Increase your plant production 1 step for every 2 microbe tags you have, including this.',
     effects: [ChangeProduction(GetTags(Tag.Microbe, 2), ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinOxygen(5)]
   },
   {
     name: 'Decomposers',
@@ -2716,6 +2754,7 @@ const CARDS = [
     effectText: 'Requires 3# oxygen. 1 VP per 3 microbes on this card.',
     // todo
     resourceHeld: 'Microbes',
+    requires: [MinOxygen(3)]
   },
   {
     name: 'Fusion Power',
@@ -2754,6 +2793,7 @@ const CARDS = [
     effectText: 'Requires -14\u00b0C or warmer.',
     actions: [[ChangeAnyCardResource(1, CardResource.Microbes)]],
     resourceHeld: null,
+    requires: [MinHeat(-14)]
   },
   {
     name: 'Extreme-Cold Fungus',
@@ -2780,6 +2820,7 @@ const CARDS = [
     ],
     effectText: 'It must be -10\u00b0C or colder.',
     resourceHeld: null,
+    requires: [MaxHeat(-10)]
   },
   {
     name: 'Advanced Ecosystems',
@@ -2817,6 +2858,7 @@ const CARDS = [
     effectText: 'Requires 4 ocean tiles. Increase your energy production 2 steps.',
     effects: [ChangeProduction(2, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [MinOceans(4)]
   },
   {
     name: 'Cartel',
@@ -2880,6 +2922,7 @@ const CARDS = [
     effectText: 'Requires 3 ocean tiles. Increase your energy production 1 step.',
     effects: [ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [MinOceans(3)]
   },
   {
     name: 'Lava Flows',
@@ -3024,6 +3067,7 @@ const CARDS = [
       'Requires 3 ocean tiles and that you lose 2 plants. Increase your plant production 2 steps.',
     effects: [ChangeInventory(-2, ResourceType.Plant), ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
+    requries: [MinOceans(3)]
   },
   {
     name: 'Herbivores',
@@ -3044,6 +3088,7 @@ const CARDS = [
       'Requires 8% oxygen. Add 1 animal to this card. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
     // todo
     resourceHeld: 'Animals',
+    requires: [MinOxygen(8)]
   },
   {
     name: 'Insects',
@@ -3064,6 +3109,7 @@ const CARDS = [
       'Requires 6% oxygen. Increase your plant production 1 step for each plant tag you have.',
     effects: [ChangeProduction(GetTags(Tag.Plant), ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinOxygen(6)]
   },
   {
     name: "CEO's Favourite Project",
@@ -3201,6 +3247,7 @@ const CARDS = [
     effectText: 'It must be -14\u00b0C or colder. Increase your plant production 2 steps.',
     effects: [ChangeProduction(2, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MaxHeat(-14)]
   },
   {
     name: 'Standard Technology',
@@ -3281,6 +3328,7 @@ const CARDS = [
     effectText: 'Requires -24\u00b0C or warmer. Increase your plant production 1 step.',
     effects: [ChangeProduction(1, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinHeat(-24)]
   },
   {
     name: 'Power Supply Consortium',
@@ -3423,6 +3471,7 @@ const CARDS = [
       'Requires 5% oxygen. Decrease your energy production 1 step and increase your MC production 2 steps.',
     effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
+    requires: [MinOxygen(6)]
   },
   {
     name: 'Import of Advanced GHG',
@@ -3461,6 +3510,7 @@ const CARDS = [
     effectText: 'Requires 7% oxygen. Increase your energy production 1 step.',
     effectd: [ChangeProduction(1, ResourceType.Energy)],
     resourceHeld: null,
+    requires: [MinOxygen(7)]
   },
   {
     name: 'Tundra Farming',
@@ -3485,6 +3535,7 @@ const CARDS = [
       ChangeInventory(1, ResourceType.Plant),
     ],
     resourceHeld: null,
+    requires: [MinHeat(-6)]
   },
   {
     name: 'Aerobraked Ammonia Asteroid',
@@ -3632,6 +3683,7 @@ const CARDS = [
       'Requires -20\u00b0C or warmer. Increase your MC production 1 step and gain 2 plants.',
     effects: [ChangeProduction(1, ResourceType.Money), ChangeInventory(2, ResourceType.Plant)],
     resourceHeld: null,
+    requires: [MinHeat(-20)]
   },
   {
     name: 'Water Splitting Plant',
@@ -3651,6 +3703,7 @@ const CARDS = [
     effectText: 'Requires 2 ocean tiles.',
     actions: [[ChangeInventory(-3, ResourceType.Energy), RaiseOxygen(1)]],
     resourceHeld: null,
+    requires: [MinOceans(2)]
   },
   {
     name: 'Heat Trappers',
@@ -3735,6 +3788,7 @@ const CARDS = [
     effectText: 'Requires +2\u00b0C or warmer. Place 1 ocean tile.',
     effects: [PlaceOceans(1)],
     resourceHeld: null,
+    requires: [MinHeat(2)]
   },
   {
     name: 'Corporate Stronghold',
@@ -3782,6 +3836,7 @@ const CARDS = [
       ChangeProduction(2, ResourceType.Energy),
     ],
     resourceHeld: null,
+    requires: [MinOxygen(6)]
   },
   {
     name: 'Livestock',
@@ -3803,6 +3858,7 @@ const CARDS = [
     actions: [[ChangeCardResource(1, CardResource.Animals)]],
     effects: [ChangeProduction(-1, ResourceType.Plant), ChangeProduction(2, ResourceType.Money)],
     resourceHeld: 'Animals',
+    requires: [MinOxygen(9)]
   },
   {
     name: 'Olympus Conference',
@@ -3939,6 +3995,7 @@ const CARDS = [
     effectText: 'Requires -8\u00b0C or warmer. Place 1 ocean tile.',
     effects: [PlaceOceans(1)],
     resourceHeld: null,
+    requires: [MinHeat(-8)]
   },
   {
     name: 'Invention Contest',
@@ -4331,6 +4388,7 @@ const CARDS = [
     effectText:
       'Requires 2 oceans. Increase your plant production and your heat production 1 step each.',
     resourceHeld: null,
+    requires: [MinOceans(2)]
     // todo
   },
 ]

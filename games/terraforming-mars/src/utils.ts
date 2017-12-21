@@ -1,4 +1,4 @@
-import {GameState, Transform, Tag} from './types'
+import {GameState, Transform, Tag, GlobalType} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
@@ -32,6 +32,43 @@ export const Branch = (condition: (state: GameState) => boolean, ifTrue, ifFalse
 export const Discount = (delta: number, tags?: Tag[]) => {}
 export const AfterCard = (tags: Tag[], effects: any[]) => {}
 export const AfterTile = {}
+
+/* Global Parameter Requirement Checks (for playing cards) */
+
+export const GetGlobalTypeValue = (global: GlobalType): ((state: GameState) => number) => {
+  /* Not yet implemented */
+  return state => 0
+}
+
+export const GlobalTypeWithinRange = (global: GlobalType, min: number, max: number): ((state: GameState) => boolean) => {
+  return state => (GetGlobalTypeValue(global)(state) >= min) && (GetGlobalTypeValue(global)(state) <= max)
+}
+
+export const MinOxygen = (thresh: number): ((state: GameState) => boolean) => {
+  return GlobalTypeWithinRange(GlobalType.Oxygen, thresh, Infinity)
+}
+
+export const MaxOxygen = (thresh: number): ((state: GameState) => boolean) => {
+  return GlobalTypeWithinRange(GlobalType.Oxygen, -Infinity, thresh)
+}
+
+export const MinHeat = (thresh: number): ((state: GameState) => boolean) => {
+  return GlobalTypeWithinRange(GlobalType.Heat, thresh, Infinity)
+}
+
+export const MaxHeat = (thresh: number): ((state: GameState) => boolean) => {
+  return GlobalTypeWithinRange(GlobalType.Heat, -Infinity, thresh)
+}
+
+export const MinOceans = (thresh: number): ((state: GameState) => boolean) => {
+  return GlobalTypeWithinRange(GlobalType.Oceans, thresh, Infinity)
+}
+
+export const MaxOceans = (thresh: number): ((state: GameState) => boolean) => {
+  return GlobalTypeWithinRange(GlobalType.Oceans, -Infinity, thresh)
+}
+
+/* Card Tag Requirement Check */
 
 export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boolean) => {
   return state => true
