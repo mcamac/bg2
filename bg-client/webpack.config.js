@@ -32,7 +32,7 @@ module.exports = {
     noParse: [/node_modules\/ws/],
   },
   resolve: {
-    extensions: ['.ts', '.js', '.json'],
+    extensions: ['.ts', '.tsx', '.js', '.json'],
   },
   plugins: [new ForkTsCheckerWebpackPlugin()],
 }

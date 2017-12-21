@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "lib": ["es2015"]
+    "lib": ["es2015", "dom"],
+    "jsx": "react"
   },
-  "include": ["../games/power-grid/src/*.ts"]
+  "include": ["../games/power-grid/src/*.ts", "../games/terraforming-mars/src/*.ts"]
 }

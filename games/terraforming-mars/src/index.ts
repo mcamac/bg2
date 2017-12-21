@@ -66,3 +66,5 @@ const handlers = {
   STANDARD_PROJECT: () => {},
   PLAY_CARD: () => {},
 }
+
+export const handleAction = {}

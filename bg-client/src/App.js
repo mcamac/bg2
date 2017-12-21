@@ -5,6 +5,7 @@ import store from './pages/store'
 import history from './history'
 
 import {Game, GameLobby, Login, Lobby} from './pages'
+import TerraformingMars from './games/terraforming-mars/index'
 import {Callback} from './components'
 import {Auth} from './pages/Login'
 
@@ -24,6 +25,7 @@ class App extends Component {
           <Router history={history}>
             <Switch>
               <Route exact path="/" component={Lobby} />
+              <Route exact path="/tf/:uid" component={TerraformingMars} />
               <Route exact path="/game/:uid" component={Game} />
               <Route exact path="/login" render={props => <Login auth={auth} {...props} />} />
               <Route

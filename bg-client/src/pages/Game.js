@@ -6,6 +6,7 @@ import {compose, branch, renderNothing} from 'recompose'
 import GameLobby from './GameLobby'
 import {db} from '../firebase'
 import PowerGrid from '../games/power-grid'
+import TerraformingMars from '../games/terraforming-mars/index'
 
 class Game extends Component {
   componentWillMount() {}
