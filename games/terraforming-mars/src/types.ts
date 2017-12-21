@@ -67,6 +67,8 @@ export interface Tile {
   owner: Player
 }
 
+export type Position = [number, number]
+
 // (-2, 4)
 export interface MapState {
   [key: string]: Tile

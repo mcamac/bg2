@@ -17,4 +17,9 @@ export const OCEAN_POSITIONS = [
 
 export const RESOURCE_BONUSES = {
   '-4,4': [ResourceBonus.Steel, ResourceBonus.Steel],
+  '-3,4': [ResourceBonus.Steel, ResourceBonus.Steel],
+  '-3,3': [ResourceBonus.Steel],
+  '-1,4': [ResourceBonus.Card],
+  '1,3': [ResourceBonus.Card],
+  '2,2': [ResourceBonus.Steel],
 }
