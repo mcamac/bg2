@@ -69,6 +69,28 @@ export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean
   return state => true
 }
 
+/* Compute VP as a function of card resources */
+
+export const VPIfCardHasResources = (resource: CardResource, minimum: number, vp: number): ((state: GameState) => number) => {
+  return state => GetCardResources(resource)(state) > minimum ? 0 : vp
+}
+
+export const VPForTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
+  return state => GetTags(tag)(state) / ratio
+}
+
+export const VPForCardResources = (resource: CardResource, ratio?: number): ((state: GameState) => number) => {
+  return state => GetCardResources(resource)(state) / ratio
+}
+
+export const VPForCitiesOnMars = (ratio?: number): ((state: GameState) => number) => {
+  return state => GetCitiesOnMars()(state) / ratio
+}
+
+export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
+  return state => 0
+}
+
 export const GetTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
   return state => 0
 }
