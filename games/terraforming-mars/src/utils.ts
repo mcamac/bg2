@@ -35,43 +35,29 @@ export const AfterTile = {}
 
 /* Global Parameter Requirement Checks (for playing cards) */
 
-export const GetGlobalTypeValue = (global: GlobalType): ((state: GameState) => number) => {
-  /* Not yet implemented */
-  return state => 0
-}
-
 export const GlobalTypeWithinRange = (
   global: GlobalType,
   min: number,
   max: number
 ): ((state: GameState) => boolean) => {
-  return state =>
-    GetGlobalTypeValue(global)(state) >= min && GetGlobalTypeValue(global)(state) <= max
+  return state => state.globalParameters[global] >= min && state.globalParameters[global] <= max
 }
 
-export const MinOxygen = (thresh: number): ((state: GameState) => boolean) => {
-  return GlobalTypeWithinRange(GlobalType.Oxygen, thresh, Infinity)
-}
+export const MinOxygen = (thresh: number) =>
+  GlobalTypeWithinRange(GlobalType.Oxygen, thresh, Infinity)
 
-export const MaxOxygen = (thresh: number): ((state: GameState) => boolean) => {
-  return GlobalTypeWithinRange(GlobalType.Oxygen, -Infinity, thresh)
-}
+export const MaxOxygen = (thresh: number) =>
+  GlobalTypeWithinRange(GlobalType.Oxygen, -Infinity, thresh)
 
-export const MinHeat = (thresh: number): ((state: GameState) => boolean) => {
-  return GlobalTypeWithinRange(GlobalType.Heat, thresh, Infinity)
-}
+export const MinHeat = (thresh: number) => GlobalTypeWithinRange(GlobalType.Heat, thresh, Infinity)
 
-export const MaxHeat = (thresh: number): ((state: GameState) => boolean) => {
-  return GlobalTypeWithinRange(GlobalType.Heat, -Infinity, thresh)
-}
+export const MaxHeat = (thresh: number) => GlobalTypeWithinRange(GlobalType.Heat, -Infinity, thresh)
 
-export const MinOceans = (thresh: number): ((state: GameState) => boolean) => {
-  return GlobalTypeWithinRange(GlobalType.Oceans, thresh, Infinity)
-}
+export const MinOceans = (thresh: number) =>
+  GlobalTypeWithinRange(GlobalType.Oceans, thresh, Infinity)
 
-export const MaxOceans = (thresh: number): ((state: GameState) => boolean) => {
-  return GlobalTypeWithinRange(GlobalType.Oceans, -Infinity, thresh)
-}
+export const MaxOceans = (thresh: number) =>
+  GlobalTypeWithinRange(GlobalType.Oceans, -Infinity, thresh)
 
 /* Card Tag Requirement Check */
 
