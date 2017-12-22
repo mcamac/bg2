@@ -20,8 +20,19 @@ export const enum Tag {
 export interface Card {
   cost: number
   name: string
-  tags: string[]
+  type: string
+  deck: string
+  tags?: string[]
+  vp?: number | any[]
+  actionText?: string
+  effectText?: string
+  placeTiles?: boolean
+  requires?: any[][]
   discounts?: any
+  resourceHeld?: CardResource
+  effects?: any[]
+  actions?: any[][]
+  afterCardTrigger?: [any[], any[]]
 }
 
 export type Player = string

@@ -153,7 +153,7 @@ export const getDiscount = (played: Card[], card: Card) => {
     if (playedCard.discounts) {
       playedCard.discounts.forEach(discount => {
         if (discount.tags) {
-          if (isSubset(discount.tags, card.tags)) {
+          if (isSubset(discount.tags, card.tags || [])) {
             delta += discount.delta
           }
         } else {

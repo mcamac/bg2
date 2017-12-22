@@ -3,7 +3,7 @@ import {keyBy} from 'lodash'
 import {Discount} from './utils'
 import {ResourceType, CardResource, Tag, Card} from './types'
 
-export const CARDS = [
+export const CARDS: Card[] = [
   {
     name: 'Colonizer Training Camp',
     cost: 8,
@@ -153,7 +153,7 @@ export const CARDS = [
     actions: [
       [['ChangeInventory', -1, ResourceType.Titanium], ['ChangeInventory', 5, ResourceType.Money]],
     ],
-    effect: [['ChangeProduction', 1, ResourceType.Titanium]],
+    effects: [['ChangeProduction', 1, ResourceType.Titanium]],
   },
   {
     name: 'Development Center',
@@ -282,7 +282,7 @@ export const CARDS = [
     tags: ['Plant'],
     actionText: 'Effect: When anyone places an ocean tile, gain 2 plants.',
     effectText: 'It must be -12\u00b0C or colder to play. Gain 1 plant.',
-    effect: [['ChangeInventory', 1, ResourceType.Plant]],
+    effects: [['ChangeInventory', 1, ResourceType.Plant]],
     requires: [['MaxHeat', -12]],
   },
   {
@@ -294,7 +294,7 @@ export const CARDS = [
     vp: ['VPForCardResources', CardResource.Animals],
     actionText: 'Action: Remove 1 animal from any card and add it to this card.',
     effectText: 'Requires 11% oxygen. 1 VP per animal on this card.',
-    action: [
+    actions: [
       [
         ['ChangeAnyCardResource', -1, CardResource.Animals],
         ['ChangeCardResource', 1, CardResource.Animals],
@@ -309,7 +309,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Space'],
-    requirements: {Microbe: ' '},
     vp: 1,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     discounts: [Discount(2, [Tag.Space])],
@@ -336,7 +335,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Space', 'Earth', 'Event'],
-    requirements: {Science: '5'},
     vp: 4,
     effectText: 'Requires 5 science tags.',
     requires: [['HasTags', 5, Tag.Science]],
@@ -455,7 +453,7 @@ export const CARDS = [
     actionText: 'Action: Remove 1 microbe from any card to add 1 to this card.',
     effectText: 'Requires 4% oxygen. 1 VP per 2 microbes on this card.',
     resourceHeld: CardResource.Microbes,
-    action: [
+    actions: [
       [
         ['ChangeAnyCardResource', -1, CardResource.Microbes],
         ['ChangeCardResource', 1, CardResource.Microbes],
@@ -469,7 +467,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    TR: 2,
     effectText: 'Raise your terraform rating 2 steps.',
     effects: [['IncreaseTR', 2]],
   },
@@ -479,7 +476,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Science', 'Event'],
-    TR: 2,
     effectText:
       'Raise your terraforming rating 2 steps and temperature 1 step. Increase your plant production 1 step, or 4 steps if you have 3 plant tags.',
     effects: [
@@ -592,7 +588,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Energy'],
-    requirements: {Science: '3'},
     vp: 1,
     effectText:
       'Requires 3 science tags. Increase your energy production and your MC production 1 step each.',
@@ -716,7 +711,7 @@ export const CARDS = [
       ['ChangeProduction', 3, ResourceType.Plant],
       ['ChangeInventory', 2, ResourceType.Plant],
     ],
-    requries: [['MinOceans', 6]],
+    requires: [['MinOceans', 6]],
   },
   {
     name: 'Mine',
@@ -743,7 +738,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space', 'Jovian', 'Energy'],
-    requirements: {Jovian: '1'},
     vp: 1,
     effectText:
       'Requires a Jovian tag. Increase your heat production and energy production 3 steps each.',
@@ -833,7 +827,7 @@ export const CARDS = [
     tags: ['Building'],
     effectText:
       'Decrease your energy production 1 step and increase your steel production 2 steps.',
-    effect: [
+    effects: [
       ['ChangeProduction', 1, ResourceType.Energy],
       ['ChangeProduction', 2, ResourceType.Steel],
     ],
@@ -846,7 +840,7 @@ export const CARDS = [
     tags: ['Event'],
     placeTiles: true,
     effectText: 'Place your marker on a non-reserved area. Only you may place a tile here',
-    effect: [['LandClaim']],
+    effects: [['LandClaim']],
   },
   {
     name: 'Mining Rights',
@@ -992,7 +986,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science', 'Energy'],
-    requirements: {Science: '4'},
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it',
     discounts: [Discount(2, [Tag.Space])],
     requires: [['HasTags', 4, Tag.Science]],
@@ -1127,7 +1120,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Science'],
-    requirements: {Science: '3'},
     vp: 2,
     effectText: 'Requires 3 science tags. Increase your MC production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Money]],
@@ -1167,7 +1159,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science', 'Energy'],
-    requirements: {Science: '5'},
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: 'Requires 5 science tags. Increase your energy production 6 steps.',
     discounts: [Discount(2, [Tag.Space])],
@@ -1381,7 +1372,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Earth', 'Event'],
-    TR: 2,
     vp: -2,
     effectText: 'Raise your terraform rating 2 steps.',
     effects: [['IncreaseTR', 2]],
@@ -1626,7 +1616,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science', 'Building', 'Energy'],
-    requirements: {Energy: '2'},
     effectText: 'Requires 2 power tags. Increase your energy production 3 steps.',
     effects: [['ChangeProduction', 3, ResourceType.Energy]],
     requires: [['HasTags', 2, Tag.Power]],
@@ -1662,7 +1651,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Microbe', 'Plant', 'Animal'],
-    requirements: {Microbe: '1', Plant: '1', Animal: '1'},
     vp: 3,
     effectText: 'Requires a plant tag, a microbe tag, and an animal tag.',
     requires: [['HasTags', 1, Tag.Microbe], ['HasTags', 1, Tag.Plant], ['HasTags', 1, Tag.Animal]],
@@ -1781,8 +1769,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    requirements: {Science: '2'},
-    TR: 1,
     vp: 1,
     effectText: 'Requires 2 science tags. Increase your energy production 3 steps.',
     effects: [['ChangeProduction', 3, ResourceType.Energy]],
@@ -1800,7 +1786,7 @@ export const CARDS = [
       ['ChangeInventory', -2, ResourceType.Plant],
       ['ChangeProduction', 2, ResourceType.Plant],
     ],
-    requries: [['MinOceans', 3]],
+    requires: [['MinOceans', 3]],
   },
   {
     name: 'Herbivores',
@@ -1842,7 +1828,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science'],
-    requirements: {Science: '7'},
     vp: 3,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: 'Requires 7 science tags.',
@@ -1957,7 +1942,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Energy'],
-    requirements: {Energy: '2'},
     effectText:
       'Requires 2 power tags. Decrease any energy production 1 step and increase your own 1 step.',
     effects: [
@@ -1994,7 +1978,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Earth', 'Event'],
-    TR: 1,
     effectText:
       'Raise your TR 1 step and gain 4 plants. Add 3 microbes to ANOTHER card and 2 animals to ANOTHER card.',
     effects: [
@@ -2018,7 +2001,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    TR: 3,
     effectText:
       'Decrease your energy production 4 steps and increase your plant production 2 steps. Raise your TR 3 steps.',
     effects: [
@@ -2061,7 +2043,7 @@ export const CARDS = [
     tags: ['Building', 'Energy'],
     vp: 1,
     effectText: 'Requires 7% oxygen. Increase your energy production 1 step.',
-    effectd: [['ChangeProduction', 1, ResourceType.Energy]],
+    effects: [['ChangeProduction', 1, ResourceType.Energy]],
     requires: [['MinOxygen', 7]],
   },
   {
@@ -2100,7 +2082,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    TR: 1,
     effectText:
       'Decrease your energy production 2 steps and increase your plant production 1 step. Raise your terraform rating 1 step.',
     effects: [
@@ -2294,7 +2275,6 @@ export const CARDS = [
     cost: 6,
     type: 'Automated',
     deck: 'Corporate',
-    requirements: {City: 'Ref'},
     vp: 1,
     effectText: 'Requires 2 cities in play. Increase your MC production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Money]],
@@ -2368,7 +2348,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    requirements: {Science: '2'},
     placeTiles: true,
     effectText: 'Requires 2 science tags. Place a greenery tile and raise oxygen 1 step.',
     effects: [['PlaceGreenery']],
@@ -2500,7 +2479,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    TR: 2,
     effectText: 'Decrease your energy production 1 step. Raise your terraform rating 2 steps.',
     effects: [['ChangeProduction', -1, ResourceType.Energy], ['IncreaseTR', 2]],
   },
@@ -2531,7 +2509,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science', 'Building'],
-    requirements: {Science: '3'},
     vp: 1,
     actionText: 'Action: Draw 2 cards.',
     effectText: 'Requires 3 science tags to play. Decrease your energy production 1 step.',
@@ -2553,7 +2530,6 @@ export const CARDS = [
     cost: 7,
     type: 'Active',
     deck: 'Promo',
-    requirements: {Science: '2'},
     actionText:
       'Action: Reveal and place a SPACE OR BUILDING card here from hand, and place 2 resources on it, OR double the resources on a card here. Effect: Cards here may be played as if from hand with its cost reduced by the number of resources on it.',
     effectText: 'Requires 2 science tags.',
