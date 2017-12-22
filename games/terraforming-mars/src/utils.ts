@@ -76,15 +76,15 @@ export const VPIfCardHasResources = (resource: CardResource, minimum: number, vp
 }
 
 export const VPForTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
-  return state => GetTags(tag)(state) / ratio
+  return state => Math.floor(GetTags(tag)(state) / ratio)
 }
 
 export const VPForCardResources = (resource: CardResource, ratio?: number): ((state: GameState) => number) => {
-  return state => GetCardResources(resource)(state) / ratio
+  return state => Math.floor(GetCardResources(resource)(state) / ratio)
 }
 
 export const VPForCitiesOnMars = (ratio?: number): ((state: GameState) => number) => {
-  return state => GetCitiesOnMars()(state) / ratio
+  return state => Math.floor(GetCitiesOnMars()(state) / ratio)
 }
 
 export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
