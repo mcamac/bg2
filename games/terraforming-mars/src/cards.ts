@@ -1,3 +1,5 @@
+import {keyBy} from 'lodash'
+
 import {
   DecreaseAnyProduction,
   DecreaseAnyInventory,
@@ -39,8 +41,12 @@ import {
   MinHeat,
   HasCitiesOnMars,
   MaxOceans,
+  VPForCitiesOnMars,
+  VPForEachCardResource,
+  VPForEachTag,
+  VPIfCardHasResources,
 } from './utils'
-import {ResourceType, CardResource, Tag} from './types'
+import {ResourceType, CardResource, Tag, Card} from './types'
 
 export const CARDS = [
   {
@@ -112,7 +118,7 @@ export const CARDS = [
     globalRequirements: {Oxygen: [null, 6]},
     inventory: {Money: 'Ref'},
     TR: 0,
-    vp: 0,
+    vp: VPIfCardHasResources(CardResource.Science, 1, 3),
     placeTiles: false,
     actionText:
       'Action: Spend 1 MC to reveal and discard the top card of the draw deck. If that card has a microbe tag, add a science resource here.',
@@ -214,6 +220,7 @@ export const CARDS = [
     inventory: {Money: 'Ref', Titanium: 'Ref'},
     terraforming: {Temperature: 0, Oxygen: 0, Ocean: null},
     TR: 0,
+    vp: VPForEachTag(Tag.Jovian),
     placeTiles: false,
     actionText:
       'Action: Pay 12 MC to place an ocean tile. TITANIUM MAY BE USED as if playing a space card.',
@@ -343,6 +350,7 @@ export const CARDS = [
     actionText: 'Effect: When you play a card, you pay 1 MC less for it.',
     effectText: 'Place a city tile NEXT TO NO OTHER TILE.',
     effects: [PlaceResearchOutpost],
+    discounts: [Discount(1)]
   },
   {
     name: 'Phobos Space Haven',
@@ -399,6 +407,7 @@ export const CARDS = [
     tags: ['Animal'],
     globalRequirements: {Oxygen: [11, null]},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals),
     placeTiles: false,
     actionText: 'Action: Remove 1 animal from any card and add it to this card.',
     effectText: 'Requires 11% oxygen. 1 VP per animal on this card.',
@@ -422,7 +431,7 @@ export const CARDS = [
     vp: 1,
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
-    triggers: [Discount(2, [Tag.Space])],
+    discounts: [Discount(2, [Tag.Space])],
   },
   {
     name: 'Eos Chasma National Park',
@@ -466,6 +475,7 @@ export const CARDS = [
     tags: ['Space'],
     inventory: {Titanium: 'Ref'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Fighters),
     placeTiles: false,
     actionText: 'Action: Spend 1 titanium to add 1 fighter resource to this card.',
     effectText: '1 VP for each fighter resource on this card.',
@@ -594,6 +604,7 @@ export const CARDS = [
     tags: ['Microbe'],
     globalRequirements: {Oxygen: [4, null]},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Microbes, 2),
     placeTiles: false,
     actionText: 'Action: Remove 1 microbe from any card to add 1 to this card.',
     effectText: 'Requires 4% oxygen. 1 VP per 2 microbes on this card.',
@@ -806,6 +817,7 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Microbe'],
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Microbes, 4),
     placeTiles: false,
     actionText: 'Action: Add 1 microbe to this card.',
     effectText: '1 VP per 4 microbes on this card.',
@@ -851,6 +863,7 @@ export const CARDS = [
     globalRequirements: {Temperature: [2, null]},
     production: {Plant: 'Ref'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals),
     placeTiles: false,
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
@@ -881,6 +894,7 @@ export const CARDS = [
     globalRequirements: {Oxygen: [6, null]},
     production: {Plant: 'Ref'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals, 2),
     placeTiles: false,
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
@@ -1130,7 +1144,7 @@ export const CARDS = [
     vp: 2,
     placeTiles: false,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
-    triggers: [Discount(2)],
+    discounts: [Discount(2)],
   },
   {
     name: 'Advanced Alloys',
@@ -1154,6 +1168,7 @@ export const CARDS = [
     globalRequirements: {Oxygen: [13, null]},
     production: {Plant: 'Ref'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals),
     placeTiles: false,
     actionText: 'Action: Add an animal to this card.',
     effectText:
@@ -1255,7 +1270,7 @@ export const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it',
-    triggers: [Discount(2, [Tag.Space])],
+    discounts: [Discount(2, [Tag.Space])],
     requires: [HasTags(4, Tag.Science)],
   },
   {
@@ -1280,6 +1295,7 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Space', 'City', 'Jovian'],
     TR: 0,
+    vp: VPForEachTag(Tag.Jovian),
     placeTiles: true,
     effectText:
       'Place a city tile ON THE RESERVED AREA [for Ganymede Colony]. 1 VP per Jovian tag you have.',
@@ -1437,6 +1453,7 @@ export const CARDS = [
     tags: ['Space', 'Jovian'],
     production: {Money: '2', Titanium: '2'},
     TR: 0,
+    vp: VPForEachTag(Tag.Jovian),
     placeTiles: false,
     effectText:
       'Increase your titanium production 2 steps and your MC production 2 steps. 1 VP per Jovian tag you have.',
@@ -1472,7 +1489,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: 'Requires 5 science tags. Increase your energy production 6 steps.',
-    triggers: [Discount(2, [Tag.Space])],
+    discounts: [Discount(2, [Tag.Space])],
     effects: [ChangeProduction(6, ResourceType.Energy)],
     requires: [HasTags(5, Tag.Science)],
   },
@@ -1484,6 +1501,7 @@ export const CARDS = [
     tags: ['Science', 'Building'],
     inventory: {Energy: 'Ref'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Science, 0.5),
     placeTiles: false,
     actionText: 'Action: Spend 6 energy to add a science resource to this card.',
     effectText: '2 VP for each science resource on this card.',
@@ -1640,7 +1658,7 @@ export const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: 'Effect: When you play an Earth tag, you pay 3 MC less for it.',
-    triggers: [Discount(3, [Tag.Earth])],
+    discounts: [Discount(3, [Tag.Earth])],
   },
   {
     name: 'Acquired Company',
@@ -1977,6 +1995,7 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Plant', 'Animal'],
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals, 2),
     placeTiles: true,
     actionText:
       'Effect: When you play an animal or a plant tag (including these 2), add an animal to this card.',
@@ -2023,6 +2042,7 @@ export const CARDS = [
     tags: ['Microbe'],
     globalRequirements: {Oxygen: [3, null]},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Microbes, 3),
     placeTiles: false,
     actionText:
       'Effect: When you play an animal, plant, or microbe tag, including this, add a microbe to this card.',
@@ -2277,6 +2297,7 @@ export const CARDS = [
     globalRequirements: {Oxygen: [8, null]},
     production: {Plant: 'Ref'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals, 2),
     placeTiles: false,
     actionText: 'Effect: When you place a greenery tile, add an animal to this card.',
     effectText:
@@ -2325,7 +2346,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: 'Requires 7 science tags.',
-    triggers: [Discount(2)],
+    discounts: [Discount(2)],
     requires: [HasTags(7, Tag.Science)],
   },
   {
@@ -2563,6 +2584,7 @@ export const CARDS = [
       'Requires 5% oxygen. Decrease your energy production 1 step and increase your MC production 2 steps.',
     effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(2, ResourceType.Money)],
     requires: [MinOxygen(6)],
+    discounts: [Discount(2, [Tag.Space])],
   },
   {
     name: 'Import of Advanced GHG',
@@ -2655,6 +2677,7 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Animal', 'Earth'],
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals, 2),
     placeTiles: false,
     actionText:
       'Effect: When any city tile is placed, add an animal to this card. Animals may not be removed from this card.',
@@ -2845,6 +2868,7 @@ export const CARDS = [
     globalRequirements: {Oxygen: [9, null]},
     production: {Money: '2', Plant: '-1'},
     TR: 0,
+    vp: VPForEachCardResource(CardResource.Animals),
     placeTiles: false,
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
@@ -3038,6 +3062,7 @@ export const CARDS = [
     tags: ['Space', 'Earth'],
     production: {Money: '5'},
     TR: 0,
+    vp: VPForCitiesOnMars(3),
     placeTiles: false,
     effectText: 'Increase your MC production 5 steps. 1 VP for every 3rd city in play.',
     effects: [ChangeProduction(5, ResourceType.Money)],
@@ -3230,3 +3255,6 @@ export const CARDS = [
     // todo
   },
 ]
+
+export const CARDS_BY_NAME = keyBy(CARDS, 'name')
+export const getCardByName = name => CARDS_BY_NAME[name] as Card

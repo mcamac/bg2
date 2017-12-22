@@ -29,18 +29,22 @@ export const Mohole = {}
 export const Choice = (...args: any[]) => {}
 export const Branch = (condition: (state: GameState) => boolean, ifTrue, ifFalse) => {}
 
-export const Discount = (delta: number, tags?: Tag[]) => {}
+export const Discount = (delta: number, tags?: Tag[]) => ({
+  delta,
+  tags,
+})
+
 export const AfterCard = (tags: Tag[], effects: any[]) => {}
 export const AfterTile = {}
 
 /* Global Parameter Requirement Checks (for playing cards) */
 
 export const GlobalTypeWithinRange = (
-  global: GlobalType,
+  param: GlobalType,
   min: number,
   max: number
 ): ((state: GameState) => boolean) => {
-  return state => state.globalParameters[global] >= min && state.globalParameters[global] <= max
+  return state => state.globalParameters[param] >= min && state.globalParameters[param] <= max
 }
 
 export const MinOxygen = (thresh: number) =>
@@ -67,6 +71,28 @@ export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boole
 
 export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
   return state => true
+}
+
+/* Compute VP as a function of card resources */
+
+export const VPIfCardHasResources = (resource: CardResource, minimum: number, vp: number): ((state: GameState) => number) => {
+  return state => GetCardResources(resource)(state) > minimum ? 0 : vp
+}
+
+export const VPForTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
+  return state => Math.floor(GetTags(tag)(state) / ratio)
+}
+
+export const VPForCardResources = (resource: CardResource, ratio?: number): ((state: GameState) => number) => {
+  return state => Math.floor(GetCardResources(resource)(state) / ratio)
+}
+
+export const VPForCitiesOnMars = (ratio?: number): ((state: GameState) => number) => {
+  return state => Math.floor(GetCitiesOnMars()(state) / ratio)
+}
+
+export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
+  return state => 0
 }
 
 export const GetTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
