@@ -5,10 +5,7 @@ import {range} from 'lodash/fp'
 
 import {reducer} from './reducer'
 
-const Wrapper = styled.div`
-  font-family: Rubik;
-  padding: 20px;
-`
+const Wrapper = styled.div`font-family: Rubik;`
 
 const CARD_COLORS = {
   Active: '#dff3ff',
@@ -144,20 +141,30 @@ const PlayerCard = () => (
 
 const TerraformingMars = () => (
   <Wrapper>
-    <div style={{fontFamily: 'Rubik Mono One'}}>Terraforming Mars</div>
+    <Box
+      py={1}
+      px={2}
+      slign="center"
+      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid black'}}
+    >
+      Terraforming Mars
+    </Box>
     <Flex>
-      <Box w={200} style={{minWidth: 200}}>
+      <Box p={2} w={200} style={{minWidth: 200}}>
         <PlayerCard />
         <PlayerCard />
         <PlayerCard />
       </Box>
-      <Box flex="1 1 auto">
+      <Box flex="1 1 auto" py={2}>
         <Flex>
           <Box>
             <GlobalParams />
             <Leaderboard />
           </Box>
           <Box flex="1 1 auto" style={{textAlign: 'center'}}>
+            <Box px={2} py={1} mx={2} style={{background: '#eee'}}>
+              Choose an action.
+            </Box>
             <Grid />
           </Box>
         </Flex>
@@ -182,7 +189,7 @@ const TerraformingMars = () => (
           </Box>
         </Flex>
       </Box>
-      <Box>
+      <Box p={2}>
         Hand
         <Box>
           <Card cost={23} name="Development Center" />
