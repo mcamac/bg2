@@ -184,6 +184,35 @@ const getInitialGameState = (players: Player[]): GameState => {
   }
 }
 
+function isSubset<T>(l1: T[], l2: T[]): boolean {
+  const s1 = new Set(l1)
+  const s2 = new Set(l2)
+  for (var elem of Array.from(s1.values())) {
+    if (!s2.has(elem)) {
+      return false
+    }
+  }
+  return true
+}
+
+export const getDiscount = (played: Card[], card: Card) => {
+  let delta = 0
+  played.forEach(playedCard => {
+    if (playedCard.discounts) {
+      playedCard.discounts.forEach(discount => {
+        if (discount.tags) {
+          if (isSubset(discount.tags, card.tags)) {
+            delta += discount.delta
+          }
+        } else {
+          delta += discount.delta
+        }
+      })
+    }
+  })
+  return delta
+}
+
 const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
   [Milestones.Terraformer]: state => state.playerState[state.player].TR >= 35,
   [Milestones.Mayor]: null,

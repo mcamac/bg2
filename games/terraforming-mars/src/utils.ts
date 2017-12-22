@@ -29,18 +29,22 @@ export const Mohole = {}
 export const Choice = (...args: any[]) => {}
 export const Branch = (condition: (state: GameState) => boolean, ifTrue, ifFalse) => {}
 
-export const Discount = (delta: number, tags?: Tag[]) => {}
+export const Discount = (delta: number, tags?: Tag[]) => ({
+  delta,
+  tags,
+})
+
 export const AfterCard = (tags: Tag[], effects: any[]) => {}
 export const AfterTile = {}
 
 /* Global Parameter Requirement Checks (for playing cards) */
 
 export const GlobalTypeWithinRange = (
-  global: GlobalType,
+  param: GlobalType,
   min: number,
   max: number
 ): ((state: GameState) => boolean) => {
-  return state => state.globalParameters[global] >= min && state.globalParameters[global] <= max
+  return state => state.globalParameters[param] >= min && state.globalParameters[param] <= max
 }
 
 export const MinOxygen = (thresh: number) =>

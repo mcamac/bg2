@@ -24,7 +24,7 @@ export interface Card {
   production: any
   inventory: any
   tags: string[]
-  action: any
+  discounts: any
 }
 
 export type Player = string
@@ -54,6 +54,7 @@ export interface PlayerState {
   resources: ResourcesState
   TR: number
   hand: Card[]
+  played: Card[]
   hasIncreasedTRThisGeneration: boolean // For UN.
 }
 

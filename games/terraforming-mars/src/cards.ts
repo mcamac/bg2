@@ -1,3 +1,5 @@
+import {keyBy} from 'lodash'
+
 import {
   DecreaseAnyProduction,
   DecreaseAnyInventory,
@@ -40,7 +42,7 @@ import {
   HasCitiesOnMars,
   MaxOceans,
 } from './utils'
-import {ResourceType, CardResource, Tag} from './types'
+import {ResourceType, CardResource, Tag, Card} from './types'
 
 export const CARDS = [
   {
@@ -421,6 +423,7 @@ export const CARDS = [
     effectText: 'Place a city tile NEXT TO NO OTHER TILE.',
     effects: [PlaceResearchOutpost],
     resourceHeld: null,
+    discounts: [Discount(1)],
   },
   {
     name: 'Phobos Space Haven',
@@ -523,7 +526,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: '',
-    triggers: [Discount(2, [Tag.Space])],
+    discounts: [Discount(2, [Tag.Space])],
   },
   {
     name: 'Eos Chasma National Park',
@@ -1397,7 +1400,7 @@ export const CARDS = [
     vp: 0,
     placeTiles: false,
     actionText: '',
-    effectText: 'Increase your MC production 2  steps.',
+    effectText: 'Increase your MC production 2 steps.',
     effects: [ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
   },
@@ -1441,7 +1444,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: '',
-    triggers: [Discount(2)],
+    discounts: [Discount(2)],
     resourceHeld: null,
   },
   {
@@ -1610,8 +1613,8 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it',
     effectText: '',
-    triggers: [Discount(2, [Tag.Space])],
-    resourceHeld: null,
+    discounts: [Discount(2, [Tag.Space])],
+    recourceHeld: null,
     requires: [HasTags(4, Tag.Science)],
   },
   {
@@ -1900,7 +1903,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: 'Requires 5 science tags. Increase your energy production 6 steps.',
-    triggers: [Discount(2, [Tag.Space])],
+    discounts: [Discount(2, [Tag.Space])],
     effects: [ChangeProduction(6, ResourceType.Energy)],
     resourceHeld: null,
     requires: [HasTags(5, Tag.Science)],
@@ -2125,7 +2128,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: When you play an Earth tag, you pay 3 MC less for it.',
     effectText: '',
-    triggers: [Discount(3, [Tag.Earth])],
+    discounts: [Discount(3, [Tag.Earth])],
     resourceHeld: null,
   },
   {
@@ -3020,7 +3023,7 @@ export const CARDS = [
     placeTiles: false,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: 'Requires 7 science tags.',
-    triggers: [Discount(2)],
+    discounts: [Discount(2)],
     resourceHeld: null,
     requires: [HasTags(7, Tag.Science)],
   },
@@ -3334,6 +3337,7 @@ export const CARDS = [
     effects: [ChangeProduction(-1, ResourceType.Energy), ChangeProduction(2, ResourceType.Money)],
     resourceHeld: null,
     requires: [MinOxygen(6)],
+    discounts: [Discount(2, [Tag.Space])],
   },
   {
     name: 'Import of Advanced GHG',
@@ -4220,3 +4224,6 @@ export const CARDS = [
     // todo
   },
 ]
+
+export const CARDS_BY_NAME = keyBy(CARDS, 'name')
+export const getCardByName = name => CARDS_BY_NAME[name] as Card
