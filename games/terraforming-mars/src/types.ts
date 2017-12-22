@@ -60,6 +60,18 @@ export interface PlayerState {
 export const enum TileType {
   Greenery = 'greenery',
   City = 'city',
+  Ocean = 'ocean',
+  NuclearZone = 'nuclearZone',
+  IndustrialCenter = 'industrialCenter',
+  LavaFlows = 'lavaFlows',
+  EcologicalZone = 'ecologicalZone',
+  MiningArea = 'miningArea',
+  MiningRights = 'miningRights',
+  Capital = 'capital',
+  MoholeArea = 'moholeArea',
+  RestrictedArea = 'restrictedArea',
+  CommercialDistrict = 'commercialDistrict',
+  NaturalPreserve = 'naturalPreserve'
 }
 
 export interface Tile {
