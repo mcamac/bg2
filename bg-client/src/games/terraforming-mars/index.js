@@ -13,11 +13,13 @@ const CARD_COLORS = {
 
 const CircleWrapper = styled.div`
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
   background: ${props => props.color};
-  text-align: center;
-  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const Circle = props => (
@@ -119,7 +121,10 @@ const GlobalParams = () => (
 
 const PlayerCard = () => (
   <Box mb={2}>
-    <Flex>viz</Flex>
+    <Flex>
+      <Box flex="1 1 auto">viz</Box>
+      <Box>30</Box>
+    </Flex>
     <Flex>
       <Flex>
         <Circle color="yellow">C</Circle>
@@ -145,26 +150,29 @@ const TerraformingMars = () => (
       py={1}
       px={2}
       slign="center"
-      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid black'}}
+      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #aaa'}}
     >
       Terraforming Mars
     </Box>
     <Flex>
-      <Box p={2} w={200} style={{minWidth: 200}}>
+      <Box p={2} w={200} style={{minWidth: 200, borderRight: '1px solid #ddd'}}>
         <PlayerCard />
         <PlayerCard />
         <PlayerCard />
       </Box>
-      <Box flex="1 1 auto" py={2}>
+      <Box flex="1 1 auto" p={2}>
         <Flex>
           <Box>
             <GlobalParams />
             <Leaderboard />
           </Box>
           <Box flex="1 1 auto" style={{textAlign: 'center'}}>
-            <Box px={2} py={1} mx={2} style={{background: '#eee'}}>
-              Choose an action.
-            </Box>
+            <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
+              2 actions left. Choose an action or
+              <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
+                pass
+              </Box>
+            </Flex>
             <Grid />
           </Box>
         </Flex>
@@ -189,9 +197,11 @@ const TerraformingMars = () => (
           </Box>
         </Flex>
       </Box>
-      <Box p={2}>
-        Hand
-        <Box>
+      <Box style={{borderLeft: '1px solid #ddd'}}>
+        <Box p={1} style={{fontSize: 12, color: '#555'}}>
+          HAND
+        </Box>
+        <Box px={2}>
           <Card cost={23} name="Development Center" />
           <Card cost={23} name="Development Center" />
           <Card cost={23} name="Development Center" />

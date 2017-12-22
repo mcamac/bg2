@@ -1,4 +1,4 @@
-import {GameState, Transform, Tag, GlobalType, Player} from './types'
+import {GameState, Transform, Tag, GlobalType, Player, CardResource} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
@@ -75,15 +75,22 @@ export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean
 
 /* Compute VP as a function of card resources */
 
-export const VPIfCardHasResources = (resource: CardResource, minimum: number, vp: number): ((state: GameState) => number) => {
-  return state => GetCardResources(resource)(state) > minimum ? 0 : vp
+export const VPIfCardHasResources = (
+  resource: CardResource,
+  minimum: number,
+  vp: number
+): ((state: GameState) => number) => {
+  return state => (GetCardResources(resource)(state) > minimum ? 0 : vp)
 }
 
 export const VPForTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
   return state => Math.floor(GetTags(tag)(state) / ratio)
 }
 
-export const VPForCardResources = (resource: CardResource, ratio?: number): ((state: GameState) => number) => {
+export const VPForCardResources = (
+  resource: CardResource,
+  ratio?: number
+): ((state: GameState) => number) => {
   return state => Math.floor(GetCardResources(resource)(state) / ratio)
 }
 

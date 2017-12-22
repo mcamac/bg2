@@ -20,9 +20,6 @@ export const enum Tag {
 export interface Card {
   cost: number
   name: string
-  requirements: any
-  production: any
-  inventory: any
   tags: string[]
   discounts: any
 }
