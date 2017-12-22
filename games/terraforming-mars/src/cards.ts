@@ -10,7 +10,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Jovian'],
-    globalRequirements: {Oxygen: [null, 5]},
     vp: 2,
     effectText: 'Oxygen must be 5% or less.',
     requires: [['MaxOxygen', 5]],
@@ -77,7 +76,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    inventory: {Money: 'Ref', Energy: 'Ref'},
     actionText: 'Action: Spend 1 energy to gain 1 MC for each city tile ON MARS.',
     // todo
   },
@@ -87,8 +85,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    globalRequirements: {Oceans: [4, null]},
-    production: {Money: '5', Energy: '-2'},
     placeTiles: true,
     effectText:
       'Requires 4 ocean tiles. Place [the capital city] tile. Decrease your energy production 2 steps and increase your MC production 5 steps. 1 ADDITIONAL VP FOR EACH OCEAN TILE ADJACENT TO THIS CITY TILE.',
@@ -101,8 +97,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    inventory: {Titanium: '2', Plant: 'Ref'},
-    terraforming: {Temperature: 1, Oxygen: 0, Ocean: 0},
     effectText:
       'Raise temperature 1 step and gain 2 titanium. Remove up to 3 plants from any player.',
     // todo
@@ -128,8 +122,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    inventory: {Titanium: '4', Plant: 'Ref'},
-    terraforming: {Temperature: 2, Oxygen: 0, Ocean: 0},
     effectText:
       'Raise temperature 2 steps and gain 4 titanium. Remove up to 4 plants from any player.',
     effects: [
@@ -144,8 +136,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Space', 'Jovian'],
-    inventory: {Money: 'Ref', Titanium: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: null},
     vp: ['VPForTags', Tag.Jovian],
     actionText:
       'Action: Pay 12 MC to place an ocean tile. TITANIUM MAY BE USED as if playing a space card.',
@@ -157,8 +147,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Building', 'Space'],
-    production: {Titanium: '1'},
-    inventory: {Money: 'Ref', Steel: 'Ref'},
     vp: 2,
     actionText: 'Action: Spend 1 steel to gain 5 MC',
     effectText: 'Increase your titanium production 1 step.',
@@ -173,7 +161,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science', 'Building'],
-    inventory: {Energy: 'Ref'},
     actionText: 'Action: Spend 1 energy to draw a card.',
     actions: [[['ChangeInventory', -1, ResourceType.Energy], ['Draw', 1]]],
   },
@@ -183,7 +170,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Energy: 'Ref'},
     actionText:
       'Action: Decrease your energy production 1 step to increase your terraforming rating 1 step.',
     actions: [[['ChangeProduction', -1, ResourceType.Energy], ['IncreaseTR', 1]]],
@@ -194,9 +180,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    globalRequirements: {Oxygen: [null, 7]},
-    production: {Money: '3', Energy: '-1'},
-    inventory: {Plant: '3'},
     vp: 1,
     placeTiles: true,
     effectText:
@@ -209,7 +192,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    production: {Money: '3', Energy: '-1'},
     placeTiles: true,
     effectText:
       'Decrease your energy production 1 step and increase your MC production 3 steps. Place a tile ON THE RESERVED AREA, disregarding normal placement restrictions.',
@@ -225,8 +207,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space', 'Jovian'],
-    globalRequirements: {Oxygen: [2, null]},
-    production: {Plant: '2', Heat: '2'},
     vp: 2,
     effectText:
       'Requires 2% oxygen. Increase your heat production 2 steps and your plant production 2 steps.',
@@ -242,8 +222,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Earth', 'Event'],
-    inventory: {Plant: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     placeTiles: true,
     effectText:
       'Gain 3 plants, or add 3 microbes or 2 animals to ANOTHER card. Place an ocean tile.',
@@ -277,7 +255,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space', 'City'],
-    production: {Titanium: '1'},
     vp: 3,
     placeTiles: true,
     effectText:
@@ -288,8 +265,6 @@ export const CARDS = [
     cost: 15,
     type: 'Automated',
     deck: 'Basic',
-    production: {Money: '-2', Heat: '3'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     placeTiles: true,
     effectText:
       'Place an ocean tile. Decrease your MC production 2 steps and increase your heat production 3 steps.',
@@ -305,8 +280,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [null, -12]},
-    inventory: {Plant: 'Ref'},
     actionText: 'Effect: When anyone places an ocean tile, gain 2 plants.',
     effectText: 'It must be -12\u00b0C or colder to play. Gain 1 plant.',
     effect: [['ChangeInventory', 1, ResourceType.Plant]],
@@ -318,7 +291,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Animal'],
-    globalRequirements: {Oxygen: [11, null]},
     vp: ['VPForCardResources', CardResource.Animals],
     actionText: 'Action: Remove 1 animal from any card and add it to this card.',
     effectText: 'Requires 11% oxygen. 1 VP per animal on this card.',
@@ -348,9 +320,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Plant'],
-    globalRequirements: {Temperature: [-12, null]},
-    production: {Money: '2'},
-    inventory: {Plant: '3'},
     vp: 1,
     effectText:
       'Requires -12C  or warmer. Add 1 animal TO ANY ANIMAL CARD. Gain 3 plants. Increase your MC production 2 steps.',
@@ -378,7 +347,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Space'],
-    inventory: {Titanium: 'Ref'},
     vp: ['VPForCardResources', CardResource.Fighters],
     actionText: 'Action: Spend 1 titanium to add 1 fighter resource to this card.',
     effectText: '1 VP for each fighter resource on this card.',
@@ -396,8 +364,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    globalRequirements: {Oxygen: [null, 9]},
-    production: {Money: '3', Energy: '-1'},
     placeTiles: true,
     effectText:
       'Oxygen must be 9% or less. Place a city tile. Decrease your energy production 1 step and increase your MC production 3 steps.',
@@ -414,7 +380,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Earth', 'Energy'],
-    production: {Money: '-2', Energy: '2', Heat: '2'},
     effectText:
       'Decrease your MC production 2 steps and increase your heat production and energy production 2 steps each.',
     effects: [
@@ -441,7 +406,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    production: {Steel: '2', Energy: '-2'},
     placeTiles: true,
     effectText:
       'Place a city tile. Decrease your energy production 2 steps and increase your steel production 2 steps.',
@@ -457,7 +421,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Science', 'Microbe'],
-    terraforming: {Temperature: 0, Oxygen: null, Ocean: 0},
     actionText:
       'Action: Add 1 microbe to this card, or remove 2 microbe from this card to raise oxygen level 1 step.',
     actions: [
@@ -472,8 +435,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Science', 'Microbe'],
-    globalRequirements: {Oxygen: [4, null]},
-    terraforming: {Temperature: null, Oxygen: 0, Ocean: 0},
     actionText:
       'Action: Add 1 microbe to this card, or remove 2 microbes to raise temperature 1 step.',
     actions: [
@@ -490,7 +451,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Oxygen: [4, null]},
     vp: ['VPForCardResources', CardResource.Microbes, 2],
     actionText: 'Action: Remove 1 microbe from any card to add 1 to this card.',
     effectText: 'Requires 4% oxygen. 1 VP per 2 microbes on this card.',
@@ -519,8 +479,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Science', 'Event'],
-    production: {Plant: 'Ref'},
-    terraforming: {Temperature: 1, Oxygen: 0, Ocean: 0},
     TR: 2,
     effectText:
       'Raise your terraforming rating 2 steps and temperature 1 step. Increase your plant production 1 step, or 4 steps if you have 3 plant tags.',
@@ -543,7 +501,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    inventory: {Money: 'Ref'},
     vp: 1,
     actionText: 'Effect: When any city tile is placed, gain 2 MC',
   },
@@ -553,8 +510,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    inventory: {Steel: '4', Plant: 'Ref'},
-    terraforming: {Temperature: 3, Oxygen: 0, Ocean: 0},
     effectText:
       'Raise temperature 3 steps and gain 4 steel. Remove up to 8 plants from any player.',
     effects: [
@@ -569,7 +524,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space', 'Jovian'],
-    production: {Titanium: '2'},
     vp: 2,
     effectText: 'Increase your titanium production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Titanium]],
@@ -580,7 +534,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Money: '4', Plant: '-1'},
     vp: 1,
     effectText: 'Decrease your plant production 1 step and increase your MC production 4 steps.',
     effects: [
@@ -594,8 +547,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Temperature: [null, -18]},
-    production: {Plant: '1'},
     effectText: 'It must be -18\u00b0C or colder. Increase your plant production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Plant]],
     requires: [['MaxHeat', -18]],
@@ -606,7 +557,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Energy: '-1', Heat: '3'},
     effectText: 'Decrease your energy production 1 step and increase your heat production 3 steps.',
     effects: [
       ['ChangeProduction', -1, ResourceType.Energy],
@@ -619,8 +569,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science', 'Building'],
-    globalRequirements: {Oxygen: [null, 4]},
-    production: {Money: '1'},
     placeTiles: true,
     effectText:
       'Oxygen must be 4% or less. Place this tile NEXT TO NO OTHER TILE. Increase your MC production 1 step.',
@@ -632,7 +580,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Money: '-2', Energy: '3'},
     effectText: 'Decrease your MC production 2 steps and increase your energy production 3 steps.',
     effects: [
       ['ChangeProduction', -2, ResourceType.Money],
@@ -646,7 +593,6 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Energy'],
     requirements: {Science: '3'},
-    production: {Money: '1', Energy: '1'},
     vp: 1,
     effectText:
       'Requires 3 science tags. Increase your energy production and your MC production 1 step each.',
@@ -662,9 +608,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Oceans: [5, null]},
-    production: {Plant: '2'},
-    inventory: {Plant: '1'},
     effectText: 'Requires 5 ocean tiles. Gain 1 plant and increase your plant production 2 steps.',
     effects: [
       ['ChangeInventory', 1, ResourceType.Plant],
@@ -678,7 +621,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    production: {Plant: '1'},
     effectText: 'Increase your plant production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Plant]],
   },
@@ -717,7 +659,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Space', 'Jovian'],
-    production: {Money: 'Ref'},
     vp: 1,
     effectText: 'Increase your MC production 1 step for each Earth tag you have.',
     effects: [['ChangeProduction', ['GetTags', Tag.Earth], ResourceType.Money]],
@@ -728,8 +669,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Animal'],
-    globalRequirements: {Temperature: [2, null]},
-    production: {Plant: 'Ref'},
     vp: ['VPForCardResources', CardResource.Animals],
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
@@ -744,7 +683,6 @@ export const CARDS = [
     cost: 18,
     type: 'Automated',
     deck: 'Basic',
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 2},
     vp: 2,
     placeTiles: true,
     effectText: 'Requires 0\u00b0C or warmer. Place 2 ocean tiles.',
@@ -756,8 +694,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Animal'],
-    globalRequirements: {Oxygen: [6, null]},
-    production: {Plant: 'Ref'},
     vp: ['VPForCardResources', CardResource.Animals, 2],
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
@@ -772,9 +708,6 @@ export const CARDS = [
     cost: 17,
     type: 'Automated',
     deck: 'Basic',
-    globalRequirements: {Oceans: [6, null]},
-    production: {Money: '2', Plant: '3'},
-    inventory: {Plant: '2'},
     vp: 1,
     effectText:
       'Requires 6 ocean tiles. Increase your MC production 2 steps and your plant production 3 steps. Gain 2 plants.',
@@ -791,7 +724,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Steel: '1'},
     effectText: 'Increase your steel production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Steel]],
   },
@@ -801,7 +733,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Space', 'Jovian'],
-    production: {Titanium: '1'},
     vp: 1,
     effectText: 'Increase your titanium production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Titanium]],
@@ -813,7 +744,6 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Space', 'Jovian', 'Energy'],
     requirements: {Jovian: '1'},
-    production: {Energy: '3', Heat: '3'},
     vp: 1,
     effectText:
       'Requires a Jovian tag. Increase your heat production and energy production 3 steps each.',
@@ -829,8 +759,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [4, null]},
-    terraforming: {Temperature: 0, Oxygen: 1, Ocean: 0},
     vp: 1,
     placeTiles: true,
     effectText:
@@ -844,9 +772,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [-4, null]},
-    production: {Plant: '3'},
-    inventory: {Plant: '1'},
     vp: 1,
     effectText:
       'Requires -4\u00b0C or warmer. Increase your plant production 3 steps. Gain 1 plant.',
@@ -861,7 +786,6 @@ export const CARDS = [
     cost: 6,
     type: 'Automated',
     deck: 'Corporate',
-    production: {Steel: 'Ref'},
     effectText:
       'Requires that you have steel production. Decrease any steel production 1 step and increase your own 1 step',
     effects: [
@@ -875,7 +799,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Event'],
-    inventory: {Steel: '5'},
     effectText: 'Gain 5 steel.',
     effects: [['ChangeInventory', 5, ResourceType.Steel]],
   },
@@ -885,8 +808,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    inventory: {Steel: '2', Plant: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: 1, Ocean: 0},
     effectText: 'Raise oxygen 1 step. Remove 2 plants from any player. Gain 2 steel.',
     effects: [
       ['RaiseOxygen', 1],
@@ -900,7 +821,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Steel: 'Ref', Titanium: 'Ref'},
     placeTiles: true,
     effectText:
       'Place [the mining] tile on an area with a steel or titanium placement bonus, adjacent to another of your tiles. Increase your production of that resource 1 step.',
@@ -911,7 +831,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Steel: '2', Energy: '-1'},
     effectText:
       'Decrease your energy production 1 step and increase your steel production 2 steps.',
     effect: [
@@ -935,7 +854,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Steel: 'Ref', Titanium: 'Ref'},
     placeTiles: true,
     effectText:
       'Place [the mining] tile on an area with a steel or titanium placement bonus. Increase that production 1 step.',
@@ -946,7 +864,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Earth'],
-    production: {Money: '2'},
     effectText: 'Increase your MC production 2  steps.',
     effects: [['ChangeProduction', 2, ResourceType.Money]],
   },
@@ -956,9 +873,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Building'],
-    globalRequirements: {Oxygen: [null, 8]},
-    production: {Energy: '-1'},
-    inventory: {Money: 'Ref', Steel: 'Ref', Plant: 'Ref'},
     vp: 1,
     actionText: 'Action: Spend 1 plant or 1 steel to gain 7 MC',
     effectText: 'Oxygen must be 8% or less. Decrease your energy production 1 step.',
@@ -1000,8 +914,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Animal'],
-    globalRequirements: {Oxygen: [13, null]},
-    production: {Plant: 'Ref'},
     vp: ['VPForCardResources', CardResource.Animals],
     actionText: 'Action: Add an animal to this card.',
     effectText:
@@ -1037,8 +949,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    inventory: {Plant: '2'},
-    terraforming: {Temperature: 0, Oxygen: 1, Ocean: 1},
     placeTiles: true,
     effectText: 'Gain 2 plants. Raise oxygen level 1 step and place an ocean tile.',
     effects: [['ChangeInventory', 2, ResourceType.Plant], ['RaiseOxygen', 1], ['PlaceOceans', 1]],
@@ -1049,8 +959,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Space', 'Energy'],
-    production: {Energy: 'Ref'},
-    inventory: {Money: 'Ref'},
     actionText: 'Action: Spend 7MC to increase your energy production 1 step.',
     actions: [
       [['ChangeInventory', 7, ResourceType.Money], ['ChangeProduction', 1, ResourceType.Energy]],
@@ -1062,8 +970,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science', 'Space', 'Energy'],
-    production: {Energy: '1'},
-    inventory: {Titanium: '2'},
     effectText: 'Increase your energy production 1 step and gain 2 titanium.',
     effects: [
       ['ChangeProduction', 1, ResourceType.Energy],
@@ -1076,7 +982,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 2},
     placeTiles: true,
     effectText: 'Place 2 ocean tiles.',
     effects: [['PlaceOceans', 2]],
@@ -1088,7 +993,6 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Science', 'Energy'],
     requirements: {Science: '4'},
-    production: {Energy: '4'},
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it',
     discounts: [Discount(2, [Tag.Space])],
     requires: [['HasTags', 4, Tag.Science]],
@@ -1099,8 +1003,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    inventory: {Plant: 'Ref'},
-    terraforming: {Temperature: 2, Oxygen: 0, Ocean: 2},
     placeTiles: true,
     effectText:
       'Raise temperature 2 steps and place 2 ocean tiles. Remove up to 6 plants from any plyer.',
@@ -1128,7 +1030,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Space', 'Jovian'],
-    production: {Money: '3'},
     vp: 2,
     effectText: 'Increase your MC production 3 steps.',
     effects: [['ChangeProduction', 3, ResourceType.Money]],
@@ -1139,7 +1040,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space', 'Energy'],
-    production: {Energy: '3'},
     effectText: 'Increase your energy production 3 steps.',
     effects: [['ChangeProduction', 3, ResourceType.Energy]],
   },
@@ -1157,7 +1057,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Money: '4', Energy: '-1'},
     placeTiles: true,
     effectText:
       'Decrease your energy production 1 step and increase your MC production 4 steps. Place [the commercial district] tile. 1 VP PER ADJACENT CITY TILE.',
@@ -1169,14 +1068,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Science'],
-    production: {
-      Money: 'Ref',
-      Steel: 'Ref',
-      Titanium: 'Ref',
-      Plant: 'Ref',
-      Energy: 'Ref',
-      Heat: 'Ref',
-    },
     effectText: 'Duplicate only the production box of one of your building cards.',
     effects: [['RoboticWorkforce']],
   },
@@ -1186,9 +1077,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [-16, null]},
-    production: {Plant: '1'},
-    inventory: {Plant: '3'},
     effectText:
       'Requires -16\u00b0C or warmer. Increase your plant production 1 step. Gain 3 plants.',
     effects: [
@@ -1203,9 +1091,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [-14, null]},
-    production: {Plant: '1'},
-    inventory: {Plant: '1'},
     effectText:
       'Requires -14\u00b0C or warmer. Increase your plant production 1 step. Gain 1 plant.',
     effects: [
@@ -1220,7 +1105,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Money: '-1', Energy: '2'},
     effectText: 'Decrease your MC production 1 step and increase your energy production 2 steps.',
     effects: [
       ['ChangeProduction', -1, ResourceType.Money],
@@ -1244,7 +1128,6 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Science'],
     requirements: {Science: '3'},
-    production: {Money: '2'},
     vp: 2,
     effectText: 'Requires 3 science tags. Increase your MC production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Money]],
@@ -1256,7 +1139,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Space', 'Jovian'],
-    production: {Money: '2', Titanium: '2'},
     vp: ['VPForTags', Tag.Jovian],
     effectText:
       'Increase your titanium production 2 steps and your MC production 2 steps. 1 VP per Jovian tag you have.',
@@ -1271,9 +1153,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [-10, null]},
-    production: {Plant: '2'},
-    inventory: {Plant: '2'},
     effectText:
       'Requires -10\u00b0C or warmer. Increase your plant production 2 steps. Gain 2 plants.',
     effects: [
@@ -1289,7 +1168,6 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Science', 'Energy'],
     requirements: {Science: '5'},
-    production: {Energy: '6'},
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: 'Requires 5 science tags. Increase your energy production 6 steps.',
     discounts: [Discount(2, [Tag.Space])],
@@ -1302,7 +1180,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science', 'Building'],
-    inventory: {Energy: 'Ref'},
     vp: ['VPForCardResources', CardResource.Science, 0.5],
     actionText: 'Action: Spend 6 energy to add a science resource to this card.',
     effectText: '2 VP for each science resource on this card.',
@@ -1320,7 +1197,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Plant'],
-    inventory: {Plant: 'Ref'},
     effectText: 'Gain 1 plant for each city tile in play.',
     effects: [['ChangeInventory', ['GetCities'], ResourceType.Plant]],
   },
@@ -1330,7 +1206,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Earth'],
-    terraforming: {Temperature: 2, Oxygen: 0, Ocean: 0},
     vp: -2,
     placeTiles: true,
     effectText: 'Place [the nuclear zone] tile and raise the temperature 2 steps.',
@@ -1342,7 +1217,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Money: '3', Heat: '-2'},
     vp: 2,
     effectText: 'Decrease your heat production 2 steps and increase your MC production 3 steps.',
     effects: [
@@ -1356,7 +1230,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Space'],
-    production: {Money: 'Ref'},
     effectText: 'Increase your MC production 1 step for each space tag your OPPONENTS have.',
     effects: [['ChangeProduction', ['GetOpponentTags', Tag.Space], ResourceType.Money]],
   },
@@ -1366,7 +1239,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Money: '-1', Energy: '1'},
     effectText: 'Decrease your MC production 1 step and increase your energy production 1 step.',
     effects: [
       ['ChangeProduction', -1, ResourceType.Money],
@@ -1379,8 +1251,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    inventory: {Steel: 'Ref', Energy: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: null, Ocean: 0},
     actionText: 'Action: Spend 4 energy to gain 1 steel and increase oxygen 1 step.',
     actions: [
       [
@@ -1396,7 +1266,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Energy'],
-    production: {Energy: 'Ref'},
     effectText:
       'Increase your energy production 1 step for each power tag you have, including this.)',
     effects: [['ChangeProduction', ['GetTags', Tag.Power], ResourceType.Energy]],
@@ -1407,8 +1276,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    inventory: {Steel: 'Ref', Energy: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: null, Ocean: 0},
     actionText: 'Action: Spend 4 energy to gain 2 steel and increase oxygen 1 step.',
     actions: [
       [
@@ -1424,8 +1291,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    inventory: {Titanium: 'Ref', Plant: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: null, Ocean: 0},
     actionText: 'Action: Spend 4 energy to gain 1 titanium and increase oxygen 1 step.',
     actions: [
       [
@@ -1450,7 +1315,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Earth'],
-    production: {Money: '3'},
     effectText: 'Increase your MC production 3 steps.',
     effects: [['ChangeProduction', 3, ResourceType.Money]],
   },
@@ -1460,7 +1324,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Earth'],
-    inventory: {Money: 'Ref'},
     effectText: 'Gain 1 MC for each event EVER PLAYED by all players',
     effects: [['ChangeInventory', ['GetAllTags', Tag.Event], ResourceType.Money]],
   },
@@ -1470,9 +1333,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    globalRequirements: {Oxygen: [12, null]},
-    production: {Money: '4', Energy: '-1'},
-    inventory: {Plant: '2'},
     vp: 1,
     placeTiles: true,
     effectText:
@@ -1491,7 +1351,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Earth'],
-    inventory: {Money: 'Ref'},
     actionText: 'Effect: After you play an event card, you gain 3MC',
     afterCardTrigger: [[Tag.Event], [['ChangeInventory', 3, ResourceType.Money]]],
   },
@@ -1501,7 +1360,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Earth'],
-    production: {Money: '-1'},
     actionText: 'Action: Look at the top card and either buy it or discard it',
     effectText: 'Decrease your MC production 1 step.',
     // TODO act
@@ -1534,7 +1392,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Energy: '1'},
     vp: 1,
     effectText: 'Increase your energy production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Energy]],
@@ -1545,7 +1402,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science'],
-    globalRequirements: {Oxygen: [7, null]},
     vp: 2,
     effectText: 'Requires 7% oxygen.',
     requires: [['MinOxygen', 7]],
@@ -1556,7 +1412,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science'],
-    production: {Plant: 'Ref', Energy: 'Ref'},
     effectText: 'Increase your plant production 1 step or your energy production 2 steps.',
     effects: [
       [
@@ -1571,8 +1426,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    globalRequirements: {Temperature: [-6, null]},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     vp: 1,
     placeTiles: true,
     effectText:
@@ -1586,7 +1439,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Energy: '2'},
     effectText: 'Increase your energy production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Energy]],
   },
@@ -1596,9 +1448,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Temperature: [4, null]},
-    production: {Money: '2', Plant: '2'},
-    inventory: {Plant: '2'},
     vp: 2,
     effectText:
       'Requires +4\u00b0C or warmer. Increase your MC production 2 steps and your plant production 2 steps. Gain 2 plants.',
@@ -1614,7 +1463,6 @@ export const CARDS = [
     cost: 2,
     type: 'Automated',
     deck: 'Basic',
-    globalRequirements: {Oceans: [null, 3]},
     vp: 1,
     effectText: 'Requires 3 or less ocean tiles.',
     requires: [['MaxOceans', 3]],
@@ -1625,7 +1473,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    production: {Money: '2', Energy: '-1'},
     placeTiles: true,
     effectText:
       'Decrease your energy production 1 step and increase your MC production 2 steps. Place a city tile ADJACENT TO AT LEAST 2 OTHER CITY TILES.',
@@ -1641,7 +1488,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Event'],
-    inventory: {Money: 'Ref', Steel: 'Ref', Titanium: 'Ref'},
     effectText: 'Remove up to 3 titanium from any player, or 4 steel, or 7 MC.',
     effects: [
       [
@@ -1660,9 +1506,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Oceans: [3, null]},
-    production: {Plant: '1'},
-    inventory: {Plant: '-1'},
     effectText:
       'Requires 3 ocean tiles and that you lose 1 plant. Increase your plant production 1 step.',
     effects: [
@@ -1677,8 +1520,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Steel: 'Ref'},
-    inventory: {Money: 'Ref'},
     placeTiles: true,
     actionText: 'Action: Spend 7 MC to increase your steel production 1 step.',
     effectText: 'Place [the Industrial Center] tile ADJACENT TO A CITY TILE.',
@@ -1690,7 +1531,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Event'],
-    inventory: {Money: 'Ref', Steel: 'Ref'},
     effectText: 'Steal up to 2 steel, or 3MC from any player.',
     // todo
   },
@@ -1699,7 +1539,6 @@ export const CARDS = [
     cost: 3,
     type: 'Automated',
     deck: 'Corporate',
-    production: {Money: 'Ref', Energy: '-1'},
     vp: -1,
     effectText:
       'Decrease your energy production 1 step and any MC production 2 steps. Increase your MC production 2 steps.',
@@ -1715,7 +1554,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Energy: '-1', Heat: '4'},
     effectText: 'Decrease your energy production 1 step and increase your heat production 4 steps.',
     effects: [
       ['ChangeProduction', -1, ResourceType.Energy],
@@ -1728,7 +1566,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     placeTiles: true,
     effectText: 'Place 1 ocean tile.',
     effects: [['PlaceOceans', 1]],
@@ -1752,8 +1589,6 @@ export const CARDS = [
     cost: 13,
     type: 'Automated',
     deck: 'Basic',
-    globalRequirements: {Oxygen: [5, null]},
-    production: {Money: 'Ref'},
     vp: 1,
     effectText:
       'Requires 5% oxygen. Increase your MC production 1 step for each city tile ON MARS.',
@@ -1766,8 +1601,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Oxygen: [4, null]},
-    production: {Plant: 'Ref'},
     effectText:
       'Requires 4% oxygen. Increase your plant production 1 step for every 2 microbe tags you have, including this.',
     effects: [['ChangeProduction', ['GetTags', Tag.Microbe, 2], ResourceType.Plant]],
@@ -1779,7 +1612,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Oxygen: [3, null]},
     vp: ['VPForCardResources', CardResource.Microbes, 3],
     actionText:
       'Effect: When you play an animal, plant, or microbe tag, including this, add a microbe to this card.',
@@ -1795,7 +1627,6 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Science', 'Building', 'Energy'],
     requirements: {Energy: '2'},
-    production: {Energy: '3'},
     effectText: 'Requires 2 power tags. Increase your energy production 3 steps.',
     effects: [['ChangeProduction', 3, ResourceType.Energy]],
     requires: [['HasTags', 2, Tag.Power]],
@@ -1806,7 +1637,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Temperature: [-14, null]},
     actionText: 'Action: Add a microbe to ANOTHER card.',
     effectText: 'Requires -14\u00b0C or warmer.',
     actions: [[['ChangeAnyCardResource', 1, CardResource.Microbes]]],
@@ -1818,8 +1648,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Temperature: [null, -10]},
-    inventory: {Plant: 'Ref'},
     actionText: 'Action: Gain 1 plant or add 2 microbes to ANOTHER card.',
     actions: [
       ['ChangeInventory', 1, ResourceType.Plant],
@@ -1845,8 +1673,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    globalRequirements: {Oceans: [4, null]},
-    production: {Energy: '2'},
     vp: 1,
     effectText: 'Requires 4 ocean tiles. Increase your energy production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Energy]],
@@ -1858,7 +1684,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Earth'],
-    production: {Money: 'Ref'},
     effectText: 'Increase your MC production 1 step for each Earth tag you have, including this.',
     effects: [['ChangeProduction', ['GetTags', Tag.Earth], ResourceType.Money]],
   },
@@ -1868,8 +1693,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Steel: '2', Titanium: '1', Energy: '-1'},
-    terraforming: {Temperature: 0, Oxygen: 2, Ocean: 0},
     effectText:
       'Decrease your energy production 2 steps. Increase your steel production 2 steps and your titanium production 1 step. Raise oxygen 2 steps.',
     effects: [
@@ -1885,8 +1708,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Energy'],
-    globalRequirements: {Oceans: [3, null]},
-    production: {Energy: '1'},
     vp: 1,
     effectText: 'Requires 3 ocean tiles. Increase your energy production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Energy]],
@@ -1898,7 +1719,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    terraforming: {Temperature: 2, Oxygen: 0, Ocean: 0},
     placeTiles: true,
     effectText:
       'Raise the temperature 2 steps and place this [the Lava Flow] tile ON EITHER THARSIS THOLUS, ASCRAEUS MONS, PAVONIS MONS OR ARSIA MONS.',
@@ -1910,7 +1730,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Energy: '1'},
     effectText: 'Increase your energy production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Energy]],
   },
@@ -1920,7 +1739,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Heat: '4'},
     placeTiles: true,
     effectText:
       'Increase your heat production 4 steps. Place [the Mohole Area] tile ON AN AREA RESERVED FOR OCEAN.',
@@ -1932,8 +1750,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Earth', 'Event'],
-    inventory: {Plant: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     vp: 2,
     placeTiles: true,
     effectText:
@@ -1956,7 +1772,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Titanium: '1'},
     effectText: 'Increase your titanium production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Titanium]],
   },
@@ -1967,7 +1782,6 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Building', 'Energy'],
     requirements: {Science: '2'},
-    production: {Energy: '3'},
     TR: 1,
     vp: 1,
     effectText: 'Requires 2 science tags. Increase your energy production 3 steps.',
@@ -1980,9 +1794,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Oceans: [3, null]},
-    production: {Plant: '2'},
-    inventory: {Plant: '-2'},
     effectText:
       'Requires 3 ocean tiles and that you lose 2 plants. Increase your plant production 2 steps.',
     effects: [
@@ -1997,8 +1808,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Animal'],
-    globalRequirements: {Oxygen: [8, null]},
-    production: {Plant: 'Ref'},
     vp: ['VPForCardResources', CardResource.Animals, 2],
     actionText: 'Effect: When you place a greenery tile, add an animal to this card.',
     effectText:
@@ -2013,8 +1822,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Microbe'],
-    globalRequirements: {Oxygen: [6, null]},
-    production: {Plant: 'Ref'},
     effectText:
       'Requires 6% oxygen. Increase your plant production 1 step for each plant tag you have.',
     effects: [['ChangeProduction', ['GetTags', Tag.Plant], ResourceType.Plant]],
@@ -2048,8 +1855,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Earth', 'Event'],
-    production: {Money: '-1'},
-    inventory: {Money: '10'},
     effectText: 'Decrease your MC production 1 step. Gain 10 MC.',
     effects: [
       ['ChangeProduction', -1, ResourceType.Money],
@@ -2061,7 +1866,6 @@ export const CARDS = [
     cost: 2,
     type: 'Automated',
     deck: 'Basic',
-    production: {Money: 'Ref', Heat: 'Ref'},
     effectText:
       'Decrease your heat production any number of steps and increase your MC production the same number of steps.',
     effects: [
@@ -2084,7 +1888,6 @@ export const CARDS = [
     cost: 3,
     type: 'Active',
     deck: 'Corporate',
-    inventory: {Heat: 'Ref'},
     actionText: 'Action: Spend 8 heat to increase your terraforming rating 1 step.',
     effectText: 'Requires 0\u00b0C or warmer.',
     actions: [[['ChangeInventory', -8, ResourceType.Heat], ['IncreaseTR', 1]]],
@@ -2095,8 +1898,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science', 'Microbe'],
-    globalRequirements: {Temperature: [null, -14]},
-    production: {Plant: '2'},
     effectText: 'It must be -14\u00b0C or colder. Increase your plant production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Plant]],
     requires: [['MaxHeat', -14]],
@@ -2134,7 +1935,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Microbe'],
-    production: {Steel: '1', Energy: '1'},
     effectText: 'Increase your energy production and your steel production 1 step each.',
     effects: [
       ['ChangeProduction', 1, ResourceType.Energy],
@@ -2147,8 +1947,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [-24, null]},
-    production: {Plant: '1'},
     effectText: 'Requires -24\u00b0C or warmer. Increase your plant production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Plant]],
     requires: [['MinHeat', -24]],
@@ -2160,7 +1958,6 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Energy'],
     requirements: {Energy: '2'},
-    production: {Energy: 'Ref'},
     effectText:
       'Requires 2 power tags. Decrease any energy production 1 step and increase your own 1 step.',
     effects: [
@@ -2175,7 +1972,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     placeTiles: true,
     effectText: 'Place 1 ocean tile and draw 1 card.',
     effects: [['PlaceOceans', 1], ['Draw', 1]],
@@ -2186,8 +1982,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Earth', 'Event'],
-    production: {Heat: '1'},
-    inventory: {Heat: '3'},
     effectText: 'Increase your heat production 1 step and gain 3 heat.',
     effects: [
       ['ChangeProduction', 1, ResourceType.Heat],
@@ -2215,7 +2009,6 @@ export const CARDS = [
     cost: 3,
     type: 'Automated',
     deck: 'Basic',
-    production: {Heat: '1'},
     effectText: 'Increase your heat production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Heat]],
   },
@@ -2225,7 +2018,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Plant: '2', Energy: '-4'},
     TR: 3,
     effectText:
       'Decrease your energy production 4 steps and increase your plant production 2 steps. Raise your TR 3 steps.',
@@ -2241,8 +2033,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Space'],
-    globalRequirements: {Oxygen: [6, null]},
-    production: {Money: '2', Energy: '-1'},
     vp: 1,
     actionText: 'Effect: When you play a space card, you pay 2MC less for it.',
     effectText:
@@ -2260,7 +2050,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Earth', 'Event'],
-    production: {Heat: '2'},
     effectText: 'Increase your heat production 2 steps.',
     effects: [['ChangeProduction', 2, ResourceType.Heat]],
   },
@@ -2270,8 +2059,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    globalRequirements: {Oxygen: [7, null]},
-    production: {Energy: '1'},
     vp: 1,
     effectText: 'Requires 7% oxygen. Increase your energy production 1 step.',
     effectd: [['ChangeProduction', 1, ResourceType.Energy]],
@@ -2283,9 +2070,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Plant'],
-    globalRequirements: {Temperature: [-6, null]},
-    production: {Money: '2', Plant: '1'},
-    inventory: {Plant: '1'},
     vp: 2,
     effectText:
       'Requires -6\u00b0C or warmer. Increase your plant production 1 step and your MC production 2 steps. Gain 1 plant.',
@@ -2302,7 +2086,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Space', 'Event'],
-    production: {Plant: '1', Heat: '3'},
     effectText:
       'Add 2 microbes to ANOTHER card. Increase your heat production 3 steps and your plant production 1 step.',
     effects: [
@@ -2317,7 +2100,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Plant: '1', Energy: '-2'},
     TR: 1,
     effectText:
       'Decrease your energy production 2 steps and increase your plant production 1 step. Raise your terraform rating 1 step.',
@@ -2354,8 +2136,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Plant'],
-    production: {Money: '2'},
-    terraforming: {Temperature: 0, Oxygen: 1, Ocean: 0},
     placeTiles: true,
     effectText:
       'Increase your MC production 2 steps. Place a greenery tile ON AN AREA RESERVED FOR OCEAN, disregarding normal placement restrictions, and increase oxygen 1 step.',
@@ -2367,7 +2147,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Space'],
-    production: {Money: 'Ref'},
     effectText:
       'Increase your MC production 1 step for each space tag you have, including this one.',
     effects: [['ChangeProduction', ['GetTags', Tag.Space], ResourceType.Money]],
@@ -2378,9 +2157,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Plant'],
-    globalRequirements: {Temperature: [-20, null]},
-    production: {Money: '1'},
-    inventory: {Plant: '2'},
     vp: 1,
     effectText:
       'Requires -20\u00b0C or warmer. Increase your MC production 1 step and gain 2 plants.',
@@ -2396,9 +2172,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    globalRequirements: {Oceans: [2, null]},
-    inventory: {Energy: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: null, Ocean: 0},
     actionText: 'Action: Spend 3 energy to raise oxygen 1 step.',
     effectText: 'Requires 2 ocean tiles.',
     actions: [[['ChangeInventory', -3, ResourceType.Energy], ['RaiseOxygen', 1]]],
@@ -2410,8 +2183,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    production: {Energy: '1'},
-    inventory: {Heat: 'Ref'},
     vp: -1,
     effectText: 'Decrease any heat production 2 steps and increase your energy production 1 step.',
     effects: [
@@ -2425,7 +2196,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Plant: '1', Energy: '-1'},
     vp: 1,
     effectText: 'Decrease your energy production 1 step and increase your plant production 1 step.',
     effects: [
@@ -2439,7 +2209,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    production: {Money: '1', Titanium: '1', Energy: '-1'},
     effectText:
       'Decreases your energy production 1 step and increase your titanium and your MC production 1 step each.',
     effects: [
@@ -2454,8 +2223,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    globalRequirements: {Temperature: [2, null]},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     placeTiles: true,
     effectText: 'Requires +2\u00b0C or warmer. Place 1 ocean tile.',
     effects: [['PlaceOceans', 1]],
@@ -2467,7 +2234,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building', 'City'],
-    production: {Money: '3', Energy: '-1'},
     vp: -2,
     placeTiles: true,
     effectText:
@@ -2484,8 +2250,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'Energy'],
-    globalRequirements: {Oxygen: [6, null]},
-    production: {Plant: 'Ref', Energy: '2'},
     vp: -1,
     effectText:
       'Requires 6% oxygen. Decrease any plant production 1 step and increase your energy production 2 steps.',
@@ -2501,8 +2265,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Animal'],
-    globalRequirements: {Oxygen: [9, null]},
-    production: {Money: '2', Plant: '-1'},
     vp: ['VPForCardResources', CardResource.Animals],
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
@@ -2533,7 +2295,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     requirements: {City: 'Ref'},
-    production: {Money: '1'},
     vp: 1,
     effectText: 'Requires 2 cities in play. Increase your MC production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Money]],
@@ -2545,8 +2306,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    inventory: {Money: 'Ref', Steel: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: null},
     placeTiles: true,
     actionText:
       'Action: Spend 8 MC to place 1 ocean tile. STEEL MAY BE USED as if you were playing a building card.',
@@ -2558,8 +2317,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    inventory: {Money: 'Ref'},
-    terraforming: {Temperature: 0, Oxygen: 0, Ocean: 1},
     vp: -1,
     placeTiles: true,
     effectText:
@@ -2572,7 +2329,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Energy'],
-    production: {Energy: 'Ref'},
     effectText: 'Increase your energy production 1 step for each city tile in play.',
     effects: [['ChangeProduction', ['GetCities'], ResourceType.Energy]],
   },
@@ -2582,7 +2338,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    inventory: {Plant: 'Ref', Heat: '-5'},
     effectText: 'Spend 5 heat to either gain 4 plants, or to add 2 animals to ANOTHER card.',
     // todo
   },
@@ -2592,7 +2347,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    globalRequirements: {Temperature: [-8, null]},
     placeTiles: true,
     effectText: 'Requires -8\u00b0C or warmer. Place 1 ocean tile.',
     effects: [['PlaceOceans', 1]],
@@ -2615,7 +2369,6 @@ export const CARDS = [
     deck: 'Basic',
     tags: ['Plant'],
     requirements: {Science: '2'},
-    terraforming: {Temperature: 0, Oxygen: 1, Ocean: 0},
     placeTiles: true,
     effectText: 'Requires 2 science tags. Place a greenery tile and raise oxygen 1 step.',
     effects: [['PlaceGreenery']],
@@ -2627,7 +2380,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Building', 'Energy'],
-    inventory: {Money: 'Ref', Energy: 'Ref'},
     actionText: 'Action: Spend any amount of energy to gain that amount of MC.',
     actions: [
       [
@@ -2672,7 +2424,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space', 'Earth'],
-    production: {Money: '5'},
     vp: ['VPForCitiesOnMars', 3],
     effectText: 'Increase your MC production 5 steps. 1 VP for every 3rd city in play.',
     effects: [['ChangeProduction', 5, ResourceType.Money]],
@@ -2683,7 +2434,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science'],
-    inventory: {Money: 'Ref'},
     placeTiles: true,
     actionText: 'Action: Spend 2MC to draw a card.',
     effectText: 'Place [the restricted area] tile.',
@@ -2695,7 +2445,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    production: {Money: 'Ref', Energy: '-1'},
     placeTiles: true,
     actionText:
       'Effect: Each time a city tile is placed, including this, increase your MC production 1 step.',
@@ -2709,7 +2458,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Energy'],
-    production: {Energy: 'Ref'},
     vp: -1,
     effectText: 'Decrease any energy production 1 step and increase your own 1 step.',
     effects: [
@@ -2723,8 +2471,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Heat: 'Ref'},
-    inventory: {Money: 'Ref'},
     actionText: 'Action: Spend 10 MC to increase your heat production 2 steps.',
     actions: [
       [['ChangeInventory', -10, ResourceType.Money], ['ChangeProduction', 2, ResourceType.Heat]],
@@ -2736,7 +2482,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Space'],
-    production: {Heat: '7'},
     effectText: 'Increase your heat production 7 steps.',
     effects: [['ChangeProduction', 7, ResourceType.Heat]],
   },
@@ -2755,7 +2500,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    production: {Energy: '-1'},
     TR: 2,
     effectText: 'Decrease your energy production 1 step. Raise your terraform rating 2 steps.',
     effects: [['ChangeProduction', -1, ResourceType.Energy], ['IncreaseTR', 2]],
@@ -2776,7 +2520,6 @@ export const CARDS = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Science', 'Building'],
-    production: {Money: 'Ref'},
     vp: 1,
     effectText:
       'Increase your MC production 1 step for every 2 building tags you have, including this.',
@@ -2789,7 +2532,6 @@ export const CARDS = [
     deck: 'Corporate',
     tags: ['Science', 'Building'],
     requirements: {Science: '3'},
-    production: {Energy: '-1'},
     vp: 1,
     actionText: 'Action: Draw 2 cards.',
     effectText: 'Requires 3 science tags to play. Decrease your energy production 1 step.',
@@ -2803,8 +2545,6 @@ export const CARDS = [
     type: 'Event',
     deck: 'Promo',
     tags: ['Space', 'Event'],
-    inventory: {Plant: 'Ref'},
-    terraforming: {Temperature: 1, Oxygen: 0, Ocean: 0},
     effectText: 'Increase temperature 1 step. Remove up to 2 plants from any player.',
     effects: [['IncreaseTemperature', 1], ['DecreaseAnyInventory', 2, ResourceType.Plant]],
   },
@@ -2826,8 +2566,6 @@ export const CARDS = [
     type: 'Active',
     deck: 'Promo',
     tags: ['Plant'],
-    globalRequirements: {Oceans: [2, null]},
-    production: {Plant: '1', Heat: '1'},
     effectText:
       'Requires 2 oceans. Increase your plant production and your heat production 1 step each.',
     requires: [['MinOceans', 2]],
