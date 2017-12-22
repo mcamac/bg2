@@ -4,8 +4,6 @@ import {getDiscount} from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {Card} from '../src/types'
 
-const fn = async () => Promise.resolve('foo')
-
 // Discounts
 test(t => {
   const played = ['Research Outpost'].map(C)
