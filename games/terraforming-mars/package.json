@@ -1,4 +1,6 @@
 {
+  "name": "terraforming-mars",
+  "version": "0.0.0",
   "dependencies": {
     "lodash": "^4.17.4",
     "random-seed": "^0.3.0"

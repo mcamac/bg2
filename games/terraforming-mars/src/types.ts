@@ -72,7 +72,7 @@ export const enum TileType {
   MoholeArea = 'moholeArea',
   RestrictedArea = 'restrictedArea',
   CommercialDistrict = 'commercialDistrict',
-  NaturalPreserve = 'naturalPreserve'
+  NaturalPreserve = 'naturalPreserve',
 }
 
 export interface Tile {
@@ -165,9 +165,9 @@ export const enum Milestones {
 }
 
 export const enum Awards {
-  Landlord,
-  Banker,
-  Scientist,
-  Thermalist,
-  Miner,
+  Landlord = 'Landlord',
+  Banker = 'Banker',
+  Scientist = 'Scientist',
+  Thermalist = 'Thermalist',
+  Miner = 'Miner',
 }
