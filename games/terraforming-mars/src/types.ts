@@ -21,7 +21,7 @@ export interface Card {
   cost: number
   name: string
   tags: string[]
-  discounts: any
+  discounts?: any
 }
 
 export type Player = string
