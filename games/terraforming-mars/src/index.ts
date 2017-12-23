@@ -9,11 +9,21 @@ import {
   Milestones,
   Tag,
   Awards,
+  Phase,
+  UserAction,
+  PlayerState,
+  ResourceState,
+  ResourcesState,
 } from './types'
 import {CARDS} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
 import {HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
 import {shuffle} from 'shuffle-seed'
+import {cloneDeep} from 'lodash'
+
+function clone<T>(x: T): T {
+  return cloneDeep(x)
+}
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -115,15 +125,22 @@ const normalProduction = {
 
 const SEED = 'martin'
 
-export const getInitialGameState = (players: Player[], seed: string = SEED): GameState => {
-  const playerState = {}
+const INITIAL_RESOURCES: ResourcesState = {
+  [ResourceType.Money]: {production: 0, count: 0},
+  [ResourceType.Titanium]: {production: 0, count: 0},
+  [ResourceType.Steel]: {production: 0, count: 0},
+  [ResourceType.Plant]: {production: 0, count: 0},
+  [ResourceType.Energy]: {production: 0, count: 0},
+  [ResourceType.Heat]: {production: 0, count: 0},
+}
 
+export const getInitialGameState = (players: Player[], seed: string = SEED): GameState => {
   let state = {
-    phase: '',
+    phase: Phase.CardBuying,
     generation: 0,
     players,
     firstPlayer: players[0],
-    playerState,
+    playerState: <{[key: string]: PlayerState}>{},
     passed: {},
     player: players[0],
     deck: shuffle(CARDS.map(card => card.name), SEED),
@@ -140,8 +157,20 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     // Private
     draft: {},
     choosingCards: {},
+    choosingCorporations: {},
     seed: SEED,
   }
+
+  state.players.forEach(player => {
+    state.playerState[player] = {
+      TR: 20,
+      hand: [],
+      played: [],
+      corporation: '',
+      hasIncreasedTRThisGeneration: false,
+      resources: clone<ResourcesState>(INITIAL_RESOURCES),
+    }
+  })
 
   state = setupInitialHands(state)
   return state
@@ -165,13 +194,18 @@ export const getDiscount = (played: Card[], card: Card) => {
   return delta
 }
 
-export const chooseCards = (state: GameState, chosen: Card[], player: Player): GameState => {
+export const buyCards = (state: GameState, player: Player, chosen: string[]): GameState => {
   // todo: Check subset of player
   // state.choosingCards[player]
   state = changeInventory(state, player, ResourceType.Money, -chosen.length * 3)
   state.playerState[player].hand = state.playerState[player].hand.concat(chosen)
   delete state.choosingCards[player]
+  // Add remaining to discard
   return state
+}
+
+const isDoneBuyingCards = (state: GameState): boolean => {
+  return state.players.map(player => !state.choosingCards[player]).every(x => x)
 }
 
 const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
@@ -214,10 +248,25 @@ const fundAward = (state: GameState, award: Awards): GameState => {
   return state
 }
 
+export const actionHandlers = {}
+
 // Enumerates all client messages.
 export const handlers = {
-  DRAFT_ROUND_CHOICE: null,
-  CARD_BUY_CHOICE: null,
+  // During drafts.
+  [UserAction.DraftRoundChoice]: (state, action) => {
+    state = handlePlayerChoice(state, action.player, action.choice)
+    if (isDraftDone(state)) {
+      state = startActions(state)
+    }
+    return state
+  },
+  [UserAction.BuyCards]: (state, action) => {
+    state = buyCards(state, action.player, action.chosen)
+    if (isDoneBuyingCards(state)) {
+      state.phase = Phase.Actions
+    }
+    return state
+  },
   // During generation
   CARD_ACTION: null,
   STANDARD_PROJECT: () => {},
@@ -228,17 +277,13 @@ export const handlers = {
 
 const startActions: Transform = state => {
   state.player = state.firstPlayer
-  state.phase = 'ACTIONS'
+  state.phase = Phase.CardBuying
   return state
 }
 
 export const handleAction = (state: GameState, action): GameState => {
-  if (action.type === 'DRAFT_ROUND_CHOICE') {
-    state = handlePlayerChoice(state, action.player, action.choice)
-    if (isDraftDone(state)) {
-      state = startActions(state)
-    }
-    return state
+  if (handlers[action.type]) {
+    return handlers[action.type](state, action)
   }
   return state
 }

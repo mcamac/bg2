@@ -63,8 +63,9 @@ export type ResourcesState = {[resource in ResourceType]: ResourceState}
 export interface PlayerState {
   resources: ResourcesState
   TR: number
-  hand: Card[]
-  played: Card[]
+  hand: string[]
+  played: string[]
+  corporation: string
   hasIncreasedTRThisGeneration: boolean // For UN.
 }
 
@@ -105,11 +106,16 @@ export enum GlobalType {
 
 export type GlobalParameters = {[p in GlobalType]: number}
 
-export const enum State {
-  Action = 'action',
-  CardChoice = 'cardChoice',
-  Draft = 'draft',
-  FinalGreenery = 'finalGreenery',
+export const enum Phase {
+  Actions = 'Actions',
+  CardBuying = 'CardBuying',
+  Draft = 'Draft',
+  FinalGreenery = 'FinalGreenery',
+}
+
+export const enum UserAction {
+  DraftRoundChoice = 'DraftRoundChoice',
+  BuyCards = 'BuyCards',
 }
 
 export interface PlayerDraftState {
@@ -151,6 +157,10 @@ export interface GameState {
   }
 
   choosingCards: {
+    [key: string]: string[]
+  }
+
+  choosingCorporations: {
     [key: string]: string[]
   }
 

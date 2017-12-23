@@ -1,10 +1,10 @@
 import test from 'ava'
 import * as util from 'util'
 
-import {getDiscount, getInitialGameState, handleAction} from '../src/index'
+import {getDiscount, getInitialGameState, handleAction, buyCards} from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
-import {GameState, Card, Transform} from '../src/types'
+import {GameState, Card, Transform, ResourceType, Phase, UserAction} from '../src/types'
 import {cloneState} from '../src/utils'
 
 const TEST_SEED = 'martin'
@@ -51,6 +51,29 @@ test(t => {
   t.true(isDraftDone(state1))
 
   // Use action handler to test transition.
-  state = handleAction(state, {type: 'DRAFT_ROUND_CHOICE', player: 'a', choice: 'Space Station'})
-  t.is(state.phase, 'ACTIONS')
+  state = handleAction(state, {
+    type: UserAction.DraftRoundChoice,
+    player: 'a',
+    choice: 'Space Station',
+  })
+  t.is(state.phase, Phase.CardBuying)
+})
+
+// Card buying
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['b'].resources[ResourceType.Money].count = 30
+
+  const chosen = ['Gene Repair', 'Urbanized Area']
+  const chosenB = ['Open City', 'Trees', 'Bushes']
+  state = buyCards(state, 'a', chosen)
+  t.deepEqual(chosen, state.playerState['a'].hand)
+  t.deepEqual(24, state.playerState['a'].resources[ResourceType.Money].count)
+
+  state = handleAction(state, {type: UserAction.BuyCards, player: 'b', chosen: chosenB})
+  t.deepEqual(chosenB, state.playerState['b'].hand)
+  t.deepEqual(21, state.playerState['b'].resources[ResourceType.Money].count)
+  t.is(state.phase, Phase.Actions)
 })
