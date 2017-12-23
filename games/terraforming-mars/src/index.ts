@@ -242,3 +242,17 @@ export const handleAction = (state: GameState, action): GameState => {
   }
   return state
 }
+
+export const checkCardRequirements = (card: Card, state: GameState): boolean => {
+  // todo: check if can pay for it as well?
+  if(card.hasOwnProperty('requires')) {
+    let requirementResults = card.requires.map(requirement => requirement(state))
+    if(requirementResults.every(x => x)) {
+      return(true)
+    } else {
+      return(false)
+    }
+  } else {
+    return(true)
+  }
+}
