@@ -19,6 +19,7 @@ import {
 import {CARDS} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
 import {clone, HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
+import {omit, omitBy, pick, mapValues} from 'lodash'
 import {shuffle} from 'shuffle-seed'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
@@ -292,4 +293,33 @@ export const handleAction = (state: GameState, action): GameState => {
     return handlers[action.type](state, action)
   }
   return state
+}
+
+export const getClientState = (state: GameState, player: Player) => {
+  const publicState = omit(state, [
+    'playerState',
+    'deck',
+    'draft',
+    'choosingCards',
+    'choosingCorporations',
+  ]) as any
+
+  publicState.playerState = mapValues(
+    state.playerState,
+    (pstate, p) => (p === player ? pstate : omit(pstate, ['hand']))
+  )
+
+  const keys = ['draft', 'choosingCards', 'choosingCorporations']
+  keys.forEach(key => {
+    publicState[key] = pick(state[key], player)
+  })
+
+  return publicState
+}
+
+// Used by server.
+export const TerraformingMars = {
+  getInitalState: getInitialGameState,
+  reducer: handleAction,
+  getClientState,
 }

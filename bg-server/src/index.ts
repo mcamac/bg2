@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken'
 import * as jwksClient from 'jwks-rsa'
 
 import {getInitialState, handleAction} from '../../games/power-grid/src/index'
+import {TerraformingMars} from '../../games/terraforming-mars/src/index'
 
 import * as r from 'rethinkdb'
 

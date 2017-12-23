@@ -1,7 +1,14 @@
 import test from 'ava'
 import * as util from 'util'
 
-import {getDiscount, getInitialGameState, handleAction, buyCards, fundAward} from '../src/index'
+import {
+  getDiscount,
+  getInitialGameState,
+  handleAction,
+  buyCards,
+  fundAward,
+  getClientState,
+} from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
 import {GameState, Card, Transform, ResourceType, Phase, UserAction, Awards} from '../src/types'
@@ -89,4 +96,14 @@ test(t => {
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 22)
   state = fundAward(state, Awards.Banker)
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 8)
+})
+
+// Player state
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  const client = getClientState(state, 'a')
+
+  t.falsy(client.playerState['b'].hand)
+  t.falsy(client.choosingCards['b'])
 })
