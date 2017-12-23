@@ -191,8 +191,14 @@ export function clone<T>(x: T): T {
 }
 
 const REQUIREMENTS_REGISTRY = {
+  MinOxygen,
   MaxOxygen,
-  MinOxygen
+  MinOceans,
+  MaxOceans,
+  MinHeat,
+  MaxHeat,
+  HasTags,
+  HasCitiesOnMars
 }
 
 const fromJSONRequires = obj => {
