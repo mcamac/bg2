@@ -50,11 +50,11 @@ const STATES = [
   'REPLENISH', // Computer only
 ]
 
-class PowerGrid {
-  constructor(state) {
-    // this._state = state
-  }
-}
+// class PowerGrid {
+//   constructor(state) {
+//     // this._state = state
+//   }
+// }
 
 let LOG = []
 
@@ -635,3 +635,8 @@ export const handleAction = (state: GameState, action: any) => {
 }
 
 export default handlers
+
+export const PowerGrid = {
+  getInitialState,
+  reducer: handleAction,
+}
