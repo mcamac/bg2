@@ -294,6 +294,7 @@ export const handleAction = (state: GameState, action): GameState => {
   }
   return state
 }
+<<<<<<< 7ed814ffa26b265cc750e6faa64f650da3f8861a
 
 export const getClientState = (state: GameState, player: Player) => {
   const publicState = omit(state, [
@@ -340,3 +341,5 @@ export const checkCardRequirements = (card: Card, state: GameState): boolean => 
     return(true)
   }
 }
+=======
+>>>>>>> good test working req code

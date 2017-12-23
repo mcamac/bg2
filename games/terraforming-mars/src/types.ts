@@ -27,7 +27,8 @@ export interface Card {
   actionText?: string
   effectText?: string
   placeTiles?: boolean
-  requires?: ((state: GameState) => boolean)[]
+  // requires?: ((state: GameState) => boolean)[]
+  requires?: any[][]
   discounts?: any
   resourceHeld?: CardResource
   effects?: any[]

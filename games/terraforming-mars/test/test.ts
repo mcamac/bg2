@@ -12,7 +12,7 @@ import {
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
 import {GameState, Card, Transform, ResourceType, Phase, UserAction, Awards} from '../src/types'
-import {cloneState} from '../src/utils'
+import {cloneState, checkCardRequirements} from '../src/utils'
 
 const TEST_SEED = 'martin'
 
@@ -108,4 +108,26 @@ test(t => {
   t.falsy(client.choosingCards['b'])
   t.falsy(client.deck)
   t.falsy(client.seed)
+})
+
+// Playing cards: checking card requirements
+
+test(t => {
+  // Make sure returns True if card has no requirements
+  let testCard = {
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    requires: [['MaxOxygen', 5]]
+  }
+
+  let low_oxygen_state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  low_oxygen_state.globalParameters.Oxygen = 0
+
+  let high_oxygen_state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  high_oxygen_state.globalParameters.Oxygen = 10
+
+  t.is(checkCardRequirements(testCard, low_oxygen_state), true)
+  t.is(checkCardRequirements(testCard, high_oxygen_state), false)
 })
