@@ -1,4 +1,4 @@
-import {GameState, Transform, Tag, GlobalType, Player, CardResource} from './types'
+import {GameState, Transform, Tag, GlobalType, Player, CardResource, ResourceType} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
@@ -134,4 +134,52 @@ export const GetX: NumGetter = (state, action) => {
 
 export const Neg = (fn: NumGetter): NumGetter => {
   return (state, action) => -fn(state, action)
+}
+
+const REGISTRY = {
+  DecreaseAnyProduction,
+  DecreaseAnyInventory,
+  ChangeCardResource,
+  ChangeAnyCardResource,
+  ChangeInventory,
+  ChangeProduction,
+  Draw,
+  IncreaseTR,
+  IncreaseTemperature,
+  RaiseOxygen,
+  PlaceOceans,
+}
+
+const fromJSON = obj => {
+  if (obj instanceof Array) {
+    const [opName, ...args] = obj
+    if (!REGISTRY[obj[0]]) return null
+    return REGISTRY[obj[0]](...args)
+  } else {
+    return obj
+  }
+}
+
+export function isSubset<T>(l1: T[], l2: T[]): boolean {
+  const s1 = new Set(l1)
+  const s2 = new Set(l2)
+  for (var elem of Array.from(s1.values())) {
+    if (!s2.has(elem)) {
+      return false
+    }
+  }
+  return true
+}
+
+export const changeInventory = (
+  state: GameState,
+  player: Player,
+  resource: ResourceType,
+  delta: number
+): GameState => {
+  state.playerState[player].resources[resource].count += delta
+  if (state.playerState[player].resources[resource].count < 0) {
+    throw Error('Not enough resources')
+  }
+  return state
 }

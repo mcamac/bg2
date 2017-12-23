@@ -247,7 +247,7 @@ export const CARDS: Card[] = [
     actionText: 'Effect: When you play a card, you pay 1 MC less for it.',
     effectText: 'Place a city tile NEXT TO NO OTHER TILE.',
     effects: [['PlaceResearchOutpost']],
-    discounts: [['Discount', 1]],
+    discounts: [[1]],
   },
   {
     name: 'Phobos Space Haven',
@@ -311,7 +311,7 @@ export const CARDS: Card[] = [
     tags: ['Space'],
     vp: 1,
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
-    discounts: [Discount(2, [Tag.Space])],
+    discounts: [[2, [Tag.Space]]],
   },
   {
     name: 'Eos Chasma National Park',
@@ -890,7 +890,7 @@ export const CARDS: Card[] = [
     tags: ['Earth'],
     vp: 2,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
-    discounts: [['Discount', 2]],
+    discounts: [[2]],
   },
   {
     name: 'Advanced Alloys',
@@ -926,6 +926,7 @@ export const CARDS: Card[] = [
     vp: 1,
     actionText:
       'Effect: When you play a science tag, including this, you may discard a card from hand to draw a card.',
+    afterCardTrigger: [[Tag.Science], ['Option', [['Discard', 1], ['Draw', 1]]]],
   },
   {
     name: 'Viral Enhancers',
@@ -935,7 +936,10 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Microbe'],
     actionText:
       'Effect: When you play a plant, microbe, or an animal tag, including this, gain 1 plant or add 1 resource TO THAT CARD.',
-    // TODO,
+    afterCardTrigger: [
+      [Tag.Plant, Tag.Microbe, Tag.Animal],
+      ['Choice', [['ChangeInventory', 1, ResourceType.Plant], ['ChangePlayedCardResource', 1]]],
+    ],
   },
   {
     name: 'Towing a Comet',
@@ -987,7 +991,7 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Science', 'Energy'],
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it',
-    discounts: [Discount(2, [Tag.Space])],
+    discounts: [[2, [Tag.Space]]],
     requires: [['HasTags', 4, Tag.Science]],
   },
   {
@@ -1161,7 +1165,7 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Energy'],
     actionText: 'Effect: When you play a space card, you pay 2 MC less for it.',
     effectText: 'Requires 5 science tags. Increase your energy production 6 steps.',
-    discounts: [Discount(2, [Tag.Space])],
+    discounts: [[2, [Tag.Space]]],
     effects: [['ChangeProduction', 6, ResourceType.Energy]],
     requires: [['HasTags', 5, Tag.Science]],
   },
@@ -1298,7 +1302,7 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Earth'],
     actionText: 'Effect: When you play an Earth tag, you pay 3 MC less for it.',
-    discounts: [Discount(3, [Tag.Earth])],
+    discounts: [[3, [Tag.Earth]]],
   },
   {
     name: 'Acquired Company',
@@ -1364,7 +1368,7 @@ export const CARDS: Card[] = [
     tags: ['Earth', 'Event'],
     effectText:
       'Look at the top 4 cards from the deck. Take 2 of them into hand and discard the other 2',
-    // TODO
+    effects: [['DrawAndChoose', 4, 2]],
   },
   {
     name: 'Bribed Committee',
@@ -1831,7 +1835,7 @@ export const CARDS: Card[] = [
     vp: 3,
     actionText: 'Effect: when you play a card, you pay 2 MC less for it.',
     effectText: 'Requires 7 science tags.',
-    discounts: [['Discount', 2]],
+    discounts: [[2]],
     requires: [['HasTags', 7, Tag.Science]],
   },
   {
@@ -2024,7 +2028,7 @@ export const CARDS: Card[] = [
       ['ChangeProduction', 2, ResourceType.Money],
     ],
     requires: [['MinOxygen', 6]],
-    discounts: [Discount(2, [Tag.Space])],
+    discounts: [[2, [Tag.Space]]],
   },
   {
     name: 'Import of Advanced GHG',
@@ -2340,7 +2344,7 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Event'],
     effectText:
       'Look at the top 3 cards from the deck. Take 1 of them into hand and discard the other 2',
-    //todo
+    effects: [['DrawAndChoose', 3, 1]],
   },
   {
     name: 'Plantation',

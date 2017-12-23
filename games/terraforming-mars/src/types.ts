@@ -32,7 +32,9 @@ export interface Card {
   resourceHeld?: CardResource
   effects?: any[]
   actions?: any[][]
-  afterCardTrigger?: [any[], any[]]
+  afterCardTrigger?: [Tag[], any[]]
+  afterTileTrigger?: [TileType[], any[]]
+  todo?: boolean
 }
 
 export type Player = string
@@ -111,8 +113,8 @@ export const enum State {
 }
 
 export interface PlayerDraftState {
-  taken: Card[]
-  queued: Card[][]
+  taken: string[]
+  queued: string[][]
 }
 
 export interface MilestoneClaim {
@@ -137,7 +139,7 @@ export interface GameState {
   }
   player: Player
   map: MapState
-  deck: Card[]
+  deck: string[]
   discards: Card[]
   milestones: MilestoneClaim[]
   awards: AwardFunding[]
@@ -145,6 +147,10 @@ export interface GameState {
 
   draft: {
     [key: string]: PlayerDraftState
+  }
+
+  choosingCards: {
+    [key: string]: string[]
   }
 
   // log(): void

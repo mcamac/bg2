@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "dependencies": {
     "lodash": "^4.17.4",
-    "random-seed": "^0.3.0"
+    "random-seed": "^0.3.0",
+    "shuffle-seed": "^1.1.6"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.91",
+    "@types/node": "^8.5.2",
     "@types/ramda": "github:types/npm-ramda#dist",
     "ava": "^0.23.0",
     "typescript": "^2.6.2"

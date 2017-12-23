@@ -11,7 +11,9 @@ import {
   Awards,
 } from './types'
 import {CARDS} from './cards'
-import {HasTags, GetPlayerTags} from './utils'
+import {setupInitialHands} from './deck'
+import {HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
+import {shuffle} from 'shuffle-seed'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -111,53 +113,50 @@ const normalProduction = {
   RAISE_HEAT: c(costs(8, ResourceType.Heat), raiseHeat),
 }
 
-const getInitialGameState = (players: Player[]): GameState => {
+const SEED = 'martin'
+
+export const getInitialGameState = (players: Player[], seed: string = SEED): GameState => {
   const playerState = {}
 
-  return {
+  let state = {
     generation: 0,
     players,
     firstPlayer: players[0],
     playerState,
     passed: {},
     player: players[0],
-    map: null,
-    deck: CARDS as Card[], // TODO: Nope
+    deck: shuffle(CARDS.map(card => card.name), SEED),
     discards: [],
-    milestones: null,
-    awards: null,
     globalParameters: {
       Oxygen: 0,
       Oceans: 0,
       Heat: -30,
     },
+    map: {},
+    milestones: [],
+    awards: [],
 
+    // Private
     draft: {},
+    choosingCards: {},
+    seed: SEED,
   }
-}
 
-function isSubset<T>(l1: T[], l2: T[]): boolean {
-  const s1 = new Set(l1)
-  const s2 = new Set(l2)
-  for (var elem of Array.from(s1.values())) {
-    if (!s2.has(elem)) {
-      return false
-    }
-  }
-  return true
+  state = setupInitialHands(state)
+  return state
 }
 
 export const getDiscount = (played: Card[], card: Card) => {
   let delta = 0
   played.forEach(playedCard => {
     if (playedCard.discounts) {
-      playedCard.discounts.forEach(discount => {
-        if (discount.tags) {
-          if (isSubset(discount.tags, card.tags || [])) {
-            delta += discount.delta
+      playedCard.discounts.forEach(([discountDelta, tags]) => {
+        if (tags) {
+          if (isSubset(tags, card.tags || [])) {
+            delta += discountDelta
           }
         } else {
-          delta += discount.delta
+          delta += discountDelta
         }
       })
     }
@@ -165,10 +164,19 @@ export const getDiscount = (played: Card[], card: Card) => {
   return delta
 }
 
+export const chooseCards = (state: GameState, chosen: Card[], player: Player): GameState => {
+  // todo: Check subset of player
+  // state.choosingCards[player]
+  state = changeInventory(state, player, ResourceType.Money, -chosen.length * 3)
+  state.playerState[player].hand = state.playerState[player].hand.concat(chosen)
+  delete state.choosingCards[player]
+  return state
+}
+
 const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
   [Milestones.Terraformer]: state => state.playerState[state.player].TR >= 35,
-  [Milestones.Mayor]: null,
-  [Milestones.Gardener]: null,
+  // [Milestones.Mayor]: null,
+  // [Milestones.Gardener]: null,
   [Milestones.Builder]: HasTags(8, Tag.Building),
   [Milestones.Planner]: state => state.playerState[state.player].hand.length >= 16,
 }
