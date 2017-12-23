@@ -1,6 +1,6 @@
 import * as r from 'rethinkdb'
 import {SocketServer} from './socket'
-import {GameStorage, PlayerConnection} from './base'
+import {GameStorage, PlayerConnection, Room} from './base'
 
 import {PowerGrid} from '../../games/power-grid/src/index'
 import {TerraformingMars} from '../../games/terraforming-mars/src/index'
@@ -10,14 +10,13 @@ const GAMES = {
   TerraformingMars,
 }
 
-export class RDBStorage extends GameStorage {
+export class RDBStorage implements GameStorage {
   userConnections: {[key: string]: any}
   connection: r.Connection
   sockets: SocketServer
   playerConnection: PlayerConnection
 
   constructor(params: r.ConnectionOptions, playerConnection: PlayerConnection) {
-    super()
     this.playerConnection = playerConnection
     this.playerConnection.setStorage(this)
     this.connect(params)
@@ -39,7 +38,8 @@ export class RDBStorage extends GameStorage {
             return
           }
           cursor.each((err, room) => {
-            this.roomNotify(room)
+            const {new_val: newRoom} = room
+            this.playerConnection.notifyRoom(newRoom)
           })
         })
       resolve()
@@ -47,20 +47,11 @@ export class RDBStorage extends GameStorage {
     return promise
   }
 
-  roomNotify(room) {
-    const {new_val: rm} = room
-    console.log('room change', rm)
-    if (rm && rm.users) {
-      rm.users.filter(u => this.userConnections[u]).forEach(u => {
-        console.log('sending room user', u, rm)
-        this.userConnections[u].send(
-          JSON.stringify({
-            type: 'ROOM_UPDATE',
-            room: rm,
-          })
-        )
-      })
-    }
+  createUser(id: string) {
+    return r
+      .table('users')
+      .insert({id})
+      .run(this.connection)
   }
 
   createRoom(id: string): Promise<any> {
@@ -75,41 +66,39 @@ export class RDBStorage extends GameStorage {
     return await r.table('rooms').get(id)
   }
 
+  async updateRoom(id: string, update: object) {
+    await this.createRoom(id)
+    return await r
+      .table('rooms')
+      .get(id)
+      .update(update)
+  }
+
   async onRoomJoin(room: string, player: string) {
-    return (await this.getRoom(room))
-      .update({
-        users: (r.row('users') as any).setUnion([player]).default([]),
-        modified: new Date(),
-      })
-      .run(this.connection)
+    return this.updateRoom(room, {
+      users: (r.row('users') as any).setUnion([player]).default([]),
+      modified: new Date(),
+    })
   }
 
   async onRoomLeave(room: string, player: string) {
-    return (await this.getRoom(room))
-      .update({
-        users: (r.row('users') as any).setDifference([player]).default([]),
-        modified: new Date(),
-      })
-      .run(this.connection)
+    return this.updateRoom(room, {
+      users: (r.row('users') as any).setDifference([player]).default([]),
+      modified: new Date(),
+    })
   }
 
-  async onStartRoom(id: string) {
+  async onRoomStart(id: string) {
     const room = (await this.getRoom(id)) as any
     const game = GAMES[room.g].getInitialState(room.users)
-    await r
-      .table('rooms')
-      .get(id)
-      .update({
-        game,
-      })
-      .run(this.connection)
+    return this.updateRoom(id, {
+      game,
+    })
   }
 
   async onRoomMove(room: string, player: string, move: any) {}
 
   async onRoomReset(id: string) {
-    this.onStartRoom(id)
+    this.onRoomStart(id)
   }
 }
-
-// const defaultStorage = new RDBStorage({host: 'localhost', port: 28015, db: 'bg'})
