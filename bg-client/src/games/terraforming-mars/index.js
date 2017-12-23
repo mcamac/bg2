@@ -61,7 +61,7 @@ const CardWrapper = styled(Box)`
 let Card = props => (
   <CardWrapper type={props.card.type}>
     <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
-      <div style={{fontWeight: 500, fontSize: 15}}>{props.cost}</div>
+      <div style={{fontWeight: 500, fontSize: 15, color: '#333'}}>{props.cost}</div>
       <Box flex="1 1 auto" style={{textAlign: 'right'}}>
         {props.name}
       </Box>
@@ -110,7 +110,7 @@ const Grid = () => (
 )
 
 const Leaderboard = () => (
-  <Box style={{fontSize: 14}}>
+  <Box style={{fontSize: 14}} mb={3}>
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
       Terraforming Ratings
     </Box>
@@ -139,22 +139,63 @@ const GlobalParams = () => (
   </Box>
 )
 
-const PlayerCard = () => (
-  <Box mb={2}>
-    <Flex>
-      <Box flex="1 1 auto">viz</Box>
+const Milestones = () => (
+  <Box style={{fontSize: 14}} mb={3}>
+    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
+      Milestones
+    </Box>
+    {['Oceans', 'Temp', 'Oxygen'].map(param => (
+      <Flex key={param}>
+        <Box w={120} flex="1 1 auto" style={{color: '#aaa'}}>
+          Not chosen
+        </Box>
+        <Box>a</Box>
+      </Flex>
+    ))}
+  </Box>
+)
+
+const Awards = () => (
+  <Box style={{fontSize: 14}}>
+    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
+      Awards
+    </Box>
+    {['Oceans', 'Temp', 'Oxygen'].map(param => (
+      <Flex key={param}>
+        <Box w={120} flex="1 1 auto">
+          Mayor
+        </Box>
+        <Box>a</Box>
+      </Flex>
+    ))}
+  </Box>
+)
+
+const PlayerCard = props => (
+  <Box p={2} style={{borderBottom: '1px solid #eee'}}>
+    <Flex mb="4px">
+      <Box flex="1 1 auto">{props.player}</Box>
       <Box>30</Box>
     </Flex>
     <Flex>
-      <Flex>
+      <Flex mr={1}>
         <Circle color="yellow">C</Circle>
-        2
+        <Box ml="3px" style={{fontSize: 13}}>
+          {props.state.resources.Money.count} (+{props.state.resources.Money.production})
+        </Box>
+      </Flex>
+      <Flex mr={1}>
+        <Circle color="brown">S</Circle>
+        <Box ml="3px" style={{fontSize: 13}}>
+          {props.state.resources.Steel.count} (+{props.state.resources.Steel.production})
+        </Box>
       </Flex>
       <Flex>
-        <Circle color="brown">S</Circle>
-        2
+        <Circle color="black">T</Circle>
+        <Box ml="3px" style={{fontSize: 13}}>
+          {props.state.resources.Titanium.count} (+{props.state.resources.Titanium.production})
+        </Box>
       </Flex>
-      <Circle color="black">T</Circle>
     </Flex>
     <Flex>
       <Circle color="green">P</Circle>
@@ -162,6 +203,15 @@ const PlayerCard = () => (
       <Circle color="red">H</Circle>
     </Flex>
   </Box>
+)
+
+const ActionBar = props => (
+  <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
+    Card buying. 2 actions left. Choose an action or
+    <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
+      pass
+    </Box>
+  </Flex>
 )
 
 const TerraformingMars = props => (
@@ -175,24 +225,21 @@ const TerraformingMars = props => (
       Terraforming Mars
     </Box>
     <Flex>
-      <Box p={2} w={200} style={{minWidth: 200, borderRight: '1px solid #ddd'}}>
-        <PlayerCard />
-        <PlayerCard />
-        <PlayerCard />
+      <Box w={250} style={{minWidth: 250, borderRight: '1px solid #ddd'}}>
+        {props.game.players.map(player => (
+          <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
+        ))}
       </Box>
       <Box flex="1 1 auto" p={2}>
         <Flex>
           <Box>
             <GlobalParams />
             <Leaderboard />
+            <Milestones />
+            <Awards />
           </Box>
           <Box flex="1 1 auto" style={{textAlign: 'center'}}>
-            <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
-              2 actions left. Choose an action or
-              <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
-                pass
-              </Box>
-            </Flex>
+            <ActionBar />
             <Grid />
           </Box>
         </Flex>
