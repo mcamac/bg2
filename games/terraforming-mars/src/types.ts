@@ -34,6 +34,7 @@ export interface Card {
   actions?: any[][]
   afterCardTrigger?: [Tag[], any[]]
   afterTileTrigger?: [TileType[], any[]]
+  afterStandardProjectTrigger?: any[]
   todo?: boolean
 }
 

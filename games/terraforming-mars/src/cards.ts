@@ -1899,7 +1899,7 @@ export const CARDS: Card[] = [
     tags: ['Science'],
     actionText:
       'Effect: After you pay for a standard project, except selling patents, you gain 3 MC.',
-    // TODO
+    afterStandardProjectTrigger: [['ChangeInventory', 3, ResourceType.Money]],
   },
   {
     name: 'Nitrite Reducing Bacteria',

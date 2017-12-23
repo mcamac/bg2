@@ -17,13 +17,8 @@ import {
 } from './types'
 import {CARDS} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
-import {HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
+import {clone, HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
 import {shuffle} from 'shuffle-seed'
-import {cloneDeep} from 'lodash'
-
-function clone<T>(x: T): T {
-  return cloneDeep(x)
-}
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state

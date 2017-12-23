@@ -186,3 +186,6 @@ export const changeInventory = (
 }
 
 export const cloneState: Transform = state => cloneDeep(state)
+export function clone<T>(x: T): T {
+  return cloneDeep(x)
+}
