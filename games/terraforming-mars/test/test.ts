@@ -1,10 +1,10 @@
 import test from 'ava'
 import * as util from 'util'
 
-import {getDiscount, getInitialGameState, handleAction, buyCards} from '../src/index'
+import {getDiscount, getInitialGameState, handleAction, buyCards, fundAward} from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
-import {GameState, Card, Transform, ResourceType, Phase, UserAction} from '../src/types'
+import {GameState, Card, Transform, ResourceType, Phase, UserAction, Awards} from '../src/types'
 import {cloneState} from '../src/utils'
 
 const TEST_SEED = 'martin'
@@ -76,4 +76,17 @@ test(t => {
   t.deepEqual(chosenB, state.playerState['b'].hand)
   t.deepEqual(21, state.playerState['b'].resources[ResourceType.Money].count)
   t.is(state.phase, Phase.Actions)
+})
+
+// Fund award
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  state = fundAward(state, Awards.Miner)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 22)
+  state = fundAward(state, Awards.Banker)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 8)
 })

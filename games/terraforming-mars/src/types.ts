@@ -117,6 +117,16 @@ export const enum Phase {
 export const enum UserAction {
   DraftRoundChoice = 'DraftRoundChoice',
   BuyCards = 'BuyCards',
+  Action = 'Action',
+  ChooseDiscards = 'ChooseDiscards',
+}
+
+export const enum TurnAction {
+  ClaimMilestone = 'ClaimMilestone',
+  FundAward = 'FundAward',
+  StandardProject = 'StandardProject',
+  PlayCard = 'PlayCard',
+  CardAction = 'CardAction',
 }
 
 export interface PlayerDraftState {
@@ -146,6 +156,7 @@ export interface GameState {
     [key: string]: boolean
   }
   player: Player
+  actionsDone: number
   map: MapState
   deck: string[]
   discards: Card[]

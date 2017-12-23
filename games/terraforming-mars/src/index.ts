@@ -14,6 +14,7 @@ import {
   PlayerState,
   ResourceState,
   ResourcesState,
+  TurnAction,
 } from './types'
 import {CARDS} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
@@ -138,6 +139,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     playerState: <{[key: string]: PlayerState}>{},
     passed: {},
     player: players[0],
+    actionsDone: 0,
     deck: shuffle(CARDS.map(card => card.name), SEED),
     discards: [],
     globalParameters: {
@@ -233,7 +235,7 @@ const claimMilestone = (state: GameState, milestone: Milestones): GameState => {
 }
 
 const AWARD_COSTS = [8, 14, 20]
-const fundAward = (state: GameState, award: Awards): GameState => {
+export const fundAward = (state: GameState, award: Awards): GameState => {
   const cost = AWARD_COSTS[state.awards.length]
   state.playerState[state.player].resources[ResourceType.Money].count -= cost
   state.awards.push({
@@ -243,7 +245,13 @@ const fundAward = (state: GameState, award: Awards): GameState => {
   return state
 }
 
-export const actionHandlers = {}
+export const turnActionHandlers = {
+  [TurnAction.ClaimMilestone]: (state, action) => {},
+  [TurnAction.FundAward]: (state, action) => {
+    return fundAward(state, action.award)
+  },
+  [TurnAction.PlayCard]: (state, action) => {},
+}
 
 // Enumerates all client messages.
 export const handlers = {
@@ -263,9 +271,12 @@ export const handlers = {
     return state
   },
   // During generation
-  CARD_ACTION: null,
-  STANDARD_PROJECT: () => {},
-  PLAY_CARD: () => {},
+  [UserAction.Action]: (state, action) => {
+    state = turnActionHandlers[action.turnType](state, action)
+    state.actionsDone++
+  },
+
+  // From cards
   CHOOSE_BUY_OR_DISCARD: () => {},
   CHOOSE_DISCARD: () => {},
 }
