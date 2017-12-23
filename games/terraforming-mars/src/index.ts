@@ -11,7 +11,7 @@ import {
   Awards,
 } from './types'
 import {CARDS} from './cards'
-import {setupInitialHands} from './deck'
+import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
 import {HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
 import {shuffle} from 'shuffle-seed'
 
@@ -119,6 +119,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
   const playerState = {}
 
   let state = {
+    phase: '',
     generation: 0,
     players,
     firstPlayer: players[0],
@@ -225,6 +226,19 @@ export const handlers = {
   CHOOSE_DISCARD: () => {},
 }
 
+const startActions: Transform = state => {
+  state.player = state.firstPlayer
+  state.phase = 'ACTIONS'
+  return state
+}
+
 export const handleAction = (state: GameState, action): GameState => {
+  if (action.type === 'DRAFT_ROUND_CHOICE') {
+    state = handlePlayerChoice(state, action.player, action.choice)
+    if (isDraftDone(state)) {
+      state = startActions(state)
+    }
+    return state
+  }
   return state
 }

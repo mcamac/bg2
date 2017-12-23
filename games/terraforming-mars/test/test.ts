@@ -1,10 +1,11 @@
 import test from 'ava'
 import * as util from 'util'
 
-import {getDiscount, getInitialGameState} from '../src/index'
+import {getDiscount, getInitialGameState, handleAction} from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
-import {Card} from '../src/types'
+import {GameState, Card, Transform} from '../src/types'
+import {cloneState} from '../src/utils'
 
 const TEST_SEED = 'martin'
 
@@ -45,6 +46,11 @@ test(t => {
   state = handlePlayerChoice(state, 'b', 'Domed Crater')
   state = handlePlayerChoice(state, 'a', 'Small Asteroid')
   state = handlePlayerChoice(state, 'c', 'Energy Tapping')
-  state = handlePlayerChoice(state, 'a', 'Space Station')
-  t.true(isDraftDone(state))
+
+  let state1 = handlePlayerChoice(cloneState(state), 'a', 'Space Station')
+  t.true(isDraftDone(state1))
+
+  // Use action handler to test transition.
+  state = handleAction(state, {type: 'DRAFT_ROUND_CHOICE', player: 'a', choice: 'Space Station'})
+  t.is(state.phase, 'ACTIONS')
 })

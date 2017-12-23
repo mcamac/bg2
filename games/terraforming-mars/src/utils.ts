@@ -1,3 +1,4 @@
+import {cloneDeep} from 'lodash'
 import {GameState, Transform, Tag, GlobalType, Player, CardResource, ResourceType} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
@@ -183,3 +184,5 @@ export const changeInventory = (
   }
   return state
 }
+
+export const cloneState: Transform = state => cloneDeep(state)

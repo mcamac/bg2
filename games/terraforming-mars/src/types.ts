@@ -128,6 +128,7 @@ export interface AwardFunding {
 }
 
 export interface GameState {
+  phase: string
   generation: number
   players: Player[]
   firstPlayer: Player

@@ -48,15 +48,9 @@ export const handlePlayerChoice = (state: GameState, player: Player, choice: str
 }
 
 export const isDraftDone = (state: GameState): boolean => {
-  let done = true
-  state.players.forEach(player => {
-    if (state.draft[player].taken.length !== N_DRAFT_CARDS) done = false
-  })
-  return done
-}
-
-const checkDraftFinished = (state: GameState): boolean => {
-  return state.players.map(player => state.draft[player].taken.length === 4).every(x => x)
+  return state.players
+    .map(player => state.draft[player].taken.length === N_DRAFT_CARDS)
+    .every(x => x)
 }
 
 export const setupInitialHands = state => {
