@@ -16,7 +16,7 @@ const Wrapper = styled(Flex)`
 `
 
 const CARD_COLORS = {
-  Active: '#dff3ff',
+  Active: '#c1e4f9',
   Event: '#ffc0c0',
   Automated: '#95F58D',
 }
@@ -50,7 +50,7 @@ const TAG_COLORS = {
 const Tag = props => <Circle color={TAG_COLORS[props.name] || 'blue'}>{props.name[0]}</Circle>
 
 const CardWrapper = styled(Box)`
-  background: ${props => CARD_COLORS[props.type] || '#ffc0c0'};
+  background: ${props => CARD_COLORS[props.type]};
   min-width: 250px;
   font-size: 13px;
   margin-bottom: 5px;
@@ -58,20 +58,105 @@ const CardWrapper = styled(Box)`
   box-sizing: border-box;
 `
 
+const CardRequirements = props => (
+  <Flex px="4px" ml="4px" style={{background: 'rgba(255, 255, 255, 0.5)'}}>
+    O ≥ {props.requires[0][1]}
+  </Flex>
+)
+
+const withSign = value => (value >= 0 ? `+${value}` : `${value}`)
+
+const ChangeProduction = (value, resource) => (
+  <div style={{background: '#a56c6c'}}>
+    {withSign(value)}
+    {resource}
+  </div>
+)
+
+const ChangeInventory = (value, resource) => (
+  <div>
+    {withSign(value)} {resource}
+  </div>
+)
+
+const DecreaseAnyProduction = (value, resource) => (
+  <div style={{background: '#a56c6c'}}>
+    Remove any
+    {value}
+    {resource}
+  </div>
+)
+
+const DecreaseAnyInventory = (value, resource) => (
+  <div>
+    Remove any
+    {value}
+    {resource}
+  </div>
+)
+
+const PlaceOceans = (value, card) => <div>{withSign(value)} Oceans</div>
+const IncreaseTemperature = (value, card) => <div>{withSign(value)} Temp</div>
+const RaiseOxygen = (value, card) => <div>{withSign(value)} Oxy</div>
+const Draw = (value, card) => <div>Draw {value}</div>
+
+const Choice = (choices, card) => (
+  <Flex>
+    One of:
+    {choices.map(
+      ([effect, ...args], i) =>
+        EFFECTS[effect] && <Box key={i}> {EFFECTS[effect](...args, card)}</Box>
+    )}
+  </Flex>
+)
+
+const IncreaseTR = value => <div>{withSign(value)} TR</div>
+
+const EFFECTS = {
+  ChangeProduction,
+  ChangeInventory,
+  PlaceOceans,
+  RaiseOxygen,
+  DecreaseAnyProduction,
+  DecreaseAnyInventory,
+  IncreaseTemperature,
+  IncreaseTR,
+  Choice,
+  Draw,
+}
+
+const CardEffects = props =>
+  props.effects.map(([effect, ...args], i) => (
+    <Box key={i}>
+      {EFFECTS[effect] ? (
+        EFFECTS[effect](...args, props.card)
+      ) : (
+        <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
+      )}
+    </Box>
+  ))
+
 let Card = props => (
   <CardWrapper type={props.card.type}>
     <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
-      <div style={{fontWeight: 500, fontSize: 15, color: '#333'}}>{props.cost}</div>
+      <div style={{fontWeight: 500, fontSize: 15, width: 18, color: '#333'}}>{props.card.cost}</div>
+      {props.card.requires && <CardRequirements requires={props.card.requires} />}
       <Box flex="1 1 auto" style={{textAlign: 'right'}}>
         {props.name}
       </Box>
       <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
-    {!props.collapsed && <Flex style={{padding: 5}}>1 → Card</Flex>}
+    {!props.collapsed && (
+      <Flex style={{padding: 5}}>
+        {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
+        {props.card.vp && `${props.card.vp} VP`}
+      </Flex>
+    )}
   </CardWrapper>
 )
 
 Card = withProps(props => ({card: getCardByName(props.name)}))(Card)
+export {Card}
 
 const hexPoints = (x, y, radius) => {
   var points = []
@@ -225,7 +310,7 @@ const TerraformingMars = props => (
       Terraforming Mars
     </Box>
     <Flex>
-      <Box w={250} style={{minWidth: 250, borderRight: '1px solid #ddd'}}>
+      <Box w={270} style={{minWidth: 270, borderRight: '1px solid #ddd'}}>
         {props.game.players.map(player => (
           <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
         ))}
@@ -268,9 +353,7 @@ const TerraformingMars = props => (
         <Box p={1} style={{fontSize: 12, color: '#555'}}>
           BUYING
         </Box>
-        <Box px={2}>
-          {props.game.choosingCards.a.map(name => <Card key={name} name={name} cost={20} />)}
-        </Box>
+        <Box px={2}>{props.game.choosingCards.a.map(name => <Card key={name} name={name} />)}</Box>
         <Box p={1} style={{fontSize: 12, color: '#555'}}>
           HAND
         </Box>
