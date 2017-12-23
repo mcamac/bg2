@@ -1,7 +1,7 @@
 import {keyBy} from 'lodash'
 
-import {Discount} from './utils'
-import {ResourceType, CardResource, Tag, Card} from './types'
+import {Discount, ChangeProduction} from './utils'
+import {ResourceType, CardResource, Tag, Card, TileType} from './types'
 
 export const CARDS: Card[] = [
   {
@@ -259,6 +259,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText:
       'Increase your titanium production 1 step and place a city tile ON THE RESERVED AREA.',
+    // todo
   },
   {
     name: 'Black Polar Dust',
@@ -2272,7 +2273,18 @@ export const CARDS: Card[] = [
     actionText:
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     resourceHeld: CardResource.Science,
-    // todo
+    afterCardTrigger: [
+      [Tag.Space],
+      [
+        [
+          'Choice',
+          [
+            ['ChangeCardResource', 1, CardResource.Science],
+            [['ChangeCardResource', -1, CardResource.Science], ['Draw', 1]],
+          ],
+        ],
+      ],
+    ],
   },
   {
     name: 'Rad-Suits',
@@ -2433,7 +2445,12 @@ export const CARDS: Card[] = [
       'Effect: Each time a city tile is placed, including this, increase your MC production 1 step.',
     effectText:
       'Decrease your energy production 1 step and decrease your MC production 2 steps. Place a city tile.',
-    //todo
+    afterTileTrigger: [[TileType.City], [['ChangeProduction', 1, ResourceType.Money]]],
+    effects: [
+      ['ChangeProduction', -1, ResourceType.Energy],
+      ['ChangeProduction', -2, ResourceType.Money],
+      ['PlaceCity'],
+    ],
   },
   {
     name: 'Energy Tapping',
