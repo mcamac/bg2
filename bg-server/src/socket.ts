@@ -7,6 +7,7 @@ import {PlayerConnection, GameStorage} from './base'
 interface AuthMessage {
   type: 'token'
   token: string
+  email?: string
 }
 
 interface RoomMessage {
@@ -35,50 +36,64 @@ export class SocketServer implements PlayerConnection {
 
   start() {
     this.wss = new WebSocket.Server({server: this.server})
-    this.wss.on('connection', this.onConnection)
+    this.wss.on('connection', this.onConnection.bind(this))
+    console.log('Started WS server.')
   }
 
   onConnection(ws: WebSocket) {
-    ws.on('message', async (message: string) => {
-      const data = JSON.parse(message)
-      this.onData(data, ws)
+    ws.on('message', (message: string) => {
+      try {
+        const data = JSON.parse(message)
+        this.onData(data, ws)
+      } catch (e) {
+        console.error(e)
+        return
+      }
     })
   }
 
   onData(data: ClientMessage, ws: WebSocket) {
     if (data.type === 'token') {
-      const decoded = decodeToken(data.token)
-      ws['token'] = decoded
+      if (data.token === 'DEV') {
+        ws['token'] = {email: data.email}
+      } else {
+        const decoded = decodeToken(data.token)
+        ws['token'] = decoded
+      }
       ws.send(JSON.stringify({auth: true}))
 
       this.userConnections[ws['token'].email] = ws
       this.storage.createUser(ws['token'].email)
-    } else {
-      if (ws['token']) {
-        return this.onAction(data.action, data, ws)
-      }
+      console.log('Authenticated', ws['token'])
+    } else if (ws['token']) {
+      return this.onAction(data.action, data, ws)
     }
   }
 
   onAction(action: string, data: RoomMessage, ws: WebSocket) {
     const room = data.room
     const player = ws['token'].email
-    if (action === 'JOIN_ROOM') {
+    if (action === 'ROOM_JOIN') {
       this.storage.onRoomJoin(room, player)
-    } else if (action === 'LEAVE_ROOM') {
+    } else if (action === 'ROOM_LEAVE') {
       this.storage.onRoomLeave(room, player)
+    } else if (action === 'ROOM_START') {
+      this.storage.onRoomStart(room)
     }
   }
 
-  notifyRoom(room) {
-    console.log('room change', room)
+  notifyRoom(room, getPlayerState) {
+    console.log('room change', room.id, room.users)
     if (room && room.users) {
       room.users.filter(u => this.userConnections[u]).forEach(u => {
-        console.log('sending room user', u, room)
+        let playerRoom = {...room}
+        if (room.game && getPlayerState) {
+          playerRoom.game = getPlayerState(room.game, u)
+        }
         this.userConnections[u].send(
           JSON.stringify({
             type: 'ROOM_UPDATE',
-            room,
+            room: playerRoom,
           })
         )
       })

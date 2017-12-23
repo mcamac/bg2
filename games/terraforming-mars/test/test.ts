@@ -106,4 +106,5 @@ test(t => {
 
   t.falsy(client.playerState['b'].hand)
   t.falsy(client.choosingCards['b'])
+  t.falsy(client.deck)
 })

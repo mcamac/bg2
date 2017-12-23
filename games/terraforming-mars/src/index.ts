@@ -319,7 +319,7 @@ export const getClientState = (state: GameState, player: Player) => {
 
 // Used by server.
 export const TerraformingMars = {
-  getInitalState: getInitialGameState,
+  getInitialState: getInitialGameState,
   reducer: handleAction,
   getClientState,
 }

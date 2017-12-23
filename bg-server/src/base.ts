@@ -1,6 +1,6 @@
 export interface PlayerConnection {
   setStorage(storage: GameStorage): void
-  notifyRoom(room)
+  notifyRoom(room, getPlayerState?): void
 }
 
 export interface GameStorage {

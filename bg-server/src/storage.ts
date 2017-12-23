@@ -37,9 +37,10 @@ export class RDBStorage implements GameStorage {
             console.log(err)
             return
           }
+
           cursor.each((err, room) => {
             const {new_val: newRoom} = room
-            this.playerConnection.notifyRoom(newRoom)
+            this.playerConnection.notifyRoom(newRoom, newRoom.g && GAMES[newRoom.g].getClientState)
           })
         })
       resolve()
@@ -57,39 +58,42 @@ export class RDBStorage implements GameStorage {
   createRoom(id: string): Promise<any> {
     return r
       .table('rooms')
-      .insert({id})
+      .insert({id, g: 'TerraformingMars'}, {conflict: 'error'})
       .run(this.connection)
   }
 
   async getRoom(id: string) {
     await this.createRoom(id)
-    return await r.table('rooms').get(id)
-  }
-
-  async updateRoom(id: string, update: object) {
-    await this.createRoom(id)
     return await r
       .table('rooms')
       .get(id)
-      .update(update)
+      .run(this.connection)
+  }
+
+  async updateRoom(id: string, update: object) {
+    return await r
+      .table('rooms')
+      .get(id)
+      .update({...update, modified: new Date()})
+      .run(this.connection)
   }
 
   async onRoomJoin(room: string, player: string) {
+    await this.createRoom(room)
     return this.updateRoom(room, {
-      users: (r.row('users') as any).setUnion([player]).default([]),
-      modified: new Date(),
+      users: (r.row('users') as any).setUnion([player]).default([player]),
     })
   }
 
   async onRoomLeave(room: string, player: string) {
     return this.updateRoom(room, {
       users: (r.row('users') as any).setDifference([player]).default([]),
-      modified: new Date(),
     })
   }
 
   async onRoomStart(id: string) {
     const room = (await this.getRoom(id)) as any
+    console.log('start', room, GAMES[room.g])
     const game = GAMES[room.g].getInitialState(room.users)
     return this.updateRoom(id, {
       game,
