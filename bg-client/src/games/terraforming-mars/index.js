@@ -23,9 +23,8 @@ const CARD_COLORS = {
 
 const CircleWrapper = styled.div`
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  font-size: 12px;
+  width: 18px;
+  height: 18px;
   background: ${props => props.color};
   display: flex;
   align-items: center;
@@ -34,7 +33,7 @@ const CircleWrapper = styled.div`
 
 const Circle = props => (
   <CircleWrapper {...props}>
-    <span style={{color: 'white', mixBlendMode: 'difference'}}>{props.children}</span>
+    <div style={{marginTop: 3, color: 'white', mixBlendMode: 'difference'}}>{props.children}</div>
   </CircleWrapper>
 )
 
@@ -45,9 +44,16 @@ const TAG_COLORS = {
   Power: 'purple',
   Event: 'red',
   Earth: 'blue',
+  City: '#ddd',
+  Microbe: '#bfbf2d',
+  Jovian: 'orange',
 }
 
-const Tag = props => <Circle color={TAG_COLORS[props.name] || 'blue'}>{props.name[0]}</Circle>
+const Tag = props => (
+  <Circle color={TAG_COLORS[props.name] || 'blue'}>
+    <Icon g={props.name} style={{marginTop: 2}} />
+  </Circle>
+)
 
 const CardWrapper = styled(Box)`
   background: ${props => CARD_COLORS[props.type]};
@@ -67,36 +73,43 @@ const CardRequirements = props => (
 const withSign = value => (value >= 0 ? `+${value}` : `${value}`)
 
 const ChangeProduction = (value, resource) => (
-  <div style={{background: '#a56c6c'}}>
+  <Flex style={{background: '#a56c6c', padding: '3px'}}>
     {withSign(value)}
-    {resource}
-  </div>
+    {typeof resource === 'string' ? <Icon g={resource} /> : resource}
+  </Flex>
 )
 
 const ChangeInventory = (value, resource) => (
-  <div>
-    {withSign(value)} {resource}
-  </div>
+  <Flex>
+    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource}
+  </Flex>
 )
 
 const DecreaseAnyProduction = (value, resource) => (
-  <div style={{background: '#a56c6c'}}>
-    Remove any
-    {value}
-    {resource}
-  </div>
+  <Flex style={{background: '#a56c6c'}}>
+    Remove any {value}
+    <Icon g={resource} />
+  </Flex>
 )
 
 const DecreaseAnyInventory = (value, resource) => (
-  <div>
+  <Flex>
     Remove any
     {value}
-    {resource}
-  </div>
+    <Icon g={resource} />
+  </Flex>
 )
 
-const PlaceOceans = (value, card) => <div>{withSign(value)} Oceans</div>
-const IncreaseTemperature = (value, card) => <div>{withSign(value)} Temp</div>
+const PlaceOceans = (value, card) => (
+  <Flex>
+    {withSign(value)} <Icon g="Ocean" />
+  </Flex>
+)
+const IncreaseTemperature = (value, card) => (
+  <Flex>
+    {withSign(value)} <Icon g="Temp" />
+  </Flex>
+)
 const RaiseOxygen = (value, card) => <div>{withSign(value)} Oxy</div>
 const Draw = (value, card) => <div>Draw {value}</div>
 
@@ -135,6 +148,10 @@ const CardEffects = props =>
       )}
     </Box>
   ))
+
+const Icon = props => (
+  <i className={`icon icon-${props.g}`} style={{...(props.style || {}), fontSize: 18}} />
+)
 
 let Card = props => (
   <CardWrapper type={props.card.type}>
@@ -247,8 +264,8 @@ const Awards = () => (
     </Box>
     {['Oceans', 'Temp', 'Oxygen'].map(param => (
       <Flex key={param}>
-        <Box w={120} flex="1 1 auto">
-          Mayor
+        <Box w={120} flex="1 1 auto" style={{color: '#aaa'}}>
+          Not chosen
         </Box>
         <Box>a</Box>
       </Flex>
@@ -258,11 +275,11 @@ const Awards = () => (
 
 const PlayerCard = props => (
   <Box p={2} style={{borderBottom: '1px solid #eee'}}>
-    <Flex mb="4px">
+    <Flex mb={1}>
       <Box flex="1 1 auto">{props.player}</Box>
       <Box>30</Box>
     </Flex>
-    <Flex>
+    <Flex mb="4px">
       <Flex mr={1}>
         <Circle color="yellow">C</Circle>
         <Box ml="3px" style={{fontSize: 13}}>
@@ -283,9 +300,24 @@ const PlayerCard = props => (
       </Flex>
     </Flex>
     <Flex>
-      <Circle color="green">P</Circle>
-      <Circle color="purple">E</Circle>
-      <Circle color="red">H</Circle>
+      <Flex mr={1}>
+        <Circle color="green">P</Circle>
+        <Box ml="3px" style={{fontSize: 13}}>
+          {props.state.resources.Plant.count} (+{props.state.resources.Plant.production})
+        </Box>
+      </Flex>
+      <Flex mr={1}>
+        <Circle color="purple">E</Circle>
+        <Box ml="3px" style={{fontSize: 13}}>
+          {props.state.resources.Energy.count} (+{props.state.resources.Energy.production})
+        </Box>
+      </Flex>
+      <Flex>
+        <Circle color="red">H</Circle>
+        <Box ml="3px" style={{fontSize: 13}}>
+          {props.state.resources.Heat.count} (+{props.state.resources.Heat.production})
+        </Box>
+      </Flex>
     </Flex>
   </Box>
 )
