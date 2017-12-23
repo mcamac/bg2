@@ -130,4 +130,20 @@ test(t => {
 
   t.is(checkCardRequirements(testCard, low_oxygen_state), true)
   t.is(checkCardRequirements(testCard, high_oxygen_state), false)
+
+  // Make sure returns "true" if there are no requirements
+  let testCardNoRequirements = {
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+  }
+
+  let basicGameState = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+
+  t.is(checkCardRequirements(testCardNoRequirements, basicGameState), true)
+
+
+
+
 })
