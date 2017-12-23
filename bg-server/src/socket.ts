@@ -14,6 +14,7 @@ interface RoomMessage {
   type: 'room'
   room: string
   action: string
+  move?: any
 }
 
 type ClientMessage = RoomMessage | AuthMessage
@@ -79,6 +80,8 @@ export class SocketServer implements PlayerConnection {
       this.storage.onRoomLeave(room, player)
     } else if (action === 'ROOM_START') {
       this.storage.onRoomStart(room)
+    } else if (action === 'ROOM_START') {
+      this.storage.onRoomMove(room, player, data.move)
     }
   }
 

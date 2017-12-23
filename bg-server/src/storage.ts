@@ -100,7 +100,14 @@ export class RDBStorage implements GameStorage {
     })
   }
 
-  async onRoomMove(room: string, player: string, move: any) {}
+  async onRoomMove(room: string, player: string, move: any) {
+    const room = (await this.getRoom(id)) as any
+    const state = room.game
+    const newState = GAMES[room.g].reducer(state, move)
+    this.updateRoom(id, {
+      game: newState,
+    })
+  }
 
   async onRoomReset(id: string) {
     this.onRoomStart(id)

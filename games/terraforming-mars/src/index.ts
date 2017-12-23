@@ -299,6 +299,7 @@ export const getClientState = (state: GameState, player: Player) => {
   const publicState = omit(state, [
     'playerState',
     'deck',
+    'seed',
     'draft',
     'choosingCards',
     'choosingCorporations',
@@ -313,6 +314,8 @@ export const getClientState = (state: GameState, player: Player) => {
   keys.forEach(key => {
     publicState[key] = pick(state[key], player)
   })
+
+  publicState['deckSize'] = state.deck.length
 
   return publicState
 }

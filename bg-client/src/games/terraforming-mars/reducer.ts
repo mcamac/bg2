@@ -1,5 +1,7 @@
-import {handleAction} from '../../../../games/terraforming-mars/src/index'
+import {TerraformingMars} from '../../../../games/terraforming-mars/src/index'
 
-export const reducer = (state, action) => {
-  state
+const STATE = TerraformingMars.getInitialState(['a', 'b', 'c'])
+
+export const reducer = (state = TerraformingMars.getClientState(STATE, 'a'), action) => {
+  return state
 }

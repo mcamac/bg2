@@ -2,13 +2,23 @@ import React, {Component} from 'react'
 import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
 import {range} from 'lodash/fp'
+import {connect} from 'react-redux'
+import {compose, branch, renderNothing, withProps} from 'recompose'
 
 import {reducer} from './reducer'
 
-const Wrapper = styled.div`font-family: Rubik;`
+import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
+console.log(CARDS)
+
+const Wrapper = styled(Flex)`
+  font-family: Rubik;
+  height: 100%;
+`
 
 const CARD_COLORS = {
   Active: '#dff3ff',
+  Event: '#ffc0c0',
+  Automated: '#95F58D',
 }
 
 const CircleWrapper = styled.div`
@@ -28,30 +38,40 @@ const Circle = props => (
   </CircleWrapper>
 )
 
+const TAG_COLORS = {
+  Space: 'black',
+  Building: 'brown',
+  Science: 'white',
+  Power: 'purple',
+  Event: 'red',
+  Earth: 'blue',
+}
+
+const Tag = props => <Circle color={TAG_COLORS[props.name] || 'blue'}>{props.name[0]}</Circle>
+
 const CardWrapper = styled(Box)`
   background: ${props => CARD_COLORS[props.type] || '#ffc0c0'};
   min-width: 250px;
   font-size: 13px;
   margin-bottom: 5px;
   box-shadow: 0px 1px 1px 1px #eee;
+  box-sizing: border-box;
 `
 
-const Card = props => (
-  <CardWrapper type={props.type}>
-    <Flex align="center" style={{padding: 5, borderBottom: '1px solid #d87777'}}>
+let Card = props => (
+  <CardWrapper type={props.card.type}>
+    <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
       <div style={{fontWeight: 500, fontSize: 15}}>{props.cost}</div>
       <Box flex="1 1 auto" style={{textAlign: 'right'}}>
         {props.name}
       </Box>
-      <Flex ml={5}>
-        <Circle color="blue">C</Circle>
-        <Circle color="green">P</Circle>
-        <Circle color="black">S</Circle>
-      </Flex>
+      <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
     {!props.collapsed && <Flex style={{padding: 5}}>1 → Card</Flex>}
   </CardWrapper>
 )
+
+Card = withProps(props => ({card: getCardByName(props.name)}))(Card)
 
 const hexPoints = (x, y, radius) => {
   var points = []
@@ -144,13 +164,13 @@ const PlayerCard = () => (
   </Box>
 )
 
-const TerraformingMars = () => (
-  <Wrapper>
+const TerraformingMars = props => (
+  <Wrapper direction="column">
     <Box
       py={1}
       px={2}
       slign="center"
-      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #aaa'}}
+      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #ddd'}}
     >
       Terraforming Mars
     </Box>
@@ -197,7 +217,13 @@ const TerraformingMars = () => (
           </Box>
         </Flex>
       </Box>
-      <Box style={{borderLeft: '1px solid #ddd'}}>
+      <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll'}}>
+        <Box p={1} style={{fontSize: 12, color: '#555'}}>
+          BUYING
+        </Box>
+        <Box px={2}>
+          {props.game.choosingCards.a.map(name => <Card key={name} name={name} cost={20} />)}
+        </Box>
         <Box p={1} style={{fontSize: 12, color: '#555'}}>
           HAND
         </Box>
@@ -213,4 +239,7 @@ const TerraformingMars = () => (
   </Wrapper>
 )
 
-export default TerraformingMars
+export default compose(
+  connect(state => ({game: state})),
+  branch(props => !props.game, renderNothing)
+)(TerraformingMars)
