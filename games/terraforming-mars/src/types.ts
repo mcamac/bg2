@@ -180,9 +180,9 @@ export interface GameState {
 }
 
 export const enum CardResource {
-  Microbes = 'Microbes',
+  Microbes = 'Microbe',
   Fighters = 'Fighters',
-  Animals = 'Animals',
+  Animals = 'Animal',
   Science = 'Science',
 }
 

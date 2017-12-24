@@ -1644,8 +1644,8 @@ export const CARDS: Card[] = [
     tags: ['Microbe'],
     actionText: 'Action: Gain 1 plant or add 2 microbes to ANOTHER card.',
     actions: [
-      ['ChangeInventory', 1, ResourceType.Plant],
-      ['ChangeAnyCardResource', 2, CardResource.Microbes],
+      [['ChangeInventory', 1, ResourceType.Plant]],
+      [['ChangeAnyCardResource', 2, CardResource.Microbes]],
     ],
     effectText: 'It must be -10\u00b0C or colder.',
     requires: [['MaxHeat', -10]],

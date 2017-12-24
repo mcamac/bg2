@@ -39,14 +39,20 @@ const Circle = props => (
 
 const TAG_COLORS = {
   Space: 'black',
+  Titanium: 'black',
   Building: 'brown',
   Science: 'white',
   Power: 'purple',
+  Energy: 'purple',
   Event: 'red',
   Earth: 'blue',
   City: '#ddd',
   Microbe: '#bfbf2d',
   Jovian: 'orange',
+  Greenery: 'green',
+  Plant: 'green',
+  Heat: 'red',
+  Money: 'yellow',
 }
 
 const Tag = props => (
@@ -62,6 +68,13 @@ const CardWrapper = styled(Box)`
   margin-bottom: 5px;
   box-shadow: 0px 1px 1px 1px #eee;
   box-sizing: border-box;
+  cursor: pointer;
+
+  transition: 0.2s all;
+
+  &:hover {
+    box-shadow: 0px 1px 4px 5px ${props => CARD_COLORS[props.type]};
+  }
 `
 
 const CardRequirements = props => (
@@ -73,7 +86,7 @@ const CardRequirements = props => (
 const withSign = value => (value >= 0 ? `+${value}` : `${value}`)
 
 const ChangeProduction = (value, resource) => (
-  <Flex style={{background: '#a56c6c', padding: '3px'}}>
+  <Flex mr="4px" style={{background: '#8a5d5d', color: '#eee', padding: '3px'}}>
     {withSign(value)}
     {typeof resource === 'string' ? <Icon g={resource} /> : resource}
   </Flex>
@@ -85,8 +98,20 @@ const ChangeInventory = (value, resource) => (
   </Flex>
 )
 
+const ChangeCardResource = (value, resource) => (
+  <Flex>
+    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} on Card
+  </Flex>
+)
+
+const ChangeAnyCardResource = (value, resource) => (
+  <Flex>
+    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} on any card
+  </Flex>
+)
+
 const DecreaseAnyProduction = (value, resource) => (
-  <Flex style={{background: '#a56c6c'}}>
+  <Flex style={{background: '#8a5d5d', color: '#eee', padding: 3}}>
     Remove any {value}
     <Icon g={resource} />
   </Flex>
@@ -110,8 +135,14 @@ const IncreaseTemperature = (value, card) => (
     {withSign(value)} <Icon g="Temp" />
   </Flex>
 )
+
 const RaiseOxygen = (value, card) => <div>{withSign(value)} Oxy</div>
 const Draw = (value, card) => <div>Draw {value}</div>
+const RoboticWorkforce = () => (
+  <Flex>
+    Copy the production box of any <Tag name="Building" />
+  </Flex>
+)
 
 const Choice = (choices, card) => (
   <Flex>
@@ -123,31 +154,125 @@ const Choice = (choices, card) => (
   </Flex>
 )
 
-const IncreaseTR = value => <div>{withSign(value)} TR</div>
+const IncreaseTR = value => (
+  <div>
+    {withSign(value)}{' '}
+    <span style={{background: '#e82f2f', color: 'white', fontWeight: 500, padding: '2px 4px'}}>
+      TR
+    </span>
+  </div>
+)
+const PlaceCity = () => (
+  <div>
+    <Tag name="City" />
+  </div>
+)
+
+const PlaceGreenery = () => (
+  <div>
+    <Tag name="Greenery" />
+  </div>
+)
+
+const VPForCardResources = (resource, count) => (
+  <Flex>
+    1 VP / {count} <Icon g={resource} />
+  </Flex>
+)
+
+const VPForTags = tag => (
+  <Flex>
+    1 VP / <Tag name={tag} />
+  </Flex>
+)
+
+const VPIfCardHasResources = (resource, count, vp) => (
+  <Flex>
+    {vp} VP if at least {count} <Icon g={resource} />
+  </Flex>
+)
 
 const EFFECTS = {
   ChangeProduction,
   ChangeInventory,
+  ChangeCardResource,
+  ChangeAnyCardResource,
   PlaceOceans,
+  PlaceCity,
+  PlaceGreenery,
   RaiseOxygen,
   DecreaseAnyProduction,
   DecreaseAnyInventory,
   IncreaseTemperature,
+  RoboticWorkforce,
   IncreaseTR,
   Choice,
   Draw,
+  VPForTags,
+  VPForCardResources,
+  VPIfCardHasResources,
 }
 
-const CardEffects = props =>
-  props.effects.map(([effect, ...args], i) => (
-    <Box key={i}>
-      {EFFECTS[effect] ? (
-        EFFECTS[effect](...args, props.card)
-      ) : (
-        <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
-      )}
-    </Box>
-  ))
+const CardEffects = props => (
+  <Flex align="center">
+    {props.effects.map(([effect, ...args], i) => (
+      <Box key={i}>
+        {EFFECTS[effect] ? (
+          EFFECTS[effect](...args, props.card)
+        ) : (
+          <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
+        )}
+      </Box>
+    ))}
+  </Flex>
+)
+
+const ActionWrapper = styled(Flex)`
+  padding: 2px 0;
+  transition: 0.2s background;
+
+  &:hover {
+    background: white;
+  }
+`
+
+const CardActions = props => (
+  <Box>
+    {props.actions.map((action, i) => (
+      <ActionWrapper key={i}>
+        Action:
+        {action.map(([effect, ...args], j) => (
+          <Box key={j}>
+            {EFFECTS[effect] ? (
+              EFFECTS[effect](...args, props.card)
+            ) : (
+              <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
+            )}
+          </Box>
+        ))}
+      </ActionWrapper>
+    ))}
+  </Box>
+)
+
+const Effect = (effect, ...args) =>
+  EFFECTS[effect] ? (
+    <Box>{EFFECTS[effect](...args)} </Box>
+  ) : (
+    <pre>{JSON.stringify([effect, ...args])}</pre>
+  )
+
+// const CARD_VP_TYPES = {
+//   VPForCardResources,
+// }
+
+const CardVP = props => (
+  <Flex ml={1} flex="1 1 auto" justify="flex-end">
+    <Flex style={{padding: '2px 4px', background: 'green', color: 'white'}}>
+      {typeof props.card.vp === 'number' ? `${props.card.vp} VP` : Effect(...props.card.vp)}
+    </Flex>
+  </Flex>
+)
 
 const Icon = props => (
   <i className={`icon icon-${props.g}`} style={{...(props.style || {}), fontSize: 18}} />
@@ -164,9 +289,12 @@ let Card = props => (
       <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
     {!props.collapsed && (
-      <Flex style={{padding: 5}}>
-        {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
-        {props.card.vp && `${props.card.vp} VP`}
+      <Flex style={{padding: 5}} direction="column">
+        {props.card.actions && <CardActions actions={props.card.actions} card={props.card} />}
+        <Flex align="center">
+          {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
+          {props.card.vp && <CardVP card={props.card} />}
+        </Flex>
       </Flex>
     )}
   </CardWrapper>
@@ -281,19 +409,19 @@ const PlayerCard = props => (
     </Flex>
     <Flex mb="4px">
       <Flex mr={1}>
-        <Circle color="yellow">C</Circle>
+        <Tag name="Money" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Money.count} (+{props.state.resources.Money.production})
         </Box>
       </Flex>
       <Flex mr={1}>
-        <Circle color="brown">S</Circle>
+        <Tag name="Steel" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Steel.count} (+{props.state.resources.Steel.production})
         </Box>
       </Flex>
       <Flex>
-        <Circle color="black">T</Circle>
+        <Tag name="Titanium" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Titanium.count} (+{props.state.resources.Titanium.production})
         </Box>
@@ -301,19 +429,19 @@ const PlayerCard = props => (
     </Flex>
     <Flex>
       <Flex mr={1}>
-        <Circle color="green">P</Circle>
+        <Tag name="Plant" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Plant.count} (+{props.state.resources.Plant.production})
         </Box>
       </Flex>
       <Flex mr={1}>
-        <Circle color="purple">E</Circle>
+        <Tag name="Energy" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Energy.count} (+{props.state.resources.Energy.production})
         </Box>
       </Flex>
       <Flex>
-        <Circle color="red">H</Circle>
+        <Tag name="Heat" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Heat.count} (+{props.state.resources.Heat.production})
         </Box>
@@ -362,11 +490,11 @@ const TerraformingMars = props => (
         </Flex>
         <Flex>
           <Box mr={1}>
-            <Card cost={23} name="Development Center" />
-            <Card cost={23} name="Development Center" />
-            <Card cost={23} name="Development Center" />
-            <Card cost={23} name="Development Center" />
-            <Card cost={23} name="Development Center" />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
+            <Card cost={23} name="Development Center" collapsed />
           </Box>
           <Box mr={1}>
             <Card cost={23} name="Development Center" collapsed />
