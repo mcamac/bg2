@@ -1,6 +1,6 @@
-import {ResourceBonus} from './types'
+import {ResourceBonus, Position} from './types'
 
-export const OCEAN_POSITIONS = [
+export const OCEAN_POSITIONS: Position[] = [
   [-3, 4],
   [-1, 4],
   [0, 4],
@@ -54,5 +54,5 @@ export const RESOURCE_BONUSES = {
   '4,0': [ResourceBonus.Plant, ResourceBonus.Plant],
   '4,-1': [ResourceBonus.Plant],
   '4,-3': [ResourceBonus.Titanium],
-  '4,-4': [ResourceBonus.Titanium, ResourceBonus.Titanium]
+  '4,-4': [ResourceBonus.Titanium, ResourceBonus.Titanium],
 }

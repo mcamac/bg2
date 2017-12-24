@@ -21,6 +21,7 @@ import {
   Awards,
   TurnAction,
   TileType,
+  StandardProject,
 } from '../src/types'
 import {cloneState, checkCardRequirements, applyEffects} from '../src/utils'
 
@@ -197,7 +198,7 @@ test(t => {
 
 // Play Cards
 
-test(t => {
+test('Industrial Microbes', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -211,22 +212,7 @@ test(t => {
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 18)
 })
 
-test(t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
-  state.player = 'a'
-  state.playerState['a'].resources[ResourceType.Money].count = 30
-
-  // Not enough oceans
-  t.throws(() =>
-    handleAction(state, {
-      type: UserAction.Action,
-      actionType: TurnAction.PlayCard,
-      card: 'Algae',
-    })
-  )
-})
-
-test(t => {
+test('Algae (fail)', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -341,4 +327,94 @@ test('Oceans card with invalid choice', t => {
       choices: [{locations: [[3, 3], [-1, 0]]}],
     })
   )
+})
+
+// Standard Projects
+
+test('Project: Power Plant', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.PowerPlant,
+    choices: [],
+  })
+  t.is(state.playerState['a'].resources[ResourceType.Energy].production, 1)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 19)
+  t.is(state.actionsDone, 1)
+})
+
+test('Project: Asteroid', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.Asteroid,
+    choices: [],
+  })
+  t.is(state.playerState['a'].TR, 21)
+  t.is(state.globalParameters.Heat, 1)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 16)
+  t.is(state.actionsDone, 1)
+})
+
+test('Project: Aquifer', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.Aquifer,
+    choices: [null, {locations: [[0, 0]]}],
+  })
+  t.is(state.playerState['a'].TR, 21)
+  t.is(state.globalParameters.Oceans, 1)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 12)
+  t.is(state.actionsDone, 1)
+})
+
+test('Project: Greenery', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.Greenery,
+    choices: [null, {location: [0, 0]}],
+  })
+  t.is(state.playerState['a'].TR, 21)
+  t.is(state.globalParameters.Oxygen, 1)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 7)
+  t.is(state.actionsDone, 1)
+})
+
+test('Project: City', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.City,
+    choices: [null, {location: [0, 1]}, null],
+  })
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 5)
+  t.is(state.playerState['a'].resources[ResourceType.Money].production, 1)
+  t.is(state.actionsDone, 1)
 })

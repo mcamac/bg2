@@ -41,15 +41,20 @@ export const ChangeProduction = (
 export const Draw = (n: number) => {}
 
 export const IncreaseTR = (delta: number | ((state: GameState) => number)) => {}
-export const IncreaseTemperature = (delta: number) => {}
+export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
+  state.playerState[state.player].TR += n
+  state.globalParameters.Heat += n
+  return state
+}
 export const RaiseOxygen = (delta: number) => {}
 
 export const PlaceOceans = (n: number) => (state: GameState, action, choice): GameState => {
   for (let i = 0; i < n; i++) {
     if (!isOcean(choice.locations[i])) throw Error('Not an ocean tile')
     state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.locations[i])
-    state.playerState[state.player].TR++
   }
+  state.playerState[state.player].TR += n
+  state.globalParameters.Oceans += n
   return state
 }
 
@@ -57,7 +62,14 @@ export const PlaceCity = () => (state: GameState, action, choice): GameState => 
   return placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
 }
 
-export const PlaceGreenery = {}
+export const PlaceGreenery = () => (state: GameState, action, choice): GameState => {
+  // todo: check adjacency
+  state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
+  state.globalParameters.Oxygen += 1
+  state.playerState[state.player].TR += 1
+  return state
+}
+
 export const PlaceGreeneryOnOcean = {}
 export const PlaceNoctis = {}
 export const PlaceResearchOutpost = {}
@@ -190,6 +202,7 @@ const REGISTRY = {
   RaiseOxygen,
   PlaceOceans,
   PlaceCity,
+  PlaceGreenery,
 }
 
 const fromJSON = obj => {
@@ -203,7 +216,7 @@ const fromJSON = obj => {
 }
 
 export const applyEffects = (state: GameState, action, effects: any[], card?: Card): GameState => {
-  zip(action.choices, effects).forEach(([choice, effect]) => {
+  zip(action.choices || [], effects).forEach(([choice, effect]) => {
     const effectFn = fromJSON(effect)
     state = effectFn(state, action, choice)
   })

@@ -130,6 +130,7 @@ export const enum UserAction {
   DraftRoundChoice = 'DraftRoundChoice',
   BuyCards = 'BuyCards',
   Action = 'Action',
+  StandardProject = 'StandardProject',
   ChooseDiscards = 'ChooseDiscards',
 }
 
@@ -219,4 +220,13 @@ export const enum Awards {
   Scientist = 'Scientist',
   Thermalist = 'Thermalist',
   Miner = 'Miner',
+}
+
+export const enum StandardProject {
+  SellPatents = 'SellPatents',
+  PowerPlant = 'PowerPlant',
+  Asteroid = 'Asteroid',
+  Aquifer = 'Aquifer',
+  Greenery = 'Greenery',
+  City = 'City',
 }

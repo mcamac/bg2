@@ -18,6 +18,7 @@ import {
   ResourceState,
   ResourcesState,
   TurnAction,
+  StandardProject,
 } from './types'
 import {CARDS, getCardByName} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
@@ -117,12 +118,22 @@ const resetBeforeGeneration: Transform = state => {
 }
 
 const standardProjects = {
-  SELL_CARDS: (state: GameState, cards: Card[]) => {},
-  POWER_PLANT: c(costs(11, ResourceType.Money), changeProduction(1, ResourceType.Money)),
-  ASTEROID: (state: GameState) => c(costs(14, ResourceType.Money), raiseHeat),
-  AQUIFER: (state: GameState) => c(costs(18, ResourceType.Money), ocean),
-  GREENERY: c(costs(23, ResourceType.Money), placeGreenery),
-  CITY: c(costs(25, ResourceType.Money), changeProduction(1, ResourceType.Money), placeCity),
+  [StandardProject.SellPatents]: ['SellPatents'],
+  [StandardProject.PowerPlant]: [
+    ['ChangeInventory', -11, ResourceType.Money],
+    ['ChangeProduction', 1, ResourceType.Energy],
+  ],
+  [StandardProject.Asteroid]: [
+    ['ChangeInventory', -14, ResourceType.Money],
+    ['IncreaseTemperature', 1],
+  ],
+  [StandardProject.Aquifer]: [['ChangeInventory', -18, ResourceType.Money], ['PlaceOceans', 1]],
+  [StandardProject.Greenery]: [['ChangeInventory', -23, ResourceType.Money], ['PlaceGreenery']],
+  [StandardProject.City]: [
+    ['ChangeInventory', -25, ResourceType.Money],
+    ['PlaceCity'],
+    ['ChangeProduction', 1, ResourceType.Money],
+  ],
 }
 
 const normalProduction = {
@@ -264,6 +275,11 @@ export const turnActionHandlers = {
   [TurnAction.ClaimMilestone]: (state, action) => {},
   [TurnAction.FundAward]: (state, action) => {
     return fundAward(state, action.award)
+  },
+  [TurnAction.StandardProject]: (state, action) => {
+    state = applyEffects(state, action, standardProjects[action.project])
+    // standard project triggers
+    return state
   },
   [TurnAction.PlayCard]: (state: GameState, action): GameState => {
     const playerState = state.playerState[state.player]
