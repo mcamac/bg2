@@ -102,8 +102,18 @@ const requiresByType = (type, count, tag) => {
         <Icon g="Ocean" /> ≤ {count}
       </Flex>
     )
-  else if (type === 'MinOxygen') return <Flex>O ≥ {count}</Flex>
-  else if (type === 'MaxOxygen') return <Flex>O ≤ {count}</Flex>
+  else if (type === 'MinOxygen')
+    return (
+      <Flex>
+        <Icon g="Oxygen" /> ≥ {count}
+      </Flex>
+    )
+  else if (type === 'MaxOxygen')
+    return (
+      <Flex>
+        <Icon g="Oxygen" /> ≤ {count}
+      </Flex>
+    )
   else if (type === 'HasTags')
     return (
       <Flex align="center">
@@ -162,7 +172,7 @@ const DecreaseAnyInventory = (value, resource) => (
 )
 
 const PlaceOceans = (value, card) => (
-  <Flex>
+  <Flex style={{background: '#b5b5fd'}}>
     {withSign(value)} <Icon g="Ocean" />
   </Flex>
 )
@@ -172,7 +182,11 @@ const IncreaseTemperature = (value, card) => (
   </Flex>
 )
 
-const RaiseOxygen = (value, card) => <div>{withSign(value)} Oxy</div>
+const RaiseOxygen = (value, card) => (
+  <Flex>
+    {withSign(value)} <Icon g="Oxygen" />
+  </Flex>
+)
 const Draw = (value, card) => (
   <Flex>
     {withSign(value)} <Icon g="Card" />
@@ -331,14 +345,15 @@ let Card = props => (
       <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
     {props.card.actions && <CardActions actions={props.card.actions} card={props.card} />}
-    {!props.collapsed && (
-      <Flex style={{padding: 5}} direction="column">
-        <Flex align="center">
-          {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
-          {props.card.vp && <CardVP card={props.card} />}
+    {!props.collapsed &&
+      (props.card.effects || props.card.vp) && (
+        <Flex style={{padding: 5}} direction="column">
+          <Flex align="center">
+            {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
+            {props.card.vp && <CardVP card={props.card} />}
+          </Flex>
         </Flex>
-      </Flex>
-    )}
+      )}
   </CardWrapper>
 )
 
@@ -507,7 +522,7 @@ const TerraformingMars = props => (
       py={1}
       px={2}
       slign="center"
-      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #ddd'}}
+      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #ddd', background: '#fafafa'}}
     >
       Terraforming Mars
     </Box>
