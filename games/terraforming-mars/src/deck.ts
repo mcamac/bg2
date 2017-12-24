@@ -38,7 +38,7 @@ export const handlePlayerChoice = (state: GameState, player: Player, choice: str
   currentChoices.splice(chosenIndex, 1)
   const nextPlayer =
     state.players[
-      (playerIndex + (state.generation % 0 === 1 ? 1 : -1) + state.players.length) %
+      (playerIndex + (state.generation % 2 === 0 ? -1 : 1) + state.players.length) %
         state.players.length
     ]
   if (currentChoices.length >= 2) state.draft[nextPlayer].queued.push([...currentChoices])

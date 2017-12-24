@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Fragment, Component} from 'react'
 import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
@@ -512,12 +512,35 @@ const PlayerCard = props => (
   </Box>
 )
 
-const ActionBar = props => (
-  <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
-    Card buying. 2 actions left. Choose an action or
+const ChoosingCorporationsStatus = props => (
+  <React.Fragment>
+    Choose a corporation and cards to keep.
+    <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
+      Submit
+    </Box>
+  </React.Fragment>
+)
+
+const ActionsStatus = props => (
+  <React.Fragment>
+    2 actions left. Choose an action or
     <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
       pass
     </Box>
+  </React.Fragment>
+)
+
+const DraftStatus = props => (
+  <React.Fragment>
+    Drafting. Choose a card ({4 - props.game.draft.a.taken.length} left).
+  </React.Fragment>
+)
+
+const ActionBar = props => (
+  <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
+    {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
+    {props.game.phase === 'Actions' && <ActionsStatus />}
+    {props.game.phase === 'Draft' && <DraftStatus game={props.game} />}
   </Flex>
 )
 
@@ -546,7 +569,7 @@ const TerraformingMars = props => (
             <StandardProjects />
           </Box>
           <Box flex="1 1 auto" style={{textAlign: 'center'}}>
-            <ActionBar />
+            <ActionBar game={props.game} />
             <Grid />
           </Box>
         </Flex>
@@ -572,25 +595,43 @@ const TerraformingMars = props => (
         </Flex>
       </Box>
       <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
-        <Box p={1} style={{fontSize: 12, color: '#555'}}>
-          CORPORATIONS
-        </Box>
-        <Box px={2}>
-          {props.game.choosingCorporations.a.map(name => <Corporation key={name} name={name} />)}
-        </Box>
-        <Box p={1} style={{fontSize: 12, color: '#555'}}>
-          BUYING
-        </Box>
-        <Box px={2}>{props.game.choosingCards.a.map(name => <Card key={name} name={name} />)}</Box>
+        {props.game.draft.a && (
+          <React.Fragment>
+            <Box p={1} style={{fontSize: 12, color: '#555'}}>
+              DRAFT
+            </Box>
+            <Box px={2}>
+              {props.game.draft.a.queued[0].map(name => <Card key={name} name={name} />)}
+            </Box>
+          </React.Fragment>
+        )}
+        {props.game.choosingCorporations.a && (
+          <React.Fragment>
+            <Box p={1} style={{fontSize: 12, color: '#555'}}>
+              CORPORATIONS
+            </Box>
+            <Box px={2}>
+              {props.game.choosingCorporations.a.map(name => (
+                <Corporation key={name} name={name} />
+              ))}
+            </Box>
+          </React.Fragment>
+        )}
+        {props.game.choosingCards.a && (
+          <React.Fragment>
+            <Box p={1} style={{fontSize: 12, color: '#555'}}>
+              BUYING
+            </Box>
+            <Box px={2}>
+              {props.game.choosingCards.a.map(name => <Card key={name} name={name} />)}
+            </Box>
+          </React.Fragment>
+        )}
         <Box p={1} style={{fontSize: 12, color: '#555'}}>
           HAND
         </Box>
         <Box px={2}>
-          <Card cost={23} name="Development Center" />
-          <Card cost={23} name="Development Center" />
-          <Card cost={23} name="Development Center" />
-          <Card cost={23} name="Development Center" />
-          <Card cost={23} name="Development Center" />
+          {props.game.playerState.a.hand.map(name => <Card key={name} name={name} />)}
         </Box>
       </Box>
     </Flex>

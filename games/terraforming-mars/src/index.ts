@@ -21,7 +21,7 @@ import {
   StandardProject,
 } from './types'
 import {CARDS, getCardByName} from './cards'
-import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
+import {setupInitialHands, handlePlayerChoice, isDraftDone, setupDraft} from './deck'
 import {
   clone,
   HasTags,
@@ -140,7 +140,7 @@ const INITIAL_RESOURCES: ResourcesState = {
 
 export const getInitialGameState = (players: Player[], seed: string = SEED): GameState => {
   let state = {
-    phase: Phase.CardBuying,
+    phase: Phase.ChoosingCorporations,
     generation: 0,
     players,
     firstPlayer: players[0],
@@ -277,6 +277,8 @@ const switchToNextPlayer = state => {
     // Generation over.
     state = generationProduction(state)
     state = resetNewGeneration(state)
+    state = setupDraft(state)
+    state.phase = Phase.Draft
     return state
   }
   const playerIndex = state.players.indexOf(state.player)

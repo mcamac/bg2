@@ -122,6 +122,7 @@ export type GlobalParameters = {[p in GlobalType]: number}
 export const enum Phase {
   Actions = 'Actions',
   CardBuying = 'CardBuying',
+  ChoosingCorporations = 'ChoosingCorporations',
   Draft = 'Draft',
   FinalGreenery = 'FinalGreenery',
 }

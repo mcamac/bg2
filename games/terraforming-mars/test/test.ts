@@ -24,6 +24,7 @@ import {
   StandardProject,
 } from '../src/types'
 import {cloneState, checkCardRequirements, applyEffects} from '../src/utils'
+import {getStateAfterActions} from '../src/fixtures'
 
 const TEST_SEED = 'martin'
 
@@ -49,8 +50,9 @@ test(t => {
 
 // Drafting
 
-test(t => {
+test.only('Drafting: Even generation', t => {
   let state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  state.generation = 0
   state = setupDraft(state)
   t.is(state.draft['a'].queued[0].length, 4)
 
@@ -64,6 +66,36 @@ test(t => {
   state = handlePlayerChoice(state, 'b', 'Domed Crater')
   state = handlePlayerChoice(state, 'a', 'Small Asteroid')
   state = handlePlayerChoice(state, 'c', 'Energy Tapping')
+
+  let state1 = handlePlayerChoice(cloneState(state), 'a', 'Space Station')
+  t.true(isDraftDone(state1))
+
+  // Use action handler to test transition.
+  state = handleAction(state, {
+    type: UserAction.DraftRoundChoice,
+    player: 'a',
+    choice: 'Space Station',
+  })
+  t.is(state.phase, Phase.CardBuying)
+})
+
+test('Drafting: Odd generation', t => {
+  let state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  state.generation = 1
+
+  state = setupDraft(state)
+  t.is(state.draft['a'].queued[0].length, 4)
+
+  state = handlePlayerChoice(state, 'a', 'Asteroid')
+  t.is(state.draft['b'].queued[1].length, 3)
+  state = handlePlayerChoice(state, 'b', 'Moss')
+  state = handlePlayerChoice(state, 'b', 'Birds')
+  state = handlePlayerChoice(state, 'c', 'Martian Rail')
+  state = handlePlayerChoice(state, 'c', 'Dust Seals')
+  t.false(isDraftDone(state))
+  state = handlePlayerChoice(state, 'c', 'Domed Crater')
+  state = handlePlayerChoice(state, 'a', 'Small Asteroid')
+  state = handlePlayerChoice(state, 'b', 'Energy Tapping')
 
   let state1 = handlePlayerChoice(cloneState(state), 'a', 'Space Station')
   t.true(isDraftDone(state1))
@@ -472,31 +504,6 @@ test('Corporation and card choice', t => {
   t.is(state.player, 'a')
 })
 
-const getStateAfterActions = () => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
-  state.firstPlayer = 'a'
-
-  handleAction(state, {
-    type: UserAction.CorpAndCardsChoice,
-    player: 'a',
-    corporation: 'Ecoline',
-    cards: [
-      'Equatorial Magnetizer',
-      'Interstellar Colony Ship',
-      'Gene Repair',
-      'Trans-Neptune Probe',
-    ],
-  })
-  handleAction(state, {
-    type: UserAction.CorpAndCardsChoice,
-    player: 'b',
-    corporation: 'Beginner Corporation',
-    cards: state.choosingCards['b'], // ALL THE CARDS FOR FREE!!!
-  })
-
-  return state
-}
-
 // Turn Passing
 test('Turn Passing', t => {
   let state = getStateAfterActions()
@@ -614,4 +621,28 @@ test('Turn Ceding after 2 actions', t => {
   // Ecoline
   t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)
   t.is(state.playerState['a'].resources[ResourceType.Energy].count, 2)
+})
+
+// Drafting in new generation
+
+test('New Generation: Drafting', t => {
+  let state = getStateAfterActions()
+  state.firstPlayer = 'a'
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'a',
+  })
+
+  t.is(state.player, 'b')
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'b',
+  })
+
+  // New generation
+  t.is(state.generation, 1)
+  t.is(state.firstPlayer, 'b')
+  // Ecoline
+  t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)
+  t.is(state.phase, Phase.Draft)
 })
