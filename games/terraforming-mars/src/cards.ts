@@ -395,7 +395,7 @@ export const CARDS: Card[] = [
     tags: ['Space'],
     actionText: 'Effect: When you place a space event, you gain 3 MC and 3 heat.',
     afterCardTriggers: [
-      ['HasAnyTag', [Tag.Space]],
+      ['PlayedTagMatches', [Tag.Space, true]],
       [['ChangeInventory', 3, ResourceType.Money], ['ChangeInventory', 3, ResourceType.Heat]],
     ],
   },
