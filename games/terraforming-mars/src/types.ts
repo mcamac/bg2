@@ -17,6 +17,17 @@ export const enum Tag {
   Event = 'Event',
 }
 
+// TODO: Tighten up the types
+export interface Corporation {
+  name: string
+  startingMoney: number
+  tags?: string[]
+  effects?: any[]
+  afterCardTriggers?: any[]
+  afterTileTriggers?: any[]
+  discounts?: any
+}
+
 export interface Card {
   cost: number
   name: string
