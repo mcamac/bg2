@@ -77,9 +77,45 @@ const CardWrapper = styled(Box)`
   }
 `
 
-const CardRequirements = props => (
+const requiresByType = (type, count, tag) => {
+  if (type === 'MinHeat')
+    return (
+      <Flex>
+        <Icon g="Temp" /> ≥ {count}
+      </Flex>
+    )
+  else if (type === 'MaxHeat')
+    return (
+      <Flex>
+        <Icon g="Temp" /> ≤ {count}
+      </Flex>
+    )
+  else if (type === 'MinOceans')
+    return (
+      <Flex>
+        <Icon g="Ocean" /> ≥ {count}
+      </Flex>
+    )
+  else if (type === 'MaxOceans')
+    return (
+      <Flex>
+        <Icon g="Ocean" /> ≤ {count}
+      </Flex>
+    )
+  else if (type === 'MinOxygen') return <Flex>O ≥ {count}</Flex>
+  else if (type === 'MaxOxygen') return <Flex>O ≤ {count}</Flex>
+  else if (type === 'HasTags')
+    return (
+      <Flex align="center">
+        {count >= 2 && count} <Tag name={tag} />
+      </Flex>
+    )
+  return type
+}
+
+const CardRequirements = ({requires: [[type, ...args]]}) => (
   <Flex px="4px" ml="4px" style={{background: 'rgba(255, 255, 255, 0.5)'}}>
-    O ≥ {props.requires[0][1]}
+    {requiresByType(type, ...args)}
   </Flex>
 )
 
@@ -111,7 +147,7 @@ const ChangeAnyCardResource = (value, resource) => (
 )
 
 const DecreaseAnyProduction = (value, resource) => (
-  <Flex style={{background: '#8a5d5d', color: '#eee', padding: 3}}>
+  <Flex mr="4px" style={{background: '#8a5d5d', color: '#eee', padding: 3}}>
     Remove any {value}
     <Icon g={resource} />
   </Flex>
@@ -137,7 +173,11 @@ const IncreaseTemperature = (value, card) => (
 )
 
 const RaiseOxygen = (value, card) => <div>{withSign(value)} Oxy</div>
-const Draw = (value, card) => <div>Draw {value}</div>
+const Draw = (value, card) => (
+  <Flex>
+    {withSign(value)} <Icon g="Card" />
+  </Flex>
+)
 const RoboticWorkforce = () => (
   <Flex>
     Copy the production box of any <Tag name="Building" />
@@ -239,16 +279,16 @@ const ActionWrapper = styled(Flex)`
 const CardActions = props => (
   <Box>
     {props.actions.map((action, i) => (
-      <ActionWrapper key={i}>
-        Action:
+      <ActionWrapper align="center" key={i}>
+        <Box mr="4px">Action:</Box>
         {action.map(([effect, ...args], j) => (
-          <Box key={j}>
+          <Flex key={j} align="center">
             {EFFECTS[effect] ? (
               EFFECTS[effect](...args, props.card)
             ) : (
               <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
             )}
-          </Box>
+          </Flex>
         ))}
       </ActionWrapper>
     ))}
