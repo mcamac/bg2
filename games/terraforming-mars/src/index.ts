@@ -28,6 +28,7 @@ import {
   isSubset,
   changeInventory,
   checkCardRequirements,
+  applyEffects,
 } from './utils'
 import {CORPORATIONS} from './corporations'
 
@@ -264,25 +265,30 @@ export const turnActionHandlers = {
   [TurnAction.FundAward]: (state, action) => {
     return fundAward(state, action.award)
   },
-  [TurnAction.PlayCard]: (state, action): GameState => {
+  [TurnAction.PlayCard]: (state: GameState, action): GameState => {
     const playerState = state.playerState[state.player]
-    const card = getCardByName(action.card)
+    const cardName = <string>action.card
+    const card: Card = getCardByName(action.card)
 
     // Check requirements
     const meetsRequirements = checkCardRequirements(card, state)
     if (!meetsRequirements) throw new Error('Does not meet requirements')
 
     // Get discount
-    const discount = getDiscount(playerState.played.map(getCardByName), card)
+    const played: Card[] = playerState.played.map(getCardByName)
+    const discount = getDiscount(played, card)
     const actualCost = Math.max(0, card.cost - discount)
 
     changeInventory(state, state.player, ResourceType.Money, -actualCost)
 
     // Play to board and remove from hand
-    playerState.played.push(card)
-    pull(playerState.hand, [action.card])
+    playerState.played.push(cardName)
+    pull(playerState.hand, cardName)
 
     // Card effects (read choices)
+    if (card.effects) {
+      state = applyEffects(state, action, card.effects, card)
+    }
 
     // After-card triggers
 

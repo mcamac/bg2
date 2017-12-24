@@ -9,7 +9,11 @@ import {
   ResourceType,
   Card,
   TileType,
+  Tile,
+  Position,
 } from './types'
+import {isOcean} from './tiles'
+import {getCardByName} from './cards'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
@@ -39,14 +43,18 @@ export const Draw = (n: number) => {}
 export const IncreaseTR = (delta: number | ((state: GameState) => number)) => {}
 export const IncreaseTemperature = (delta: number) => {}
 export const RaiseOxygen = (delta: number) => {}
-export const PlaceOceans = (n: number) => {}
 
-export const PlaceCity = () => (state: GameState, action, choice): GameState => {
-  state.map[choice.location] = {
-    owner: state.player,
-    type: TileType.City,
+export const PlaceOceans = (n: number) => (state: GameState, action, choice): GameState => {
+  for (let i = 0; i < n; i++) {
+    if (!isOcean(choice.locations[i])) throw Error('Not an ocean tile')
+    state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.locations[i])
+    state.playerState[state.player].TR++
   }
   return state
+}
+
+export const PlaceCity = () => (state: GameState, action, choice): GameState => {
+  return placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
 }
 
 export const PlaceGreenery = {}
@@ -194,7 +202,7 @@ const fromJSON = obj => {
   }
 }
 
-export const applyEffects = (state: GameState, action, effects: any[]): GameState => {
+export const applyEffects = (state: GameState, action, effects: any[], card?: Card): GameState => {
   zip(action.choices, effects).forEach(([choice, effect]) => {
     const effectFn = fromJSON(effect)
     state = effectFn(state, action, choice)
@@ -271,4 +279,33 @@ export const checkCardRequirements = (card: Card, state: GameState): boolean => 
   } else {
     return true
   }
+}
+
+export const applyAfterTileTriggers = (
+  state: GameState,
+  tile: Tile,
+  position: Position
+): GameState => {
+  state.players.forEach(player => {
+    state.playerState[player].played.map(getCardByName).forEach(card => {
+      if (card.afterTileTriggers) {
+        const [types, effects] = card.afterTileTriggers
+        if (types.indexOf(tile.type) >= 0) {
+          state = applyEffects(state, {player, choices: []}, effects, card)
+        }
+      }
+    })
+  })
+  return state
+}
+
+const placeTile = (state: GameState, tile: Tile, position: Position): GameState => {
+  const [x, y] = position
+  const key = `${x},${y}`
+  state.map[key] = tile
+  // todo: check restrictions on tiles
+
+  state = applyAfterTileTriggers(state, tile, position)
+
+  return state
 }

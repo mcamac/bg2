@@ -20,6 +20,7 @@ import {
   UserAction,
   Awards,
   TurnAction,
+  TileType,
 } from '../src/types'
 import {cloneState, checkCardRequirements, applyEffects} from '../src/utils'
 
@@ -263,10 +264,81 @@ test(t => {
 
   const newState = applyEffects(
     state,
-    {choices: [{location: '-4,4'}, null, null]},
+    {choices: [{location: [-4, 4]}, null, null]},
     C('Underground City').effects || []
   )
 
   t.deepEqual(state.playerState['a'].resources[ResourceType.Energy].production, 0)
   t.is(state.map['-4,4'].owner, 'a')
+})
+
+// Tile Triggers
+test('City Tiles', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].played = ['Immigrant City', 'Underground City'] // When city placed, increase by 1
+  state.playerState['a'].resources[ResourceType.Energy].production = 2
+
+  const newState = applyEffects(
+    state,
+    {choices: [{location: [-4, 4]}, null, null]},
+    C('Underground City').effects || []
+  )
+
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Steel].production, 2)
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Money].production, 1)
+})
+
+// Tile Triggers
+test('Card triggers its own tile trigger', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].resources[ResourceType.Energy].production = 1
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Immigrant City',
+    choices: [null, null, {location: [-4, 4]}],
+  })
+
+  // Triggers itself
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Money].production, -1)
+})
+
+// Oceans
+test('Oceans card', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].resources[ResourceType.Energy].production = 1
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Lake Marineris',
+    choices: [{locations: [[0, 0], [-1, 0]]}],
+  })
+
+  t.is(state.map['0,0'].type, TileType.Ocean)
+  t.deepEqual(state.playerState['a'].TR, 22)
+})
+
+test('Oceans card with invalid choice', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.globalParameters.Heat = 0
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].resources[ResourceType.Energy].production = 1
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Lake Marineris',
+      choices: [{locations: [[3, 3], [-1, 0]]}],
+    })
+  )
 })

@@ -683,6 +683,7 @@ export const CARDS: Card[] = [
     vp: 2,
     placeTiles: true,
     effectText: 'Requires 0\u00b0C or warmer. Place 2 ocean tiles.',
+    requires: [['MinHeat', 0]],
     effects: [['PlaceOceans', 2]],
   },
   {
@@ -2109,6 +2110,7 @@ export const CARDS: Card[] = [
       'Effect: When any city tile is placed, add an animal to this card. Animals may not be removed from this card.',
     effectText: 'Add 1 animal to this card. 1 VP per 2 animals here.',
     resourceHeld: CardResource.Animals,
+    afterTileTriggers: [[TileType.City], [['ChangeCardResource', 1, CardResource.Animals]]],
     // todo
   },
   {
