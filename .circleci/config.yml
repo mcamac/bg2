@@ -5,4 +5,5 @@ jobs:
       - image: circleci/node:7
     steps:
       - checkout
-      - run: cd games/terraforming-mars && npm i && npm test
+      - run: cd games/terraforming-mars && npm i
+      - run: cd games/terraforming-mars && npm test

@@ -32,6 +32,7 @@ import {
   applyEffects,
 } from './utils'
 import {CORPORATIONS} from './corporations'
+import {STANDARD_PROJECTS} from './projects'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -115,25 +116,6 @@ const resetBeforeGeneration: Transform = state => {
     playerState.hasIncreasedTRThisGeneration = false
   })
   return state
-}
-
-const standardProjects = {
-  [StandardProject.SellPatents]: ['SellPatents'],
-  [StandardProject.PowerPlant]: [
-    ['ChangeInventory', -11, ResourceType.Money],
-    ['ChangeProduction', 1, ResourceType.Energy],
-  ],
-  [StandardProject.Asteroid]: [
-    ['ChangeInventory', -14, ResourceType.Money],
-    ['IncreaseTemperature', 1],
-  ],
-  [StandardProject.Aquifer]: [['ChangeInventory', -18, ResourceType.Money], ['PlaceOceans', 1]],
-  [StandardProject.Greenery]: [['ChangeInventory', -23, ResourceType.Money], ['PlaceGreenery']],
-  [StandardProject.City]: [
-    ['ChangeInventory', -25, ResourceType.Money],
-    ['PlaceCity'],
-    ['ChangeProduction', 1, ResourceType.Money],
-  ],
 }
 
 const normalProduction = {
@@ -277,8 +259,9 @@ export const turnActionHandlers = {
     return fundAward(state, action.award)
   },
   [TurnAction.StandardProject]: (state, action) => {
-    state = applyEffects(state, action, standardProjects[action.project])
+    state = applyEffects(state, action, STANDARD_PROJECTS[action.project])
     // standard project triggers
+
     return state
   },
   [TurnAction.PlayCard]: (state: GameState, action): GameState => {
