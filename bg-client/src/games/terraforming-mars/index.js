@@ -343,6 +343,19 @@ const CardVP = props => (
   </Flex>
 )
 
+const CardDiscounts = props => (
+  <Flex ml={1} flex="1 1 auto" align="center">
+    {props.discounts.map(([discount, tags], i) => (
+      <Flex align="center">
+        {withSign(-discount)} on
+        <Flex align="center" ml="4px">
+          {tags ? tags.map(tag => <Tag name={tag} key={tag} />) : 'All'}
+        </Flex>
+      </Flex>
+    ))}
+  </Flex>
+)
+
 const Icon = props => (
   <i className={`icon icon-${props.g}`} style={{...(props.style || {}), fontSize: 18}} />
 )
@@ -363,6 +376,9 @@ let Card = props => (
         <Flex style={{padding: 5}} direction="column">
           <Flex align="center">
             {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
+            {props.card.discounts && (
+              <CardDiscounts discounts={props.card.discounts} card={props.card} />
+            )}
             {props.card.vp && <CardVP card={props.card} />}
           </Flex>
         </Flex>
