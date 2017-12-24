@@ -131,6 +131,8 @@ export const enum UserAction {
   DraftRoundChoice = 'DraftRoundChoice',
   BuyCards = 'BuyCards',
   Action = 'Action',
+  Cede = 'Cede',
+  Pass = 'Pass',
   StandardProject = 'StandardProject',
   ChooseDiscards = 'ChooseDiscards',
 }

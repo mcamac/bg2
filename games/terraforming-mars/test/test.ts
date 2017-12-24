@@ -440,6 +440,7 @@ test('Project: City', t => {
 
 test('Corporation and card choice', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.firstPlayer = 'a'
 
   handleAction(state, {
     type: UserAction.CorpAndCardsChoice,
@@ -453,15 +454,164 @@ test('Corporation and card choice', t => {
     ],
   })
   t.is(state.playerState['a'].corporation, 'Ecoline')
+  // THESE CARDS AIN'T FREE
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 36 - 12)
+  t.is(state.playerState['a'].resources[ResourceType.Plant].count, 3)
+  t.is(state.playerState['a'].resources[ResourceType.Plant].production, 2)
 
   handleAction(state, {
     type: UserAction.CorpAndCardsChoice,
     player: 'b',
     corporation: 'Beginner Corporation',
-    cards: state.choosingCards['b'],
+    cards: state.choosingCards['b'], // ALL THE CARDS FOR FREE!!!
   })
   t.is(state.playerState['b'].resources[ResourceType.Money].count, 42)
 
+  // Moved to action mode
   t.is(state.phase, Phase.Actions)
+  t.is(state.player, 'a')
+})
+
+const getStateAfterActions = () => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.firstPlayer = 'a'
+
+  handleAction(state, {
+    type: UserAction.CorpAndCardsChoice,
+    player: 'a',
+    corporation: 'Ecoline',
+    cards: [
+      'Equatorial Magnetizer',
+      'Interstellar Colony Ship',
+      'Gene Repair',
+      'Trans-Neptune Probe',
+    ],
+  })
+  handleAction(state, {
+    type: UserAction.CorpAndCardsChoice,
+    player: 'b',
+    corporation: 'Beginner Corporation',
+    cards: state.choosingCards['b'], // ALL THE CARDS FOR FREE!!!
+  })
+
+  return state
+}
+
+// Turn Passing
+test('Turn Passing', t => {
+  let state = getStateAfterActions()
+  state.firstPlayer = 'a'
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'a',
+  })
+
+  t.is(state.player, 'b')
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'b',
+  })
+
+  // New generation
+  t.is(state.generation, 1)
+  t.is(state.firstPlayer, 'b')
+
+  // Ecoline
+  t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)
+})
+
+test('Turn Ceding', t => {
+  let state = getStateAfterActions()
+  state.firstPlayer = 'a'
+
+  // No action yet
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Cede,
+      player: 'a',
+    })
+  )
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    player: 'a',
+    project: StandardProject.PowerPlant,
+  })
+
+  handleAction(state, {
+    type: UserAction.Cede,
+    player: 'a',
+  })
+
+  t.is(state.player, 'b')
+
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'b',
+  })
+
+  t.is(state.player, 'a')
+
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'a',
+  })
+
+  // New generation
+  t.is(state.generation, 1)
+  t.is(state.firstPlayer, 'b')
+
+  // Ecoline
+  t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)
+  t.is(state.playerState['a'].resources[ResourceType.Energy].count, 1)
+})
+
+test('Turn Ceding after 2 actions', t => {
+  let state = getStateAfterActions()
+  state.firstPlayer = 'a'
+
+  // No action yet
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Cede,
+      player: 'a',
+    })
+  )
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    player: 'a',
+    project: StandardProject.PowerPlant,
+  })
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    player: 'a',
+    project: StandardProject.PowerPlant,
+  })
+
+  t.is(state.player, 'b')
+
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'b',
+  })
+
+  t.is(state.player, 'a')
+
+  handleAction(state, {
+    type: UserAction.Pass,
+    player: 'a',
+  })
+
+  // New generation
+  t.is(state.generation, 1)
+  t.is(state.firstPlayer, 'b')
+
+  // Ecoline
+  t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)
+  t.is(state.playerState['a'].resources[ResourceType.Energy].count, 2)
 })

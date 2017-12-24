@@ -108,9 +108,13 @@ const generationProduction: Transform = state => {
   return state
 }
 
-const resetBeforeGeneration: Transform = state => {
+const resetNewGeneration: Transform = state => {
+  state.generation++
   state.passed = {}
   state.draft = {}
+  state.firstPlayer =
+    state.players[(state.players.indexOf(state.firstPlayer) + 1) % state.players.length]
+  state.player = state.firstPlayer
   state.players.forEach(player => {
     const playerState = state.playerState[player]
     playerState.hasIncreasedTRThisGeneration = false
@@ -264,6 +268,30 @@ export const fundAward = (state: GameState, award: Awards): GameState => {
   return state
 }
 
+const haveAllPassed = state => {
+  return state.players.map(player => state.passed[player]).every(x => x)
+}
+
+const switchToNextPlayer = state => {
+  if (haveAllPassed(state)) {
+    // Generation over.
+    state = generationProduction(state)
+    state = resetNewGeneration(state)
+    return state
+  }
+  const playerIndex = state.players.indexOf(state.player)
+  let offset = 1
+  let nextPlayer = state.player
+  while (true) {
+    nextPlayer = state.players[(playerIndex + offset) % state.players.length]
+    if (!state.passed[nextPlayer]) break
+    offset++
+  }
+  state.player = nextPlayer
+  state.actionsDone = 0
+  return state
+}
+
 export const turnActionHandlers = {
   [TurnAction.ClaimMilestone]: (state, action) => {},
   [TurnAction.FundAward]: (state, action) => {
@@ -327,9 +355,15 @@ export const handlers = {
     const cardsAreFree = corporation.name === 'Beginner Corporation'
     state = buyCards(state, action.player, action.cards, cardsAreFree)
 
+    // Possible corporation effects
+    if (corporation.effects) {
+      state = applyEffects(state, action.player, corporation.effects)
+    }
+
     if (isDoneChoosingCorporations(state)) {
       state.phase = Phase.Actions
       state.player = state.firstPlayer
+      state.passed = {}
     }
     return state
   },
@@ -337,6 +371,8 @@ export const handlers = {
     state = buyCards(state, action.player, action.chosen)
     if (isDoneBuyingCards(state)) {
       state.phase = Phase.Actions
+      state.player = state.firstPlayer
+      state.passed = {}
     }
     return state
   },
@@ -344,6 +380,24 @@ export const handlers = {
   [UserAction.Action]: (state, action) => {
     state = turnActionHandlers[action.actionType](state, action)
     state.actionsDone++
+    if (state.actionsDone === 2) {
+      // Get next player.
+      state = switchToNextPlayer(state)
+    }
+  },
+
+  [UserAction.Cede]: (state, action): GameState => {
+    // Get next player.
+    if (state.actionsDone === 0) throw Error('Cannot cede without acting.')
+    state = switchToNextPlayer(state)
+    return state
+  },
+
+  [UserAction.Pass]: (state, action) => {
+    // Get next player.
+    state.passed[state.player] = true
+    state = switchToNextPlayer(state)
+    return state
   },
 
   // From cards
