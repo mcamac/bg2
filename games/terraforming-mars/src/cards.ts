@@ -394,8 +394,8 @@ export const CARDS: Card[] = [
     deck: 'Basic',
     tags: ['Space'],
     actionText: 'Effect: When you place a space event, you gain 3 MC and 3 heat.',
-    afterCardTrigger: [
-      [Tag.Space],
+    afterCardTriggers: [
+      ['HasAnyTag', [Tag.Space]],
       [['ChangeInventory', 3, ResourceType.Money], ['ChangeInventory', 3, ResourceType.Heat]],
     ],
   },
@@ -500,6 +500,7 @@ export const CARDS: Card[] = [
     tags: ['Building'],
     vp: 1,
     actionText: 'Effect: When any city tile is placed, gain 2 MC',
+    afterTileTriggers: [[TileType.City], [['ChangeInventory', 2, ResourceType.Money]]],
   },
   {
     name: 'Deimos Down',
@@ -928,7 +929,7 @@ export const CARDS: Card[] = [
     vp: 1,
     actionText:
       'Effect: When you play a science tag, including this, you may discard a card from hand to draw a card.',
-    afterCardTrigger: [[Tag.Science], ['Option', [['Discard', 1], ['Draw', 1]]]],
+    afterCardTriggers: [['HasAnyTag', [Tag.Science]], ['Option', [['Discard', 1], ['Draw', 1]]]],
   },
   {
     name: 'Viral Enhancers',
@@ -938,8 +939,8 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Microbe'],
     actionText:
       'Effect: When you play a plant, microbe, or an animal tag, including this, gain 1 plant or add 1 resource TO THAT CARD.',
-    afterCardTrigger: [
-      [Tag.Plant, Tag.Microbe, Tag.Animal],
+    afterCardTriggers: [
+      ['HasAnyTag', [Tag.Plant, Tag.Microbe, Tag.Animal]],
       ['Choice', [['ChangeInventory', 1, ResourceType.Plant], ['ChangePlayedCardResource', 1]]],
     ],
   },
@@ -1350,7 +1351,7 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Earth'],
     actionText: 'Effect: After you play an event card, you gain 3MC',
-    afterCardTrigger: [[Tag.Event], [['ChangeInventory', 3, ResourceType.Money]]],
+    afterCardTriggers: [['HasAnyTag', [Tag.Event]], [['ChangeInventory', 3, ResourceType.Money]]],
   },
   {
     name: 'Business Network',
@@ -1902,7 +1903,7 @@ export const CARDS: Card[] = [
     tags: ['Science'],
     actionText:
       'Effect: After you pay for a standard project, except selling patents, you gain 3 MC.',
-    afterStandardProjectTrigger: [['ChangeInventory', 3, ResourceType.Money]],
+    afterStandardProjectTriggers: [['ChangeInventory', 3, ResourceType.Money]],
   },
   {
     name: 'Nitrite Reducing Bacteria',
@@ -2275,8 +2276,8 @@ export const CARDS: Card[] = [
     actionText:
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     resourceHeld: CardResource.Science,
-    afterCardTrigger: [
-      [Tag.Space],
+    afterCardTriggers: [
+      ['HasAnyTag', [Tag.Space]],
       [
         [
           'Choice',
@@ -2447,7 +2448,7 @@ export const CARDS: Card[] = [
       'Effect: Each time a city tile is placed, including this, increase your MC production 1 step.',
     effectText:
       'Decrease your energy production 1 step and decrease your MC production 2 steps. Place a city tile.',
-    afterTileTrigger: [[TileType.City], [['ChangeProduction', 1, ResourceType.Money]]],
+    afterTileTriggers: [[TileType.City], [['ChangeProduction', 1, ResourceType.Money]]],
     effects: [
       ['ChangeProduction', -1, ResourceType.Energy],
       ['ChangeProduction', -2, ResourceType.Money],

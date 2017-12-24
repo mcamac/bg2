@@ -11,8 +11,17 @@ import {
 } from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
-import {GameState, Card, Transform, ResourceType, Phase, UserAction, Awards} from '../src/types'
-import {cloneState, checkCardRequirements} from '../src/utils'
+import {
+  GameState,
+  Card,
+  Transform,
+  ResourceType,
+  Phase,
+  UserAction,
+  Awards,
+  TurnAction,
+} from '../src/types'
+import {cloneState, checkCardRequirements, applyEffects} from '../src/utils'
 
 const TEST_SEED = 'martin'
 
@@ -126,12 +135,12 @@ test(t => {
   t.true(checkCardRequirements(testCardNoRequirements, basicGameState))
 
   // Make sure breaks when there is a bad requirement
- let testCardBadRequirement = {
+  let testCardBadRequirement = {
     cost: 0,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    requires: [['NotARealRequirement', 1]]
+    requires: [['NotARealRequirement', 1]],
   }
 
   t.throws(() => checkCardRequirements(testCardBadRequirement, basicGameState), Error)
@@ -142,7 +151,7 @@ test(t => {
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    requires: [['MaxOxygen', 5]]
+    requires: [['MaxOxygen', 5]],
   }
 
   let low_oxygen_state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
@@ -160,7 +169,7 @@ test(t => {
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    requires: [['MaxOxygen', 5], ['MaxOceans', 2]]
+    requires: [['MaxOxygen', 5], ['MaxOceans', 2]],
   }
 
   let works = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
@@ -172,7 +181,7 @@ test(t => {
   broken_01.globalParameters.Oceans = 10
 
   let broken_02 = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
-  broken_02.globalParameters.Oxygen = 10 
+  broken_02.globalParameters.Oxygen = 10
   broken_02.globalParameters.Oceans = 0
 
   let broken_03 = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
@@ -183,4 +192,81 @@ test(t => {
   t.false(checkCardRequirements(testCard_02, broken_01))
   t.false(checkCardRequirements(testCard_02, broken_02))
   t.false(checkCardRequirements(testCard_02, broken_03))
+})
+
+// Play Cards
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Industrial Microbes',
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 18)
+})
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  // Not enough oceans
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Algae',
+    })
+  )
+})
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  // Not enough oceans
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Algae',
+    })
+  )
+})
+
+// Effects
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  const newState = applyEffects(state, {choices: [null, null]}, [
+    ['ChangeInventory', 1, ResourceType.Plant],
+    ['ChangeProduction', 2, ResourceType.Plant],
+  ])
+
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Plant], {production: 2, count: 1})
+})
+
+test(t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].resources[ResourceType.Energy].production = 2
+
+  const newState = applyEffects(
+    state,
+    {choices: [{location: '-4,4'}, null, null]},
+    C('Underground City').effects || []
+  )
+
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Energy].production, 0)
+  t.is(state.map['-4,4'].owner, 'a')
 })

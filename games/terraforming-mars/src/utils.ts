@@ -1,13 +1,38 @@
-import {cloneDeep} from 'lodash'
-import {GameState, Transform, Tag, GlobalType, Player, CardResource, ResourceType, Card} from './types'
+import {cloneDeep, zip} from 'lodash'
+import {
+  GameState,
+  Transform,
+  Tag,
+  GlobalType,
+  Player,
+  CardResource,
+  ResourceType,
+  Card,
+  TileType,
+} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
 export const ChangeAnyCardResource = (delta: number, type: string) => {}
 export const ChangeCardResource = (delta: number, type: string) => {}
 
-export const ChangeInventory = (delta: number | ((state: GameState) => number), type: string) => {}
-export const ChangeProduction = (delta: number | ((state: GameState) => number), type: string) => {}
+export const ChangeInventory = (
+  delta: number | ((state: GameState) => number),
+  resource: string
+): Transform => state => {
+  const playerState = state.playerState[state.player]
+  playerState.resources[resource].count += delta
+  return state
+}
+
+export const ChangeProduction = (
+  delta: number | ((state: GameState) => number),
+  resource: string
+): Transform => state => {
+  const playerState = state.playerState[state.player]
+  playerState.resources[resource].production += delta
+  return state
+}
 
 export const Draw = (n: number) => {}
 
@@ -16,7 +41,14 @@ export const IncreaseTemperature = (delta: number) => {}
 export const RaiseOxygen = (delta: number) => {}
 export const PlaceOceans = (n: number) => {}
 
-export const PlaceCity = {}
+export const PlaceCity = () => (state: GameState, action, choice): GameState => {
+  state.map[choice.location] = {
+    owner: state.player,
+    type: TileType.City,
+  }
+  return state
+}
+
 export const PlaceGreenery = {}
 export const PlaceGreeneryOnOcean = {}
 export const PlaceNoctis = {}
@@ -149,16 +181,26 @@ const REGISTRY = {
   IncreaseTemperature,
   RaiseOxygen,
   PlaceOceans,
+  PlaceCity,
 }
 
 const fromJSON = obj => {
-  if (obj instanceof Array) {
+  if (obj instanceof Array && typeof obj[0] === 'string') {
     const [opName, ...args] = obj
-    if (!REGISTRY[obj[0]]) return null
-    return REGISTRY[obj[0]](...args)
+    if (!REGISTRY[opName]) return null
+    return REGISTRY[opName](...args.map(fromJSON))
   } else {
     return obj
   }
+}
+
+export const applyEffects = (state: GameState, action, effects: any[]): GameState => {
+  zip(action.choices, effects).forEach(([choice, effect]) => {
+    const effectFn = fromJSON(effect)
+    state = effectFn(state, action, choice)
+  })
+
+  return state
 }
 
 export function isSubset<T>(l1: T[], l2: T[]): boolean {
@@ -198,13 +240,14 @@ const REQUIREMENTS_REGISTRY = {
   MinHeat,
   MaxHeat,
   HasTags,
-  HasCitiesOnMars
+  HasCitiesOnMars,
 }
 
 const fromJSONRequires = obj => {
   if (obj instanceof Array) {
     const [opName, ...args] = obj
-    if (!REQUIREMENTS_REGISTRY[opName]) {  // maybe this shouldn't throw an error
+    if (!REQUIREMENTS_REGISTRY[opName]) {
+      // maybe this shouldn't throw an error
       throw Error('could not find ' + opName)
     }
     return REQUIREMENTS_REGISTRY[opName](...args)
@@ -216,14 +259,16 @@ const fromJSONRequires = obj => {
 export const checkCardRequirements = (card: Card, state: GameState): boolean => {
   // todo: check if can pay for it as well?
   let requirementArray = card.requires ? card.requires : []
-  if(requirementArray) {
-    let requirementResults = requirementArray.map(requirement => fromJSONRequires(requirement)(state))
-    if(requirementResults.every(x => x)) {
-      return(true)
+  if (requirementArray) {
+    let requirementResults = requirementArray.map(requirement =>
+      fromJSONRequires(requirement)(state)
+    )
+    if (requirementResults.every(x => x)) {
+      return true
     } else {
-      return(false)
+      return false
     }
   } else {
-    return(true)
+    return true
   }
 }

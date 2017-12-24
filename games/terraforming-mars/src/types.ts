@@ -43,9 +43,9 @@ export interface Card {
   resourceHeld?: CardResource
   effects?: any[]
   actions?: any[][]
-  afterCardTrigger?: [Tag[], any[]]
-  afterTileTrigger?: [TileType[], any[]]
-  afterStandardProjectTrigger?: any[]
+  afterCardTriggers?: [any[], any[]]
+  afterTileTriggers?: [TileType[], any[]]
+  afterStandardProjectTriggers?: any[]
   todo?: boolean
 }
 
@@ -78,6 +78,7 @@ export interface PlayerState {
   hand: string[]
   played: string[]
   corporation: string
+  cardResources: {[key: string]: number}
   hasIncreasedTRThisGeneration: boolean // For UN.
 }
 

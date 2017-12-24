@@ -1,4 +1,4 @@
-import {omit, omitBy, pick, mapValues} from 'lodash'
+import {omit, omitBy, pick, pull, mapValues} from 'lodash'
 import {shuffle} from 'shuffle-seed'
 
 import {
@@ -19,9 +19,16 @@ import {
   ResourcesState,
   TurnAction,
 } from './types'
-import {CARDS} from './cards'
+import {CARDS, getCardByName} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
-import {clone, HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
+import {
+  clone,
+  HasTags,
+  GetPlayerTags,
+  isSubset,
+  changeInventory,
+  checkCardRequirements,
+} from './utils'
 import {CORPORATIONS} from './corporations'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
@@ -170,6 +177,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
       hand: [],
       played: [],
       corporation: '',
+      cardResources: {},
       hasIncreasedTRThisGeneration: false,
       resources: clone<ResourcesState>(INITIAL_RESOURCES),
     }
@@ -256,7 +264,30 @@ export const turnActionHandlers = {
   [TurnAction.FundAward]: (state, action) => {
     return fundAward(state, action.award)
   },
-  [TurnAction.PlayCard]: (state, action) => {},
+  [TurnAction.PlayCard]: (state, action): GameState => {
+    const playerState = state.playerState[state.player]
+    const card = getCardByName(action.card)
+
+    // Check requirements
+    const meetsRequirements = checkCardRequirements(card, state)
+    if (!meetsRequirements) throw new Error('Does not meet requirements')
+
+    // Get discount
+    const discount = getDiscount(playerState.played.map(getCardByName), card)
+    const actualCost = Math.max(0, card.cost - discount)
+
+    changeInventory(state, state.player, ResourceType.Money, -actualCost)
+
+    // Play to board and remove from hand
+    playerState.played.push(card)
+    pull(playerState.hand, [action.card])
+
+    // Card effects (read choices)
+
+    // After-card triggers
+
+    return state
+  },
 }
 
 // Enumerates all client messages.
@@ -278,7 +309,7 @@ export const handlers = {
   },
   // During generation
   [UserAction.Action]: (state, action) => {
-    state = turnActionHandlers[action.turnType](state, action)
+    state = turnActionHandlers[action.actionType](state, action)
     state.actionsDone++
   },
 
