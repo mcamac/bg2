@@ -18,7 +18,18 @@ import {getCardByName} from './cards'
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
 export const ChangeAnyCardResource = (delta: number, type: string) => {}
-export const ChangeCardResource = (delta: number, type: string) => {}
+export const ChangeCardResource = (n: number, type: string) => (
+  state: GameState,
+  action: {sold: string[]},
+  choice,
+  card: Card
+): GameState => {
+  if (!state.playerState[state.player].cardResources[card.name])
+    state.playerState[state.player].cardResources[card.name] = 0
+
+  state.playerState[state.player].cardResources[card.name]++
+  return state
+}
 
 export const SellCards = () => (state: GameState, action: {sold: string[]}, choice): GameState => {
   state = ChangeInventory(choice.sold.length, ResourceType.Money)(state)
@@ -225,7 +236,7 @@ const fromJSON = obj => {
 export const applyEffects = (state: GameState, action, effects: any[], card?: Card): GameState => {
   zip(action.choices || [], effects).forEach(([choice, effect]) => {
     const effectFn = fromJSON(effect)
-    state = effectFn(state, action, choice)
+    state = effectFn(state, action, choice, card)
   })
 
   return state

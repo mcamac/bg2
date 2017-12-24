@@ -667,3 +667,34 @@ test('Card Actions: Space Mirrors', t => {
   t.is(state.playerState['a'].resources[ResourceType.Energy].production, 1)
   t.true(state.playerState['a'].cardActionsUsedThisGeneration['Space Mirrors'])
 })
+
+test('Card Actions: Physics Complex', t => {
+  let state = getStateAfterActions()
+  state.playerState['a'].played = ['Physics Complex']
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].resources[ResourceType.Energy].count = 6
+
+  state.firstPlayer = 'a'
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.CardAction,
+    card: 'Physics Complex',
+    index: 0,
+    player: 'a',
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Energy].count, 0)
+  t.is(state.playerState['a'].cardResources['Physics Complex'], 1)
+  t.true(state.playerState['a'].cardActionsUsedThisGeneration['Physics Complex'])
+
+  // Can't play again
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.CardAction,
+      card: 'Physics Complex',
+      index: 0,
+      player: 'a',
+    })
+  )
+})
