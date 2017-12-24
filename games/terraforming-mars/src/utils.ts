@@ -1,4 +1,4 @@
-import {cloneDeep, zip} from 'lodash'
+import {cloneDeep, pull, zip} from 'lodash'
 import {
   GameState,
   Transform,
@@ -19,6 +19,12 @@ export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
 export const ChangeAnyCardResource = (delta: number, type: string) => {}
 export const ChangeCardResource = (delta: number, type: string) => {}
+
+export const SellCards = () => (state: GameState, action: {sold: string[]}, choice): GameState => {
+  state = ChangeInventory(choice.sold.length, ResourceType.Money)(state)
+  state.playerState[state.player].hand = pull(state.playerState[state.player].hand, ...choice.sold)
+  return state
+}
 
 export const ChangeInventory = (
   delta: number | ((state: GameState) => number),
@@ -203,6 +209,7 @@ const REGISTRY = {
   PlaceOceans,
   PlaceCity,
   PlaceGreenery,
+  SellCards,
 }
 
 const fromJSON = obj => {

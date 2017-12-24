@@ -331,6 +331,23 @@ test('Oceans card with invalid choice', t => {
 
 // Standard Projects
 
+test('Project: Sell Patents', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].hand = ['r', 's', 't']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.SellPatents,
+    choices: [{sold: ['r', 's']}],
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 32)
+  t.deepEqual(state.playerState['a'].hand, ['t'])
+})
+
 test('Project: Power Plant', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.globalParameters.Heat = 0

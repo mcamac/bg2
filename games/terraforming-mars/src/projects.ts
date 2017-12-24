@@ -1,7 +1,7 @@
 import {StandardProject, ResourceType} from './types'
 
 export const STANDARD_PROJECTS = {
-  [StandardProject.SellPatents]: ['SellPatents'],
+  [StandardProject.SellPatents]: [['SellCards']],
   [StandardProject.PowerPlant]: [
     ['ChangeInventory', -11, ResourceType.Money],
     ['ChangeProduction', 1, ResourceType.Energy],
