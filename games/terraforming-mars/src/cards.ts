@@ -23,7 +23,7 @@ export const CARDS: Card[] = [
     vp: 1,
     effectText:
       'Requires that you have titanium production. Decrease any titanium production 1 step and increase your own 1 step.',
-    effects: [['DecreaseAnyProduction', -1, 'titanium'], ['ChangeProduction', 1, 'titanium']],
+    effects: [['DecreaseAnyProduction', -1, 'Titanium'], ['ChangeProduction', 1, 'Titanium']],
   },
   {
     name: 'Deep Well Heating',
@@ -1048,6 +1048,7 @@ export const CARDS: Card[] = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Science', 'Space'],
+    vp: 1,
     // TODO wat
   },
   {

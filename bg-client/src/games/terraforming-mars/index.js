@@ -1,11 +1,11 @@
 import React, {Component} from 'react'
 import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
-import {range} from 'lodash/fp'
 import {connect} from 'react-redux'
 import {compose, branch, renderNothing, withProps} from 'recompose'
 
 import {reducer} from './reducer'
+import {Grid} from './Grid'
 
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
 console.log(CARDS)
@@ -80,37 +80,37 @@ const CardWrapper = styled(Box)`
 const requiresByType = (type, count, tag) => {
   if (type === 'MinHeat')
     return (
-      <Flex>
-        <Icon g="Temp" /> ≥ {count}
+      <Flex align="center">
+        <Icon g="Temp" /> <Box>≥ {count}</Box>
       </Flex>
     )
   else if (type === 'MaxHeat')
     return (
-      <Flex>
+      <Flex align="center">
         <Icon g="Temp" /> ≤ {count}
       </Flex>
     )
   else if (type === 'MinOceans')
     return (
-      <Flex>
-        <Icon g="Ocean" /> ≥ {count}
+      <Flex align="center">
+        <Icon g="Ocean" /> <Box>≥ {count}</Box>
       </Flex>
     )
   else if (type === 'MaxOceans')
     return (
-      <Flex>
+      <Flex align="center">
         <Icon g="Ocean" /> ≤ {count}
       </Flex>
     )
   else if (type === 'MinOxygen')
     return (
-      <Flex>
-        <Icon g="Oxygen" /> ≥ {count}
+      <Flex align="center">
+        <Icon g="Oxygen" /> <Box>≥ {count}</Box>
       </Flex>
     )
   else if (type === 'MaxOxygen')
     return (
-      <Flex>
+      <Flex align="center">
         <Icon g="Oxygen" /> ≤ {count}
       </Flex>
     )
@@ -133,8 +133,8 @@ const withSign = value => (value >= 0 ? `+${value}` : `${value}`)
 
 const ChangeProduction = (value, resource) => (
   <Flex mr="4px" style={{background: '#8a5d5d', color: '#eee', padding: '3px'}}>
-    {withSign(value)}
-    {typeof resource === 'string' ? <Icon g={resource} /> : resource}
+    {typeof value === 'number' ? withSign(value) : Effect(...value)}
+    <Icon g={resource} />
   </Flex>
 )
 
@@ -145,14 +145,18 @@ const ChangeInventory = (value, resource) => (
 )
 
 const ChangeCardResource = (value, resource) => (
-  <Flex>
-    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} on card
+  <Flex align="center">
+    <Box>{withSign(value)}</Box>
+    <Box px="4px">{typeof resource === 'string' ? <Icon g={resource} /> : resource}</Box>{' '}
+    <Box> on card</Box>
   </Flex>
 )
 
 const ChangeAnyCardResource = (value, resource) => (
-  <Flex>
-    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} any card
+  <Flex align="center">
+    <Box>{withSign(value)}</Box>
+    {typeof resource === 'string' ? <Icon g={resource} /> : resource}
+    <Box> any card</Box>
   </Flex>
 )
 
@@ -199,8 +203,8 @@ const RoboticWorkforce = () => (
 )
 
 const Choice = (choices, card) => (
-  <Flex>
-    One of:
+  <Flex align="center">
+    <Box mr="4px">One of:</Box>
     {choices.map(
       ([effect, ...args], i) =>
         EFFECTS[effect] && <Box key={i}> {EFFECTS[effect](...args, card)}</Box>
@@ -240,6 +244,12 @@ const VPForTags = tag => (
   </Flex>
 )
 
+const GetTags = tag => (
+  <Flex>
+    1 / <Tag name={tag} />
+  </Flex>
+)
+
 const VPIfCardHasResources = (resource, count, vp) => (
   <Flex>
     {vp} VP if at least {count} <Icon g={resource} />
@@ -265,6 +275,7 @@ const EFFECTS = {
   VPForTags,
   VPForCardResources,
   VPIfCardHasResources,
+  GetTags,
 }
 
 const CardEffects = props => (
@@ -359,42 +370,6 @@ let Card = props => (
 
 Card = withProps(props => ({card: getCardByName(props.name)}))(Card)
 export {Card}
-
-const hexPoints = (x, y, radius) => {
-  var points = []
-  for (var theta = 0; theta < Math.PI * 2; theta += Math.PI / 3) {
-    var pointX, pointY
-    pointX = x + radius * Math.sin(theta)
-    pointY = y + radius * Math.cos(theta)
-    points.push(pointX + ',' + pointY)
-  }
-  return points.join(' ')
-}
-const RADIUS = 28
-
-const Grid = () => (
-  <svg width={470} height={420}>
-    <g>
-      {range(0, 9).map(row =>
-        range(
-          4 - (4 - Math.ceil(Math.abs(4 - row) / 2)),
-          5 + 4 - Math.floor(Math.abs(4 - row) / 2)
-        ).map(col => (
-          <polygon
-            key={`${col}-${row}`}
-            stroke="black"
-            fill="transparent"
-            points={hexPoints(
-              40 - RADIUS * (row % 2) + Math.sqrt(3) * RADIUS / 2 * col * 2,
-              40 + Math.sqrt(3) * RADIUS / 2 * row * Math.sqrt(3),
-              RADIUS
-            )}
-          />
-        ))
-      )}
-    </g>
-  </svg>
-)
 
 const Leaderboard = () => (
   <Box style={{fontSize: 14}} mb={3}>
