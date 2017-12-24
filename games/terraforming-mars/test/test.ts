@@ -22,8 +22,9 @@ import {
   TurnAction,
   TileType,
   StandardProject,
+  Tag,
 } from '../src/types'
-import {cloneState, checkCardRequirements, applyEffects} from '../src/utils'
+import {cloneState, checkCardRequirements, applyEffects, IsSubset, PlayedTagMatches, AnyPlayedTagMatches} from '../src/utils'
 import {getStateAfterActions} from '../src/fixtures'
 
 const TEST_SEED = 'martin'
@@ -226,6 +227,67 @@ test(t => {
   t.false(checkCardRequirements(testCard_02, broken_01))
   t.false(checkCardRequirements(testCard_02, broken_02))
   t.false(checkCardRequirements(testCard_02, broken_03))
+})
+
+// After card triggers
+
+test('Test match finder util', t => {
+  let empty = [];
+  let required1 = [Tag.Earth]
+  let required2 = [Tag.Space, Tag.Event]
+
+  let options1 = [Tag.Space, Tag.Earth]
+  let options2 = [Tag.Space, Tag.Event]
+
+  // Make sure that empty list always returns true, but false other way around
+  t.true(IsSubset(empty, empty))
+  t.true(IsSubset(empty, options1))
+  t.false(IsSubset(options1, empty))
+
+  // Make sure functionality works right for one match
+  t.true(IsSubset(required1, options1))
+  t.false(IsSubset(required1, options2))
+
+  // Make sure works right for multiple matches
+  t.false(IsSubset(required2, options1))
+  t.true(IsSubset(required2, options2))
+})
+
+test('Look for matching tags', t => {
+  let state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+
+  let player01 = 'Player 01'
+  let player02 = 'Player 02'
+
+  let card01= {  // e.g., the one that will match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Space, Tag.Event]
+  }
+
+  let card02= {  // e.g., one that will not match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: []
+  }
+
+  // Check that works correctly when player & owner are same (and doesn't o.w.)
+  t.true(PlayedTagMatches([Tag.Space, Tag.Event])(card01, player01, player01))
+  t.false(PlayedTagMatches([Tag.Space, Tag.Event])(card01, player02, player01))
+
+  // Always works for "any match"
+  t.true(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card01, player01, player01))
+  t.true(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card01, player02, player01))
+
+  // Failure with card02
+  t.false(PlayedTagMatches([Tag.Space, Tag.Event])(card02, player01, player01))
+  t.false(PlayedTagMatches([Tag.Space, Tag.Event])(card02, player02, player01))
+  t.false(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card02, player01, player01))
+  t.false(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card02, player02, player01))
 })
 
 // Play Cards
