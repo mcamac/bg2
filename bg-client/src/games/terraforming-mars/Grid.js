@@ -16,7 +16,7 @@ const hexPoints = (x, y, radius) => {
 const RADIUS = 28
 
 let Tile = props => {
-  const xc = 240 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
+  const xc = 220 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
   const yc = 210 + 3 / 2 * RADIUS * -props.y
   return (
     <g>
@@ -35,7 +35,7 @@ let Tile = props => {
 Tile = withState('hovered', 'setHovered', false)(Tile)
 
 export const Grid = () => (
-  <svg width={470} height={420}>
+  <svg width={440} height={420}>
     <g>
       {range(-4, 5).map(row =>
         range(Math.max(-4, -4 - row), Math.min(4, 4 - row) + 1).map(col => (

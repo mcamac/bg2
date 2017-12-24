@@ -399,20 +399,6 @@ let Corporation = props => (
 Corporation = withProps(props => ({corp: getCorporationByName(props.name)}))(Corporation)
 export {Corporation}
 
-const Leaderboard = () => (
-  <Box style={{fontSize: 14}} mb={3}>
-    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
-      Terraforming Ratings
-    </Box>
-    {['abe', 'bas', 'cab'].map(player => (
-      <Flex key={player}>
-        <Box w={120}>{player}</Box>
-        <Box>20</Box>
-      </Flex>
-    ))}
-  </Box>
-)
-
 const GlobalParams = () => (
   <Box style={{fontSize: 14}} mb={3}>
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
@@ -420,7 +406,7 @@ const GlobalParams = () => (
     </Box>
     {['Oceans', 'Temp', 'Oxygen'].map(param => (
       <Flex key={param}>
-        <Box w={120} flex="1 1 auto">
+        <Box w={80} flex="1 1 auto">
           {param}
         </Box>
         <Box>0 (9 left)</Box>
@@ -436,7 +422,7 @@ const Milestones = () => (
     </Box>
     {['Oceans', 'Temp', 'Oxygen'].map(param => (
       <Flex key={param}>
-        <Box w={120} flex="1 1 auto" style={{color: '#aaa'}}>
+        <Box w={80} flex="1 1 auto" style={{color: '#aaa'}}>
           Not chosen
         </Box>
         <Box>a</Box>
@@ -446,14 +432,30 @@ const Milestones = () => (
 )
 
 const Awards = () => (
-  <Box style={{fontSize: 14}}>
+  <Box style={{fontSize: 14}} mb={3}>
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
       Awards
     </Box>
     {['Oceans', 'Temp', 'Oxygen'].map(param => (
       <Flex key={param}>
-        <Box w={120} flex="1 1 auto" style={{color: '#aaa'}}>
+        <Box w={80} flex="1 1 auto" style={{color: '#aaa'}}>
           Not chosen
+        </Box>
+        <Box>a</Box>
+      </Flex>
+    ))}
+  </Box>
+)
+
+const StandardProjects = () => (
+  <Box style={{fontSize: 14}}>
+    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
+      Standard Projects
+    </Box>
+    {['SellPatents', 'PowerPlant', 'Asteroid', 'Aquifer', 'Greenery', 'City'].map(param => (
+      <Flex key={param}>
+        <Box w={80} flex="1 1 auto">
+          {param}
         </Box>
         <Box>a</Box>
       </Flex>
@@ -539,9 +541,9 @@ const TerraformingMars = props => (
         <Flex>
           <Box>
             <GlobalParams />
-            <Leaderboard />
             <Milestones />
             <Awards />
+            <StandardProjects />
           </Box>
           <Box flex="1 1 auto" style={{textAlign: 'center'}}>
             <ActionBar />
