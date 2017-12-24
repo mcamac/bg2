@@ -204,7 +204,7 @@ const REQUIREMENTS_REGISTRY = {
 const fromJSONRequires = obj => {
   if (obj instanceof Array) {
     const [opName, ...args] = obj
-    if (!REQUIREMENTS_REGISTRY[opName]) {
+    if (!REQUIREMENTS_REGISTRY[opName]) {  // maybe this shouldn't throw an error
       throw Error('could not find ' + opName)
     }
     return REQUIREMENTS_REGISTRY[opName](...args)

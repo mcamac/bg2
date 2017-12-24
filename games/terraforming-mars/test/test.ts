@@ -113,7 +113,30 @@ test(t => {
 // Playing cards: checking card requirements
 
 test(t => {
-  // Make sure returns True if card has no requirements
+  // Make sure returns "true" if there is no requirements
+  let testCardNoRequirements = {
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+  }
+
+  let basicGameState = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+
+  t.true(checkCardRequirements(testCardNoRequirements, basicGameState))
+
+  // Make sure breaks when there is a bad requirement
+ let testCardBadRequirement = {
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    requires: [['NotARealRequirement', 1]]
+  }
+
+  t.throws(() => checkCardRequirements(testCardBadRequirement, basicGameState), Error)
+
+  // Check when there is one requirement; ensure runs correctly
   let testCard = {
     cost: 0,
     name: 'test_card',
@@ -128,22 +151,36 @@ test(t => {
   let high_oxygen_state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
   high_oxygen_state.globalParameters.Oxygen = 10
 
-  t.is(checkCardRequirements(testCard, low_oxygen_state), true)
-  t.is(checkCardRequirements(testCard, high_oxygen_state), false)
+  t.true(checkCardRequirements(testCard, low_oxygen_state))
+  t.false(checkCardRequirements(testCard, high_oxygen_state))
 
-  // Make sure returns "true" if there are no requirements
-  let testCardNoRequirements = {
+  // Check when there are multiple requirements; ensure runs correctly
+  let testCard_02 = {
     cost: 0,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
+    requires: [['MaxOxygen', 5], ['MaxOceans', 2]]
   }
 
-  let basicGameState = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  let works = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  works.globalParameters.Oxygen = 0
+  works.globalParameters.Oceans = 0
 
-  t.is(checkCardRequirements(testCardNoRequirements, basicGameState), true)
+  let broken_01 = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  broken_01.globalParameters.Oxygen = 0
+  broken_01.globalParameters.Oceans = 10
 
+  let broken_02 = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  broken_02.globalParameters.Oxygen = 10 
+  broken_02.globalParameters.Oceans = 0
 
+  let broken_03 = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
+  broken_03.globalParameters.Oxygen = 10
+  broken_03.globalParameters.Oceans = 10
 
-
+  t.true(checkCardRequirements(testCard_02, works))
+  t.false(checkCardRequirements(testCard_02, broken_01))
+  t.false(checkCardRequirements(testCard_02, broken_02))
+  t.false(checkCardRequirements(testCard_02, broken_03))
 })
