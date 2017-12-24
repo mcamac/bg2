@@ -136,13 +136,13 @@ const ChangeInventory = (value, resource) => (
 
 const ChangeCardResource = (value, resource) => (
   <Flex>
-    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} on Card
+    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} on card
   </Flex>
 )
 
 const ChangeAnyCardResource = (value, resource) => (
   <Flex>
-    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} on any card
+    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource} any card
   </Flex>
 )
 
@@ -268,7 +268,7 @@ const CardEffects = props => (
 )
 
 const ActionWrapper = styled(Flex)`
-  padding: 2px 0;
+  padding: 2px 8px;
   transition: 0.2s background;
 
   &:hover {
@@ -280,15 +280,17 @@ const CardActions = props => (
   <Box>
     {props.actions.map((action, i) => (
       <ActionWrapper align="center" key={i}>
-        <Box mr="4px">Action:</Box>
+        <Box mr="4px" style={{color: '#555'}}>
+          ACTION:
+        </Box>
         {action.map(([effect, ...args], j) => (
-          <Flex key={j} align="center">
+          <Box key={j} align="center">
             {EFFECTS[effect] ? (
               EFFECTS[effect](...args, props.card)
             ) : (
               <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
             )}
-          </Flex>
+          </Box>
         ))}
       </ActionWrapper>
     ))}
@@ -328,9 +330,9 @@ let Card = props => (
       </Box>
       <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
+    {props.card.actions && <CardActions actions={props.card.actions} card={props.card} />}
     {!props.collapsed && (
       <Flex style={{padding: 5}} direction="column">
-        {props.card.actions && <CardActions actions={props.card.actions} card={props.card} />}
         <Flex align="center">
           {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
           {props.card.vp && <CardVP card={props.card} />}
