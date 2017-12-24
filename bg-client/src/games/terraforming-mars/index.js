@@ -8,6 +8,7 @@ import {reducer} from './reducer'
 import {Grid} from './Grid'
 
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
+import {getCorporationByName} from '../../../../games/terraforming-mars/src/corporations'
 console.log(CARDS)
 
 const Wrapper = styled(Flex)`
@@ -19,6 +20,7 @@ const CARD_COLORS = {
   Active: '#c1e4f9',
   Event: '#ffc0c0',
   Automated: '#95F58D',
+  Corporation: '#e3e3e3',
 }
 
 const CircleWrapper = styled.div`
@@ -62,7 +64,7 @@ const Tag = props => (
 )
 
 const CardWrapper = styled(Box)`
-  background: ${props => CARD_COLORS[props.type]};
+  background: ${props => CARD_COLORS[props.type || (props.corporation && 'Corporation')]};
   min-width: 250px;
   font-size: 13px;
   margin-bottom: 5px;
@@ -73,7 +75,7 @@ const CardWrapper = styled(Box)`
   transition: 0.2s all;
 
   &:hover {
-    box-shadow: 0px 1px 4px 5px ${props => CARD_COLORS[props.type]};
+    box-shadow: 0px 1px 4px 5px ${props => CARD_COLORS[props.type] || '#aaa'};
   }
 `
 
@@ -371,6 +373,32 @@ let Card = props => (
 Card = withProps(props => ({card: getCardByName(props.name)}))(Card)
 export {Card}
 
+let Corporation = props => (
+  <CardWrapper corporation>
+    <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
+      <div style={{fontWeight: 500, fontSize: 15, width: 18, color: '#333'}}>
+        {props.corp.startingMoney}
+      </div>
+      <Box flex="1 1 auto" style={{textAlign: 'right'}}>
+        {props.corp.name}
+      </Box>
+      <Flex ml={5}>{(props.corp.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
+    </Flex>
+    {props.corp.actions && <CardActions actions={props.corp.actions} card={props.corp} />}
+    {!props.collapsed &&
+      props.corp.effects && (
+        <Flex style={{padding: 5}} direction="column">
+          <Flex align="center">
+            {props.corp.effects && <CardEffects effects={props.corp.effects} card={props.corp} />}
+          </Flex>
+        </Flex>
+      )}
+  </CardWrapper>
+)
+
+Corporation = withProps(props => ({corp: getCorporationByName(props.name)}))(Corporation)
+export {Corporation}
+
 const Leaderboard = () => (
   <Box style={{fontSize: 14}} mb={3}>
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
@@ -542,6 +570,12 @@ const TerraformingMars = props => (
         </Flex>
       </Box>
       <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
+        <Box p={1} style={{fontSize: 12, color: '#555'}}>
+          CORPORATIONS
+        </Box>
+        <Box px={2}>
+          {props.game.choosingCorporations.a.map(name => <Corporation key={name} name={name} />)}
+        </Box>
         <Box p={1} style={{fontSize: 12, color: '#555'}}>
           BUYING
         </Box>

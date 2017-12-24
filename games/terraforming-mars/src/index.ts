@@ -1,3 +1,6 @@
+import {omit, omitBy, pick, mapValues} from 'lodash'
+import {shuffle} from 'shuffle-seed'
+
 import {
   Transform,
   ResourceType,
@@ -19,8 +22,7 @@ import {
 import {CARDS} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone} from './deck'
 import {clone, HasTags, GetPlayerTags, isSubset, changeInventory} from './utils'
-import {omit, omitBy, pick, mapValues} from 'lodash'
-import {shuffle} from 'shuffle-seed'
+import {CORPORATIONS} from './corporations'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -159,7 +161,10 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     seed: SEED,
   }
 
-  state.players.forEach(player => {
+  const shuffled = shuffle(CORPORATIONS, SEED)
+
+  state.players.forEach((player, i) => {
+    state.choosingCorporations[player] = shuffled.splice(2 * i, 2).map(c => c.name)
     state.playerState[player] = {
       TR: 20,
       hand: [],
