@@ -50,7 +50,7 @@ test(t => {
 
 // Drafting
 
-test.only('Drafting: Even generation', t => {
+test('Drafting: Even generation', t => {
   let state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
   state.generation = 0
   state = setupDraft(state)
