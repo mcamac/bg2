@@ -930,7 +930,7 @@ export const CARDS: Card[] = [
     vp: 1,
     actionText:
       'Effect: When you play a science tag, including this, you may discard a card from hand to draw a card.',
-    afterCardTriggers: [['HasAnyTag', [Tag.Science]], ['Option', [['Discard', 1], ['Draw', 1]]]],
+    afterCardTriggers: [['PlayedTagMatches', [Tag.Science]], ['Option', [['Discard', 1], ['Draw', 1]]]],
   },
   {
     name: 'Viral Enhancers',
@@ -941,7 +941,7 @@ export const CARDS: Card[] = [
     actionText:
       'Effect: When you play a plant, microbe, or an animal tag, including this, gain 1 plant or add 1 resource TO THAT CARD.',
     afterCardTriggers: [
-      ['HasAnyTag', [Tag.Plant, Tag.Microbe, Tag.Animal]],
+      ['PlayedTagMatches', [[Tag.Plant], [Tag.Microbe], [Tag.Animal]]],
       ['Choice', [['ChangeInventory', 1, ResourceType.Plant], ['ChangePlayedCardResource', 1]]],
     ],
   },

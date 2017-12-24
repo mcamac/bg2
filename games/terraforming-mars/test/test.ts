@@ -259,7 +259,7 @@ test('Look for matching tags', t => {
   let player01 = 'Player 01'
   let player02 = 'Player 02'
 
-  let card01= {  // e.g., the one that will match
+  let card01 = {  // e.g., the one that will match
     cost: 0,
     name: 'test_card',
     type: 'Automated',
@@ -267,7 +267,15 @@ test('Look for matching tags', t => {
     tags: [Tag.Space, Tag.Event]
   }
 
-  let card02= {  // e.g., one that will not match
+ let card02 = {  // e.g., one that will not match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Animal]
+  }
+
+  let card03 = {  // e.g., one that will not match
     cost: 0,
     name: 'test_card',
     type: 'Automated',
@@ -275,19 +283,27 @@ test('Look for matching tags', t => {
     tags: []
   }
 
+  let spaceEvent = [[Tag.Space, Tag.Event]]
+  let anyLife = [[Tag.Plant], [Tag.Animal], [Tag.Microbe]]
+
   // Check that works correctly when player & owner are same (and doesn't o.w.)
-  t.true(PlayedTagMatches([Tag.Space, Tag.Event])(card01, player01, player01))
-  t.false(PlayedTagMatches([Tag.Space, Tag.Event])(card01, player02, player01))
+  t.true(PlayedTagMatches(spaceEvent)(card01, player01, player01))
+  t.false(PlayedTagMatches(spaceEvent)(card01, player02, player01))
 
   // Always works for "any match"
-  t.true(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card01, player01, player01))
-  t.true(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card01, player02, player01))
+  t.true(AnyPlayedTagMatches(spaceEvent)(card01, player01, player01))
+  t.true(AnyPlayedTagMatches(spaceEvent)(card01, player02, player01))
 
   // Failure with card02
-  t.false(PlayedTagMatches([Tag.Space, Tag.Event])(card02, player01, player01))
-  t.false(PlayedTagMatches([Tag.Space, Tag.Event])(card02, player02, player01))
-  t.false(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card02, player01, player01))
-  t.false(AnyPlayedTagMatches([Tag.Space, Tag.Event])(card02, player02, player01))
+  t.false(PlayedTagMatches(spaceEvent)(card03, player01, player01))
+  t.false(PlayedTagMatches(spaceEvent)(card03, player02, player01))
+  t.false(AnyPlayedTagMatches(spaceEvent)(card03, player01, player01))
+  t.false(AnyPlayedTagMatches(spaceEvent)(card03, player02, player01))
+
+  // Check works as expected when multiple possible matches
+  t.true(PlayedTagMatches(anyLife)(card02, player01, player01))
+  t.false(PlayedTagMatches(anyLife)(card01, player01, player01))
+  t.false(PlayedTagMatches(anyLife)(card03, player01, player01))
 })
 
 // Play Cards

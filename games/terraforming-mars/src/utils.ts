@@ -177,10 +177,10 @@ export const IsSubset = (required: any[], options: any[]) => {
   return isInOptions.every(x => x)
 }
 
-export const PlayedTagMatches = (tags: Tag[]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+export const PlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
   return (card: Card, cardPlayer: Player, owner: Player) => {
     if (owner === cardPlayer) {
-      let playedTagMatches = IsSubset(tags, card.tags ? card.tags : [])
+      let playedTagMatches = tags.map(x => IsSubset(x, card.tags ? card.tags : [])).some(x => x)
       return playedTagMatches
     } else {
       return false
@@ -188,9 +188,9 @@ export const PlayedTagMatches = (tags: Tag[]): ((card: Card, cardPlayer: Player,
   }
 }
 
-export const AnyPlayedTagMatches = (tags: Tag[]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+export const AnyPlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
   return (card: Card, cardPlayer: Player, owner: Player) => {
-    let playedTagMatches = IsSubset(tags, card.tags ? card.tags : [])
+    let playedTagMatches = tags.map(x => IsSubset(x, card.tags ? card.tags : [])).some(x => x)
     return playedTagMatches
   }
 }
