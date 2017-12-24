@@ -42,7 +42,7 @@ export const CORPORATIONS: Corporation[] = [
     startingMoney: 48,
     tags: ['Power'],
     effects: [['ChangeProduction', 1, ResourceType.Energy]],
-    discounts: [[3, Tag.Power], [3, 'PlaceholderForStandardProjectPowerPlant']],
+    discounts: [[3, [Tag.Power]], [3, ['PlaceholderForStandardProjectPowerPlant']]],
     // TODO: implement discount for standard project power plants
   },
   {
@@ -94,7 +94,7 @@ export const CORPORATIONS: Corporation[] = [
     name: 'Teractor',
     startingMoney: 60,
     tags: ['Earth'],
-    discounts: [[3, Tag.Earth]],
+    discounts: [[3, [Tag.Earth]]],
   },
   {
     name: 'United Nations Mars Initiative (UNMI)',

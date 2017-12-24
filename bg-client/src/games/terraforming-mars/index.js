@@ -246,9 +246,9 @@ const VPForTags = tag => (
   </Flex>
 )
 
-const GetTags = tag => (
+const GetTags = (tag, ratio) => (
   <Flex>
-    1 / <Tag name={tag} />
+    1 / {ratio && ratio} <Tag name={tag} />
   </Flex>
 )
 
@@ -347,7 +347,9 @@ const CardDiscounts = props => (
   <Flex ml={1} flex="1 1 auto" align="center">
     {props.discounts.map(([discount, tags], i) => (
       <Flex align="center">
-        {withSign(-discount)} on
+        <Flex>{withSign(-discount)} </Flex>
+        <Icon g="Money" />
+        <Flex>on</Flex>
         <Flex align="center" ml="4px">
           {tags ? tags.map(tag => <Tag name={tag} key={tag} />) : 'All'}
         </Flex>
@@ -372,7 +374,7 @@ let Card = props => (
     </Flex>
     {props.card.actions && <CardActions actions={props.card.actions} card={props.card} />}
     {!props.collapsed &&
-      (props.card.effects || props.card.vp) && (
+      (props.card.effects || props.card.vp || props.card.discounts) && (
         <Flex style={{padding: 5}} direction="column">
           <Flex align="center">
             {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
@@ -402,10 +404,13 @@ let Corporation = props => (
     </Flex>
     {props.corp.actions && <CardActions actions={props.corp.actions} card={props.corp} />}
     {!props.collapsed &&
-      props.corp.effects && (
+      (props.corp.effects || props.corp.discounts) && (
         <Flex style={{padding: 5}} direction="column">
           <Flex align="center">
             {props.corp.effects && <CardEffects effects={props.corp.effects} card={props.corp} />}
+            {props.corp.discounts && (
+              <CardDiscounts discounts={props.corp.discounts} card={props.corp} />
+            )}
           </Flex>
         </Flex>
       )}
