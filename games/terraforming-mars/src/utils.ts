@@ -11,6 +11,7 @@ import {
   TileType,
   Tile,
   Position,
+  StandardProject,
 } from './types'
 import {isOcean} from './tiles'
 import {getCardByName} from './cards'
@@ -194,6 +195,21 @@ export const AnyPlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Pl
     return playedTagMatches
   }
 }
+
+export const PlayedMinCost = (min: number): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+  return (card: Card, cardPlayer: Player, owner: Player) => {
+    if (owner == cardPlayer) {
+      return (card.cost >= min)
+    } else {
+      return false
+    }
+  }
+}
+
+export const StandardProjectMatches = (projects: StandardProject[]): ((project: StandardProject) => boolean) => {
+  return (project: StandardProject) => projects.find(x => x === project) != null
+}
+
 
 
 export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {

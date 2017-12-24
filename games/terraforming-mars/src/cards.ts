@@ -395,7 +395,7 @@ export const CARDS: Card[] = [
     tags: ['Space'],
     actionText: 'Effect: When you place a space event, you gain 3 MC and 3 heat.',
     afterCardTriggers: [
-      ['PlayedTagMatches', [Tag.Space, true]],
+      ['PlayedTagMatches', [[Tag.Space]]],
       [['ChangeInventory', 3, ResourceType.Money], ['ChangeInventory', 3, ResourceType.Heat]],
     ],
   },
@@ -930,7 +930,10 @@ export const CARDS: Card[] = [
     vp: 1,
     actionText:
       'Effect: When you play a science tag, including this, you may discard a card from hand to draw a card.',
-    afterCardTriggers: [['PlayedTagMatches', [Tag.Science]], ['Option', [['Discard', 1], ['Draw', 1]]]],
+    afterCardTriggers: [
+      ['PlayedTagMatches', [[Tag.Science]]], 
+      ['Option', [['Discard', 1], ['Draw', 1]]]
+    ],
   },
   {
     name: 'Viral Enhancers',
@@ -1352,7 +1355,10 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Earth'],
     actionText: 'Effect: After you play an event card, you gain 3MC',
-    afterCardTriggers: [['HasAnyTag', [Tag.Event]], [['ChangeInventory', 3, ResourceType.Money]]],
+    afterCardTriggers: [
+      ['HasAnyTag', [[Tag.Event]]], 
+      [['ChangeInventory', 3, ResourceType.Money]]
+    ],
   },
   {
     name: 'Business Network',
@@ -2279,7 +2285,7 @@ export const CARDS: Card[] = [
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     resourceHeld: CardResource.Science,
     afterCardTriggers: [
-      ['HasAnyTag', [Tag.Space]],
+      ['HasAnyTag', [[Tag.Space]]],
       [
         [
           'Choice',
