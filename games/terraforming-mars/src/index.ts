@@ -118,6 +118,7 @@ const resetNewGeneration: Transform = state => {
   state.players.forEach(player => {
     const playerState = state.playerState[player]
     playerState.hasIncreasedTRThisGeneration = false
+    playerState.cardActionsUsedThisGeneration = {}
   })
   return state
 }
@@ -176,6 +177,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
       played: [],
       corporation: '',
       cardResources: {},
+      cardActionsUsedThisGeneration: {},
       hasIncreasedTRThisGeneration: false,
       resources: clone<ResourcesState>(INITIAL_RESOURCES),
     }
@@ -331,6 +333,20 @@ export const turnActionHandlers = {
     }
 
     // After-card triggers
+
+    return state
+  },
+  [TurnAction.CardAction]: (state: GameState, action): GameState => {
+    const card = getCardByName(action.card)
+    const cardActions = card.actions
+    if (!cardActions || !cardActions[action.index]) throw Error('Invalid action.')
+    if (state.playerState[state.player].cardActionsUsedThisGeneration[action.card])
+      throw Error('Card already used.')
+
+    const effects = cardActions[action.index]
+
+    state = applyEffects(state, action, effects, card)
+    state.playerState[state.player].cardActionsUsedThisGeneration[action.card] = true
 
     return state
   },

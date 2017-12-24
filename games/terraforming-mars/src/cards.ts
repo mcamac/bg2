@@ -963,7 +963,7 @@ export const CARDS: Card[] = [
     tags: ['Space', 'Energy'],
     actionText: 'Action: Spend 7MC to increase your energy production 1 step.',
     actions: [
-      [['ChangeInventory', 7, ResourceType.Money], ['ChangeProduction', 1, ResourceType.Energy]],
+      [['ChangeInventory', -7, ResourceType.Money], ['ChangeProduction', 1, ResourceType.Energy]],
     ],
   },
   {

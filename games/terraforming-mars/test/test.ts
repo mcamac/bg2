@@ -646,3 +646,24 @@ test('New Generation: Drafting', t => {
   t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)
   t.is(state.phase, Phase.Draft)
 })
+
+// Card Actions
+
+test('Card Actions: Space Mirrors', t => {
+  let state = getStateAfterActions()
+  state.playerState['a'].played = ['Space Mirrors']
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+
+  state.firstPlayer = 'a'
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.CardAction,
+    card: 'Space Mirrors',
+    index: 0,
+    player: 'a',
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 23)
+  t.is(state.playerState['a'].resources[ResourceType.Energy].production, 1)
+  t.true(state.playerState['a'].cardActionsUsedThisGeneration['Space Mirrors'])
+})

@@ -79,6 +79,7 @@ export interface PlayerState {
   played: string[]
   corporation: string
   cardResources: {[key: string]: number}
+  cardActionsUsedThisGeneration: {[key: string]: true}
   hasIncreasedTRThisGeneration: boolean // For UN.
 }
 
