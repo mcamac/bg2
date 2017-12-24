@@ -704,6 +704,7 @@ export const CARDS: Card[] = [
     cost: 17,
     type: 'Automated',
     deck: 'Basic',
+    tags: ['Plant'],
     vp: 1,
     effectText:
       'Requires 6 ocean tiles. Increase your MC production 2 steps and your plant production 3 steps. Gain 2 plants.',
@@ -1442,7 +1443,7 @@ export const CARDS: Card[] = [
     cost: 16,
     type: 'Automated',
     deck: 'Basic',
-    tags: ['Microbe'],
+    tags: ['Plant'],
     vp: 2,
     effectText:
       'Requires +4\u00b0C or warmer. Increase your MC production 2 steps and your plant production 2 steps. Gain 2 plants.',

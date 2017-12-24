@@ -512,7 +512,7 @@ const TerraformingMars = props => (
       Terraforming Mars
     </Box>
     <Flex>
-      <Box w={270} style={{minWidth: 270, borderRight: '1px solid #ddd'}}>
+      <Box w={270} style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}>
         {props.game.players.map(player => (
           <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
         ))}
@@ -551,7 +551,7 @@ const TerraformingMars = props => (
           </Box>
         </Flex>
       </Box>
-      <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll'}}>
+      <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
         <Box p={1} style={{fontSize: 12, color: '#555'}}>
           BUYING
         </Box>
