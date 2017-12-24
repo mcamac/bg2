@@ -127,6 +127,7 @@ export const enum Phase {
 }
 
 export const enum UserAction {
+  CorpAndCardsChoice = 'CorpAndCardsChoice',
   DraftRoundChoice = 'DraftRoundChoice',
   BuyCards = 'BuyCards',
   Action = 'Action',

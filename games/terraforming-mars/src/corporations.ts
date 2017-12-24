@@ -82,7 +82,6 @@ export const CORPORATIONS: Corporation[] = [
   {
     name: 'Beginner Corporation',
     startingMoney: 42,
-    // TODO: implement the "do not pay for your draft option"
   },
   {
     name: 'Interplanetary Cinematics',

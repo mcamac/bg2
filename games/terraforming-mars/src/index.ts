@@ -31,7 +31,7 @@ import {
   checkCardRequirements,
   applyEffects,
 } from './utils'
-import {CORPORATIONS} from './corporations'
+import {CORPORATIONS, getCorporationByName} from './corporations'
 import {STANDARD_PROJECTS} from './projects'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
@@ -199,10 +199,17 @@ export const getDiscount = (played: Card[], card: Card) => {
   return delta
 }
 
-export const buyCards = (state: GameState, player: Player, chosen: string[]): GameState => {
+export const buyCards = (
+  state: GameState,
+  player: Player,
+  chosen: string[],
+  free: boolean = false
+): GameState => {
   // todo: Check subset of player
   // state.choosingCards[player]
-  state = changeInventory(state, player, ResourceType.Money, -chosen.length * 3)
+  if (!free) {
+    state = changeInventory(state, player, ResourceType.Money, -chosen.length * 3)
+  }
   state.playerState[player].hand = state.playerState[player].hand.concat(chosen)
   delete state.choosingCards[player]
   // Add remaining to discard
@@ -211,6 +218,10 @@ export const buyCards = (state: GameState, player: Player, chosen: string[]): Ga
 
 const isDoneBuyingCards = (state: GameState): boolean => {
   return state.players.map(player => !state.choosingCards[player]).every(x => x)
+}
+
+const isDoneChoosingCorporations = (state: GameState): boolean => {
+  return state.players.map(player => !state.choosingCorporations[player]).every(x => x)
 }
 
 const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
@@ -302,6 +313,23 @@ export const handlers = {
     state = handlePlayerChoice(state, action.player, action.choice)
     if (isDraftDone(state)) {
       state = startActions(state)
+    }
+    return state
+  },
+  [UserAction.CorpAndCardsChoice]: (state, action) => {
+    // Assign corp and initial bonuses
+    state.playerState[action.player].corporation = action.corporation
+    const corporation = getCorporationByName(action.corporation)
+    state.playerState[action.player].resources[ResourceType.Money].count = corporation.startingMoney
+    delete state.choosingCorporations[action.player]
+
+    // Buy and possibly pay for cards
+    const cardsAreFree = corporation.name === 'Beginner Corporation'
+    state = buyCards(state, action.player, action.cards, cardsAreFree)
+
+    if (isDoneChoosingCorporations(state)) {
+      state.phase = Phase.Actions
+      state.player = state.firstPlayer
     }
     return state
   },

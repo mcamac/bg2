@@ -435,3 +435,33 @@ test('Project: City', t => {
   t.is(state.playerState['a'].resources[ResourceType.Money].production, 1)
   t.is(state.actionsDone, 1)
 })
+
+// Corp choosing
+
+test('Corporation and card choice', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+
+  handleAction(state, {
+    type: UserAction.CorpAndCardsChoice,
+    player: 'a',
+    corporation: 'Ecoline',
+    cards: [
+      'Equatorial Magnetizer',
+      'Interstellar Colony Ship',
+      'Gene Repair',
+      'Trans-Neptune Probe',
+    ],
+  })
+  t.is(state.playerState['a'].corporation, 'Ecoline')
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 36 - 12)
+
+  handleAction(state, {
+    type: UserAction.CorpAndCardsChoice,
+    player: 'b',
+    corporation: 'Beginner Corporation',
+    cards: state.choosingCards['b'],
+  })
+  t.is(state.playerState['b'].resources[ResourceType.Money].count, 42)
+
+  t.is(state.phase, Phase.Actions)
+})
