@@ -102,6 +102,8 @@ export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boole
   return state => true
 }
 
+
+
 export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
   return state => true
 }
@@ -130,6 +132,37 @@ export const VPForCardResources = (
 export const VPForCitiesOnMars = (ratio: number = 1): ((state: GameState) => number) => {
   return state => Math.floor(GetCitiesOnMars()(state) / ratio)
 }
+
+/* After card triggers */
+
+const FoundMatches = (required: any[], options: any[]) => {
+  for (var i = 0; i < options.length; i++) {
+    var found = (required.find(x => x === options[i]) != null)
+    if (found){
+      return true
+    }
+  }
+  return false
+}
+
+export const PlayedTagMatches = (tags: Tag[]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+  return (card: Card, cardPlayer: Player, owner: Player) => {
+    if (owner === cardPlayer) {
+      let playedTagMatches = FoundMatches(tags, card.tags ? card.tags : [])
+      return playedTagMatches
+    } else {
+      return false
+    }
+  }
+}
+
+export const AnyPlayedTagMatches = (tags: Tag[]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+  return (card: Card, cardPlayer: Player, owner: Player) => {
+    let playedTagMatches = FoundMatches(tags, card.tags ? card.tags : [])
+    return playedTagMatches
+  }
+}
+
 
 export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
   return state => 0
