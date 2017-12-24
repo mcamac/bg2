@@ -1,5 +1,5 @@
 import {cloneDeep} from 'lodash'
-import {GameState, Transform, Tag, GlobalType, Player, CardResource, ResourceType} from './types'
+import {GameState, Transform, Tag, GlobalType, Player, CardResource, ResourceType, Card} from './types'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => {}
 export const DecreaseAnyInventory = (delta: number, type: string) => {}
@@ -188,4 +188,42 @@ export const changeInventory = (
 export const cloneState: Transform = state => cloneDeep(state)
 export function clone<T>(x: T): T {
   return cloneDeep(x)
+}
+
+const REQUIREMENTS_REGISTRY = {
+  MinOxygen,
+  MaxOxygen,
+  MinOceans,
+  MaxOceans,
+  MinHeat,
+  MaxHeat,
+  HasTags,
+  HasCitiesOnMars
+}
+
+const fromJSONRequires = obj => {
+  if (obj instanceof Array) {
+    const [opName, ...args] = obj
+    if (!REQUIREMENTS_REGISTRY[opName]) {  // maybe this shouldn't throw an error
+      throw Error('could not find ' + opName)
+    }
+    return REQUIREMENTS_REGISTRY[opName](...args)
+  } else {
+    return obj
+  }
+}
+
+export const checkCardRequirements = (card: Card, state: GameState): boolean => {
+  // todo: check if can pay for it as well?
+  let requirementArray = card.requires ? card.requires : []
+  if(requirementArray) {
+    let requirementResults = requirementArray.map(requirement => fromJSONRequires(requirement)(state))
+    if(requirementResults.every(x => x)) {
+      return(true)
+    } else {
+      return(false)
+    }
+  } else {
+    return(true)
+  }
 }
