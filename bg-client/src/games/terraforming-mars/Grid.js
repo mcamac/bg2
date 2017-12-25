@@ -1,7 +1,9 @@
 import {range} from 'lodash/fp'
 import {withState} from 'recompose'
+import {connect} from 'react-redux'
 
 import {RESOURCE_BONUSES, OCEAN_POSITIONS} from '../../../../games/terraforming-mars/src/constants'
+import {chooseTile} from './reducer'
 
 const hexPoints = (x, y, radius) => {
   var points = []
@@ -25,6 +27,7 @@ let Tile = props => {
         fill={props.hovered ? '#eee' : props.x === 3 ? '#95F58D' : 'transparent'}
         onMouseEnter={() => props.setHovered(true)}
         onMouseLeave={() => props.setHovered(false)}
+        onClick={() => props.onClick([props.x, props.y])}
         points={hexPoints(xc, yc, RADIUS)}
       />
       {props.x === 3 && <rect x={xc - 5} y={yc - 5} width={10} height={10} fill="blue" />}
@@ -34,14 +37,23 @@ let Tile = props => {
 
 Tile = withState('hovered', 'setHovered', false)(Tile)
 
-export const Grid = () => (
+let Grid = props => (
   <svg width={440} height={420}>
     <g>
       {range(-4, 5).map(row =>
         range(Math.max(-4, -4 - row), Math.min(4, 4 - row) + 1).map(col => (
-          <Tile key={`${col}-${row}`} y={row} x={col} />
+          <Tile key={`${col}-${row}`} y={row} x={col} onClick={props.onClickTile} />
         ))
       )}
     </g>
   </svg>
 )
+
+Grid = connect(
+  () => ({}),
+  dispatch => ({
+    onClickTile: position => dispatch(chooseTile(position)),
+  })
+)(Grid)
+
+export {Grid}

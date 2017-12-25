@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 import {compose, branch, renderNothing, withProps} from 'recompose'
 import {toPairs} from 'lodash'
 
-import {reducer, draftChoice} from './reducer'
+import {reducer, draftChoice, startStandardProject} from './reducer'
 import {Grid} from './Grid'
 import {Icon, Tag} from './components'
 
@@ -428,21 +428,28 @@ const Awards = () => (
   </Box>
 )
 
-const StandardProjects = () => (
+let StandardProjects = props => (
   <Box style={{fontSize: 14}}>
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
       Standard Projects
     </Box>
     {toPairs(STANDARD_PROJECTS).map(([key, project]) => (
-      <Flex key={key} onClick={() => console.log(key)}>
+      <Flex key={key} onClick={() => props.onClickProject(key)}>
         <Box w={80} flex="1 1 auto">
           {project.name}
         </Box>
-        <Box>a</Box>
+        <Box>{project.cost > 0 && project.cost}</Box>
       </Flex>
     ))}
   </Box>
 )
+
+StandardProjects = connect(
+  () => ({}),
+  dispatch => ({
+    onClickProject: project => dispatch(startStandardProject(project)),
+  })
+)(StandardProjects)
 
 const PlayerCard = props => (
   <Box p={2} style={{borderBottom: '1px solid #eee'}}>
@@ -517,13 +524,16 @@ const DraftStatus = props => (
   </React.Fragment>
 )
 
-const ActionBar = props => (
+let ActionBar = props => (
   <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
+    {props.ui.phase}
     {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
     {props.game.phase === 'Actions' && <ActionsStatus />}
     {props.game.phase === 'Draft' && <DraftStatus game={props.game} />}
   </Flex>
 )
+
+ActionBar = connect(state => ({ui: state.ui}))(ActionBar)
 
 let Draft = props => (
   <React.Fragment>
@@ -624,6 +634,6 @@ const TerraformingMars = props => (
 )
 
 export default compose(
-  connect(state => ({game: state})),
+  connect(state => ({game: state.game})),
   branch(props => !props.game, renderNothing)
 )(TerraformingMars)
