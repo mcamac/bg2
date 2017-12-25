@@ -11,6 +11,7 @@ import {
   TileType,
   Tile,
   Position,
+  StandardProject,
 } from './types'
 import {isOcean} from './tiles'
 import {getCardByName} from './cards'
@@ -174,6 +175,8 @@ export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boole
   return state => true
 }
 
+
+
 export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
   return state => true
 }
@@ -202,6 +205,47 @@ export const VPForCardResources = (
 export const VPForCitiesOnMars = (ratio: number = 1): ((state: GameState) => number) => {
   return state => Math.floor(GetCitiesOnMars()(state) / ratio)
 }
+
+/* After card triggers */
+
+export const IsSubset = (required: any[], options: any[]) => {
+  let isInOptions = required.map(x => options.find(y => x === y) != null)
+  return isInOptions.every(x => x)
+}
+
+export const PlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+  return (card: Card, cardPlayer: Player, owner: Player) => {
+    if (owner === cardPlayer) {
+      let playedTagMatches = tags.map(x => IsSubset(x, card.tags ? card.tags : [])).some(x => x)
+      return playedTagMatches
+    } else {
+      return false
+    }
+  }
+}
+
+export const AnyPlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+  return (card: Card, cardPlayer: Player, owner: Player) => {
+    let playedTagMatches = tags.map(x => IsSubset(x, card.tags ? card.tags : [])).some(x => x)
+    return playedTagMatches
+  }
+}
+
+export const PlayedMinCost = (min: number): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+  return (card: Card, cardPlayer: Player, owner: Player) => {
+    if (owner == cardPlayer) {
+      return (card.cost >= min)
+    } else {
+      return false
+    }
+  }
+}
+
+export const StandardProjectMatches = (projects: StandardProject[]): ((project: StandardProject) => boolean) => {
+  return (project: StandardProject) => projects.find(x => x === project) != null
+}
+
+
 
 export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
   return state => 0

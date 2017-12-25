@@ -25,6 +25,7 @@ export interface Corporation {
   effects?: any[]
   afterCardTriggers?: any[]
   afterTileTriggers?: any[]
+  afterStandardProjectTriggers?: any[]
   discounts?: any
 }
 

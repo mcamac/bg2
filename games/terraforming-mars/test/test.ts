@@ -22,8 +22,9 @@ import {
   TurnAction,
   TileType,
   StandardProject,
+  Tag,
 } from '../src/types'
-import {cloneState, checkCardRequirements, applyEffects} from '../src/utils'
+import {cloneState, checkCardRequirements, applyEffects, IsSubset, PlayedTagMatches, AnyPlayedTagMatches, PlayedMinCost, StandardProjectMatches} from '../src/utils'
 import {getStateAfterActions} from '../src/fixtures'
 
 const TEST_SEED = 'martin'
@@ -226,6 +227,115 @@ test(t => {
   t.false(checkCardRequirements(testCard_02, broken_01))
   t.false(checkCardRequirements(testCard_02, broken_02))
   t.false(checkCardRequirements(testCard_02, broken_03))
+})
+
+// After card triggers
+
+test('After card trigger: Test match finder util', t => {
+  let empty = [];
+  let required1 = [Tag.Earth]
+  let required2 = [Tag.Space, Tag.Event]
+
+  let options1 = [Tag.Space, Tag.Earth]
+  let options2 = [Tag.Space, Tag.Event]
+
+  // Make sure that empty list always returns true, but false other way around
+  t.true(IsSubset(empty, empty))
+  t.true(IsSubset(empty, options1))
+  t.false(IsSubset(options1, empty))
+
+  // Make sure functionality works right for one match
+  t.true(IsSubset(required1, options1))
+  t.false(IsSubset(required1, options2))
+
+  // Make sure works right for multiple matches
+  t.false(IsSubset(required2, options1))
+  t.true(IsSubset(required2, options2))
+})
+
+test('After card trigger: Look for matching tags', t => {
+  let player01 = 'Player 01'
+  let player02 = 'Player 02'
+
+  let card01 = {  // e.g., the one that will match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Space, Tag.Event]
+  }
+
+ let card02 = {  // e.g., one that will not match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Animal]
+  }
+
+  let card03 = {  // e.g., one that will not match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: []
+  }
+
+  let spaceEvent = [[Tag.Space, Tag.Event]]
+  let anyLife = [[Tag.Plant], [Tag.Animal], [Tag.Microbe]]
+
+  // Check that works correctly when player & owner are same (and doesn't o.w.)
+  t.true(PlayedTagMatches(spaceEvent)(card01, player01, player01))
+  t.false(PlayedTagMatches(spaceEvent)(card01, player02, player01))
+
+  // Always works for "any match"
+  t.true(AnyPlayedTagMatches(spaceEvent)(card01, player01, player01))
+  t.true(AnyPlayedTagMatches(spaceEvent)(card01, player02, player01))
+
+  // Failure with card02
+  t.false(PlayedTagMatches(spaceEvent)(card03, player01, player01))
+  t.false(PlayedTagMatches(spaceEvent)(card03, player02, player01))
+  t.false(AnyPlayedTagMatches(spaceEvent)(card03, player01, player01))
+  t.false(AnyPlayedTagMatches(spaceEvent)(card03, player02, player01))
+
+  // Check works as expected when multiple possible matches
+  t.true(PlayedTagMatches(anyLife)(card02, player01, player01))
+  t.false(PlayedTagMatches(anyLife)(card01, player01, player01))
+  t.false(PlayedTagMatches(anyLife)(card03, player01, player01))
+})
+
+test('After card trigger: min cost', t => {
+  let player01 = 'Player 01'
+  let player02 = 'Player 02'
+
+  let card01 = {  // e.g., the one that will match
+    cost: 20,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Space, Tag.Event]
+  }
+
+ let card02 = {  // e.g., one that will not match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Animal]
+  }
+
+  t.true(PlayedMinCost(20)(card01, player01, player01))
+  t.false(PlayedMinCost(20)(card02, player01, player01))
+  t.false(PlayedMinCost(20)(card01, player02, player01))
+  t.false(PlayedMinCost(20)(card02, player02, player01))
+})
+
+test('After standard project trigger: make sure it works...', t => {
+  let required = [StandardProject.Greenery]
+
+  t.true(StandardProjectMatches(required)(StandardProject.Greenery))
+  t.false(StandardProjectMatches(required)(StandardProject.PowerPlant))
+  t.false(StandardProjectMatches([])(StandardProject.Greenery))
 })
 
 // Play Cards
