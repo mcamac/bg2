@@ -49,8 +49,7 @@ export const CORPORATIONS: Corporation[] = [
     name: 'Inventrix',
     startingMoney: 45,
     tags: ['Science'],
-    effects: [], // Todo: match the effects of Adaptation Technology
-    // TODO: Implement first action being drawing three cards
+    effects: [['Draw', 3]], // Todo: match the effects of Adaptation Technology
   },
   {
     name: 'Mining Guild',

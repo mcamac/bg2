@@ -363,7 +363,7 @@ const Icon = props => (
 )
 
 let Card = props => (
-  <CardWrapper type={props.card.type}>
+  <CardWrapper type={props.card.type} onClick={props.onClick}>
     <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
       <div style={{fontWeight: 500, fontSize: 15, width: 18, color: '#333'}}>{props.card.cost}</div>
       {props.card.requires && <CardRequirements requires={props.card.requires} />}
@@ -622,7 +622,9 @@ const TerraformingMars = props => (
               DRAFT
             </Box>
             <Box px={2}>
-              {props.game.draft.a.queued[0].map(name => <Card key={name} name={name} />)}
+              {props.game.draft.a.queued[0].map(name => (
+                <Card key={name} name={name} onClick={() => console.log(name)} />
+              ))}
             </Box>
           </React.Fragment>
         )}

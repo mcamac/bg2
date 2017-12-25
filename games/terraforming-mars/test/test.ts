@@ -698,3 +698,42 @@ test('Card Actions: Physics Complex', t => {
     })
   )
 })
+
+test.only('Card Actions: AI Central', t => {
+  let state = getStateAfterActions()
+  state.playerState['a'].played = ['AI Central']
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].resources[ResourceType.Energy].count = 6
+  t.is(state.playerState['a'].hand.length, 4)
+
+  state.firstPlayer = 'a'
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.CardAction,
+    card: 'AI Central',
+    index: 0,
+  })
+
+  t.true(state.playerState['a'].cardActionsUsedThisGeneration['AI Central'])
+  t.is(state.playerState['a'].hand.length, 6)
+})
+
+// Choosing other player as target of effect.
+
+test('DecreaseAnyProduction: Hackers', t => {
+  let state = getStateAfterActions()
+  state.playerState['a'].played = ['Physics Complex']
+  state.playerState['b'].resources[ResourceType.Money].production = 2
+  state.playerState['a'].resources[ResourceType.Energy].production = 1
+  state.player = 'a'
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Hackers',
+    choices: [null, {player: 'b'}],
+  })
+
+  t.is(state.playerState['b'].resources[ResourceType.Money].production, 0)
+  t.is(state.playerState['a'].resources[ResourceType.Money].production, 2)
+})

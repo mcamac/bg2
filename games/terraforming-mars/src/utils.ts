@@ -14,10 +14,41 @@ import {
 } from './types'
 import {isOcean} from './tiles'
 import {getCardByName} from './cards'
+import {draw} from './deck'
 
-export const DecreaseAnyProduction = (delta: number, type: string) => {}
-export const DecreaseAnyInventory = (delta: number, type: string) => {}
-export const ChangeAnyCardResource = (delta: number, type: string) => {}
+export const DecreaseAnyProduction = (delta: number, type: string) => (
+  state: GameState,
+  action,
+  choice: {player: string},
+  card: Card
+): GameState => {
+  state.playerState[choice.player].resources[type].production -= delta
+  return state
+}
+
+export const DecreaseAnyInventory = (delta: number, type: string) => (
+  state: GameState,
+  action,
+  choice: {player: string},
+  card: Card
+): GameState => {
+  state.playerState[choice.player].resources[type].count -= delta
+  return state
+}
+
+export const ChangeAnyCardResource = (n: number, type: string) => (
+  state: GameState,
+  action: {sold: string[]},
+  choice: {card: string},
+  card: Card
+): GameState => {
+  if (!state.playerState[state.player].cardResources[card.name])
+    state.playerState[state.player].cardResources[card.name] = 0
+
+  state.playerState[state.player].cardResources[card.name] += n
+  return state
+}
+
 export const ChangeCardResource = (n: number, type: string) => (
   state: GameState,
   action: {sold: string[]},
@@ -27,7 +58,7 @@ export const ChangeCardResource = (n: number, type: string) => (
   if (!state.playerState[state.player].cardResources[card.name])
     state.playerState[state.player].cardResources[card.name] = 0
 
-  state.playerState[state.player].cardResources[card.name]++
+  state.playerState[state.player].cardResources[card.name] += n
   return state
 }
 
@@ -55,7 +86,11 @@ export const ChangeProduction = (
   return state
 }
 
-export const Draw = (n: number) => {}
+export const Draw = (n: number) => (state: GameState, action, choice): GameState => {
+  let [drawn, newState] = draw(n, state)
+  newState.playerState[state.player].hand = newState.playerState[state.player].hand.concat(drawn)
+  return newState
+}
 
 export const IncreaseTR = (delta: number | ((state: GameState) => number)) => {}
 export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
