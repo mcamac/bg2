@@ -302,7 +302,7 @@ export const turnActionHandlers = {
     return fundAward(state, action.award)
   },
   [TurnAction.StandardProject]: (state, action) => {
-    state = applyEffects(state, action, STANDARD_PROJECTS[action.project])
+    state = applyEffects(state, action, STANDARD_PROJECTS[action.project].effects)
     // standard project triggers
 
     return state

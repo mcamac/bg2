@@ -3,12 +3,16 @@ import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
 import {compose, branch, renderNothing, withProps} from 'recompose'
+import {toPairs} from 'lodash'
 
 import {reducer, draftChoice} from './reducer'
 import {Grid} from './Grid'
+import {Icon, Tag} from './components'
 
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
 import {getCorporationByName} from '../../../../games/terraforming-mars/src/corporations'
+import {StandardProject} from '../../../../games/terraforming-mars/src/types'
+import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
 console.log(CARDS)
 
 const Wrapper = styled(Flex)`
@@ -22,46 +26,6 @@ const CARD_COLORS = {
   Automated: '#95F58D',
   Corporation: '#e3e3e3',
 }
-
-const CircleWrapper = styled.div`
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  background: ${props => props.color};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const Circle = props => (
-  <CircleWrapper {...props}>
-    <div style={{marginTop: 3, color: 'white', mixBlendMode: 'difference'}}>{props.children}</div>
-  </CircleWrapper>
-)
-
-const TAG_COLORS = {
-  Space: 'black',
-  Titanium: 'black',
-  Building: 'brown',
-  Science: 'white',
-  Power: 'purple',
-  Energy: 'purple',
-  Event: 'red',
-  Earth: 'blue',
-  City: '#ddd',
-  Microbe: '#bfbf2d',
-  Jovian: 'orange',
-  Greenery: 'green',
-  Plant: 'green',
-  Heat: 'red',
-  Money: 'yellow',
-}
-
-const Tag = props => (
-  <Circle color={TAG_COLORS[props.name] || 'blue'}>
-    <Icon g={props.name} style={{marginTop: 2}} />
-  </Circle>
-)
 
 const CardWrapper = styled(Box)`
   background: ${props => CARD_COLORS[props.type || (props.corporation && 'Corporation')]};
@@ -358,10 +322,6 @@ const CardDiscounts = props => (
   </Flex>
 )
 
-const Icon = props => (
-  <i className={`icon icon-${props.g}`} style={{...(props.style || {}), fontSize: 18}} />
-)
-
 let Card = props => (
   <CardWrapper type={props.card.type} onClick={props.onClick}>
     <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
@@ -473,10 +433,10 @@ const StandardProjects = () => (
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
       Standard Projects
     </Box>
-    {['SellPatents', 'PowerPlant', 'Asteroid', 'Aquifer', 'Greenery', 'City'].map(param => (
-      <Flex key={param}>
+    {toPairs(STANDARD_PROJECTS).map(([key, project]) => (
+      <Flex key={key} onClick={() => console.log(key)}>
         <Box w={80} flex="1 1 auto">
-          {param}
+          {project.name}
         </Box>
         <Box>a</Box>
       </Flex>
@@ -617,15 +577,8 @@ const TerraformingMars = props => (
         <Flex>
           <Box mr={1}>
             <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
           </Box>
           <Box mr={1}>
-            <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
             <Card cost={23} name="Development Center" collapsed />
             <Card cost={23} name="Development Center" collapsed />
           </Box>
