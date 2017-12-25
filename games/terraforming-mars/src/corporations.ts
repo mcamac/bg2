@@ -1,6 +1,5 @@
 import {keyBy} from 'lodash'
 import {ResourceType, Corporation, Tag, TileType, ResourceBonus, StandardProject} from './types'
-import { StandardProjectMatches } from './utils';
 
 export const CORPORATIONS: Corporation[] = [
   {
@@ -21,7 +20,7 @@ export const CORPORATIONS: Corporation[] = [
       [['ChangeInventory', 4, ResourceType.Money]]
     ],
     afterStandardProjectTriggers: [
-      [StandardProjectMatches, [StandardProject.Greenery, StandardProject.City]],
+      ['StandardProjectMatches', [StandardProject.Greenery, StandardProject.City]],
       [['ChangeInventory', 4, ResourceType.Money]]
     ],
     // TODO: MinCostCard not currently implemented / i think after card triggers only take tags rn

@@ -24,7 +24,7 @@ import {
   StandardProject,
   Tag,
 } from '../src/types'
-import {cloneState, checkCardRequirements, applyEffects, IsSubset, PlayedTagMatches, AnyPlayedTagMatches} from '../src/utils'
+import {cloneState, checkCardRequirements, applyEffects, IsSubset, PlayedTagMatches, AnyPlayedTagMatches, PlayedMinCost, StandardProjectMatches} from '../src/utils'
 import {getStateAfterActions} from '../src/fixtures'
 
 const TEST_SEED = 'martin'
@@ -231,7 +231,7 @@ test(t => {
 
 // After card triggers
 
-test('Test match finder util', t => {
+test('After card trigger: Test match finder util', t => {
   let empty = [];
   let required1 = [Tag.Earth]
   let required2 = [Tag.Space, Tag.Event]
@@ -253,9 +253,7 @@ test('Test match finder util', t => {
   t.true(IsSubset(required2, options2))
 })
 
-test('Look for matching tags', t => {
-  let state = getInitialGameState(['a', 'b', 'c'], TEST_SEED)
-
+test('After card trigger: Look for matching tags', t => {
   let player01 = 'Player 01'
   let player02 = 'Player 02'
 
@@ -304,6 +302,40 @@ test('Look for matching tags', t => {
   t.true(PlayedTagMatches(anyLife)(card02, player01, player01))
   t.false(PlayedTagMatches(anyLife)(card01, player01, player01))
   t.false(PlayedTagMatches(anyLife)(card03, player01, player01))
+})
+
+test('After card trigger: min cost', t => {
+  let player01 = 'Player 01'
+  let player02 = 'Player 02'
+
+  let card01 = {  // e.g., the one that will match
+    cost: 20,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Space, Tag.Event]
+  }
+
+ let card02 = {  // e.g., one that will not match
+    cost: 0,
+    name: 'test_card',
+    type: 'Automated',
+    deck: 'Basic',
+    tags: [Tag.Animal]
+  }
+
+  t.true(PlayedMinCost(20)(card01, player01, player01))
+  t.false(PlayedMinCost(20)(card02, player01, player01))
+  t.false(PlayedMinCost(20)(card01, player02, player01))
+  t.false(PlayedMinCost(20)(card02, player02, player01))
+})
+
+test('After standard project trigger: make sure it works...', t => {
+  let required = [StandardProject.Greenery]
+
+  t.true(StandardProjectMatches(required)(StandardProject.Greenery))
+  t.false(StandardProjectMatches(required)(StandardProject.PowerPlant))
+  t.false(StandardProjectMatches([])(StandardProject.Greenery))
 })
 
 // Play Cards
