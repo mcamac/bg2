@@ -699,7 +699,7 @@ test('Card Actions: Physics Complex', t => {
   )
 })
 
-test.only('Card Actions: AI Central', t => {
+test('Card Actions: AI Central', t => {
   let state = getStateAfterActions()
   state.playerState['a'].played = ['AI Central']
   state.playerState['a'].resources[ResourceType.Money].count = 30

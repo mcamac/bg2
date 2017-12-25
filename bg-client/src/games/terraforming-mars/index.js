@@ -4,7 +4,7 @@ import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
 import {compose, branch, renderNothing, withProps} from 'recompose'
 
-import {reducer} from './reducer'
+import {reducer, draftChoice} from './reducer'
 import {Grid} from './Grid'
 
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
@@ -565,6 +565,26 @@ const ActionBar = props => (
   </Flex>
 )
 
+let Draft = props => (
+  <React.Fragment>
+    <Box p={1} style={{fontSize: 12, color: '#555'}}>
+      DRAFT
+    </Box>
+    <Box px={2}>
+      {props.cards.queued[0].map(name => (
+        <Card key={name} name={name} onClick={() => props.onClickCard(name)} />
+      ))}
+    </Box>
+  </React.Fragment>
+)
+
+Draft = connect(
+  () => ({}),
+  dispatch => ({
+    onClickCard: card => dispatch(draftChoice(card)),
+  })
+)(Draft)
+
 const TerraformingMars = props => (
   <Wrapper direction="column">
     <Box
@@ -616,18 +636,7 @@ const TerraformingMars = props => (
         </Flex>
       </Box>
       <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
-        {props.game.draft.a && (
-          <React.Fragment>
-            <Box p={1} style={{fontSize: 12, color: '#555'}}>
-              DRAFT
-            </Box>
-            <Box px={2}>
-              {props.game.draft.a.queued[0].map(name => (
-                <Card key={name} name={name} onClick={() => console.log(name)} />
-              ))}
-            </Box>
-          </React.Fragment>
-        )}
+        {props.game.draft.a && <Draft cards={props.game.draft.a} />}
         {props.game.choosingCorporations.a && (
           <React.Fragment>
             <Box p={1} style={{fontSize: 12, color: '#555'}}>
