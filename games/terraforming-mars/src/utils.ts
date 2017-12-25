@@ -241,11 +241,38 @@ export const PlayedMinCost = (min: number): ((card: Card, cardPlayer: Player, ow
   }
 }
 
+const AFTERCARDREGISTRY = {
+  PlayedTagMatches,
+  AnyPlayedTagMatches,
+  PlayedMinCost
+}
+
+export const applyAfterCardTrigger = (state: GameState, card: Card, player: Player, curCard: Card, curPlayer: Player) => {
+  if (card.afterCardTriggers) {
+    let [opName, ...args] = card.afterCardTriggers[0]
+    let effect = card.afterCardTriggers[1]
+    
+    let condition = AFTERCARDREGISTRY[opName](...args)
+    if (condition(curCard, curPlayer, player)) {
+      applyEffects(state, {player, choices: []}, effect)  // Is it always true that choice is 0?
+    }
+  }
+}
+
+export const applyAfterCardTriggers = (state: GameState, currentCard: Card, currentPlayer: Player) => {
+  state.players.forEach(otherPlayer => {
+    state.playerState[otherPlayer].played.map(getCardByName).forEach(otherCard => {
+      applyAfterCardTrigger(state, otherCard, otherPlayer, currentCard, currentPlayer)
+    })
+  })
+  return state
+}
+
+/* After project triggers */
+
 export const StandardProjectMatches = (projects: StandardProject[]): ((project: StandardProject) => boolean) => {
   return (project: StandardProject) => projects.find(x => x === project) != null
 }
-
-
 
 export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
   return state => 0

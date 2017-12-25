@@ -1356,7 +1356,7 @@ export const CARDS: Card[] = [
     tags: ['Earth'],
     actionText: 'Effect: After you play an event card, you gain 3MC',
     afterCardTriggers: [
-      ['HasAnyTag', [[Tag.Event]]], 
+      ['PlayedTagMatches', [[Tag.Event]]], 
       [['ChangeInventory', 3, ResourceType.Money]]
     ],
   },
@@ -2285,7 +2285,7 @@ export const CARDS: Card[] = [
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     resourceHeld: CardResource.Science,
     afterCardTriggers: [
-      ['HasAnyTag', [[Tag.Space]]],
+      ['PlayedTagMatches', [[Tag.Space]]],
       [
         [
           'Choice',
