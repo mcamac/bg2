@@ -30,6 +30,7 @@ import {
   changeInventory,
   checkCardRequirements,
   applyEffects,
+  applyAfterCardTriggers,
 } from './utils'
 import {CORPORATIONS, getCorporationByName} from './corporations'
 import {STANDARD_PROJECTS} from './projects'
@@ -333,6 +334,7 @@ export const turnActionHandlers = {
     }
 
     // After-card triggers
+    state = applyAfterCardTriggers(state, card, state.player)
 
     return state
   },
