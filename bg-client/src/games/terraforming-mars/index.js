@@ -2,10 +2,18 @@ import React, {Fragment, Component} from 'react'
 import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
-import {compose, branch, renderNothing, withProps} from 'recompose'
-import {toPairs} from 'lodash'
+import {compose, branch, renderNothing, withProps, withState, withStateHandlers} from 'recompose'
+import {toPairs, get} from 'lodash/fp'
 
-import {reducer, draftChoice, startStandardProject} from './reducer'
+import {
+  reducer,
+  draftChoice,
+  startStandardProject,
+  uiPlayCard,
+  uiCancel,
+  uiSetCardCost,
+  uiChoosePlayer,
+} from './reducer'
 import {Grid} from './Grid'
 import {Icon, Tag} from './components'
 
@@ -451,8 +459,8 @@ StandardProjects = connect(
   })
 )(StandardProjects)
 
-const PlayerCard = props => (
-  <Box p={2} style={{borderBottom: '1px solid #eee'}}>
+let PlayerCard = props => (
+  <Box p={2} style={{borderBottom: '1px solid #eee'}} onClick={props.onClick}>
     <Flex mb={1}>
       <Box flex="1 1 auto">{props.player}</Box>
       <Box>30</Box>
@@ -500,21 +508,31 @@ const PlayerCard = props => (
   </Box>
 )
 
+PlayerCard = connect(
+  state => ({}),
+  (dispatch, props) => ({
+    onClick: () => dispatch(uiChoosePlayer(props.player)),
+  })
+)(PlayerCard)
+
+const Button = styled(Box)`
+  padding: 3px 8px;
+  margin-left: 8px;
+  cursor: pointer;
+  background: #ddd;
+`
+
 const ChoosingCorporationsStatus = props => (
   <React.Fragment>
     Choose a corporation and cards to keep.
-    <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
-      Submit
-    </Box>
+    <Button>Submit</Button>
   </React.Fragment>
 )
 
 const ActionsStatus = props => (
   <React.Fragment>
     2 actions left. Choose an action or
-    <Box px={1} py="3px" ml={1} style={{cursor: 'pointer', background: '#ddd'}}>
-      pass
-    </Box>
+    <Button>pass</Button>
   </React.Fragment>
 )
 
@@ -524,16 +542,89 @@ const DraftStatus = props => (
   </React.Fragment>
 )
 
+let ChoicesBar = props => (
+  <React.Fragment>
+    {props.card}:
+    <pre>{JSON.stringify(props.choice)}</pre>
+  </React.Fragment>
+)
+
+ChoicesBar = connect(state => ({
+  choice: get(['ui', 'choice'], state),
+  card: get(['ui', 'action', 'card'], state),
+}))(ChoicesBar)
+
+const ResourceInput = styled.input`
+  width: 30px;
+  font-size: 1em;
+  text-align: right;
+  margin: 0 4px;
+`
+
+let ChooseResources = props => (
+  <React.Fragment>
+    Cost: 8 (total {props.total})
+    <Flex mr={1} align="center">
+      <Tag name="Money" />
+      <ResourceInput value={props.count.money} onChange={e => props.setMoney(e.target.value)} />
+      <Box>({props.resources.Money.count})</Box>
+    </Flex>
+    <Flex mr={1} align="center">
+      <Tag name="Steel" />
+      <ResourceInput value={props.count.steel} onChange={e => props.setSteel(e.target.value)} />
+      ({props.resources.Steel.count})
+    </Flex>
+    <Flex mr={1} align="center">
+      <Tag name="Titanium" />
+      <ResourceInput
+        value={props.count.titanium}
+        onChange={e => props.setTitanium(e.target.value)}
+      />
+      ({props.resources.Titanium.count})
+    </Flex>
+    <Button onClick={props.onSubmit}>Play</Button>
+  </React.Fragment>
+)
+
+ChooseResources = compose(
+  withStateHandlers(() => ({count: {money: 0, titanium: 0, steel: 0}}), {
+    setMoney: state => money => ({...state, count: {...state.count, money}}),
+    setSteel: state => steel => ({...state, count: {...state.count, steel}}),
+    setTitanium: state => titanium => ({...state, count: {...state.count, titanium}}),
+  }),
+  withProps(props => ({
+    total: 1 * props.count.money + 2 * props.count.steel + 3 * props.count.titanium,
+  })),
+  connect(
+    state => ({
+      resources: state.game.playerState.a.resources,
+    }),
+    (dispatch, props) => ({
+      onSubmit: () => dispatch(uiSetCardCost(props.count)),
+    })
+  )
+)(ChooseResources)
+
 let ActionBar = props => (
   <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
-    {props.ui.phase}
+    <Flex mr="3px" style={{fontSize: '0.8em'}}>
+      {props.ui.phase}
+    </Flex>
+    {props.ui.phase === 'CardCost' && <ChooseResources />}
+    {props.ui.phase === 'Choices' && <ChoicesBar />}
     {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
-    {props.game.phase === 'Actions' && <ActionsStatus />}
+    {/* {props.game.phase === 'Actions' && <ActionsStatus />} */}
     {props.game.phase === 'Draft' && <DraftStatus game={props.game} />}
+    <Button onClick={props.onCancel}>Cancel</Button>
   </Flex>
 )
 
-ActionBar = connect(state => ({ui: state.ui}))(ActionBar)
+ActionBar = connect(
+  state => ({ui: state.ui}),
+  dispatch => ({
+    onCancel: () => dispatch(uiCancel()),
+  })
+)(ActionBar)
 
 let Draft = props => (
   <React.Fragment>
@@ -554,6 +645,26 @@ Draft = connect(
     onClickCard: card => dispatch(draftChoice(card)),
   })
 )(Draft)
+
+let Hand = props => (
+  <React.Fragment>
+    <Box p={1} style={{fontSize: 12, color: '#555'}}>
+      HAND
+    </Box>
+    <Box px={2}>
+      {props.game.playerState.a.hand.map(name => (
+        <Card key={name} name={name} onClick={() => props.onClickCard(name)} />
+      ))}
+    </Box>
+  </React.Fragment>
+)
+
+Hand = connect(
+  state => ({game: state.game}),
+  dispatch => ({
+    onClickCard: card => dispatch(uiPlayCard(card)),
+  })
+)(Hand)
 
 const TerraformingMars = props => (
   <Wrapper direction="column">
@@ -586,6 +697,9 @@ const TerraformingMars = props => (
         </Flex>
         <Flex>
           <Box mr={1}>
+            {props.game.playerState.a.corporation && (
+              <Corporation name={props.game.playerState.a.corporation} collapsed />
+            )}
             <Card cost={23} name="Development Center" collapsed />
           </Box>
           <Box mr={1}>
@@ -622,12 +736,7 @@ const TerraformingMars = props => (
             </Box>
           </React.Fragment>
         )}
-        <Box p={1} style={{fontSize: 12, color: '#555'}}>
-          HAND
-        </Box>
-        <Box px={2}>
-          {props.game.playerState.a.hand.map(name => <Card key={name} name={name} />)}
-        </Box>
+        <Hand />
       </Box>
     </Flex>
   </Wrapper>

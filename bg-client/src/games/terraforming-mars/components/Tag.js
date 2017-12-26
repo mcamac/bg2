@@ -22,6 +22,7 @@ const Circle = props => (
 const TAG_COLORS = {
   Space: 'black',
   Titanium: 'black',
+  Steel: 'brown',
   Building: 'brown',
   Science: 'white',
   Power: 'purple',
