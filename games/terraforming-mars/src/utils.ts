@@ -175,8 +175,6 @@ export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boole
   return state => true
 }
 
-
-
 export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
   return state => true
 }
@@ -213,7 +211,9 @@ export const IsSubset = (required: any[], options: any[]) => {
   return isInOptions.every(x => x)
 }
 
-export const PlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+export const PlayedTagMatches = (
+  tags: Tag[][]
+): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
   return (card: Card, cardPlayer: Player, owner: Player) => {
     if (owner === cardPlayer) {
       let playedTagMatches = tags.map(x => IsSubset(x, card.tags ? card.tags : [])).some(x => x)
@@ -224,42 +224,56 @@ export const PlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Playe
   }
 }
 
-export const AnyPlayedTagMatches = (tags: Tag[][]): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+export const AnyPlayedTagMatches = (
+  tags: Tag[][]
+): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
   return (card: Card, cardPlayer: Player, owner: Player) => {
     let playedTagMatches = tags.map(x => IsSubset(x, card.tags ? card.tags : [])).some(x => x)
     return playedTagMatches
   }
 }
 
-export const PlayedMinCost = (min: number): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
+export const PlayedMinCost = (
+  min: number
+): ((card: Card, cardPlayer: Player, owner: Player) => boolean) => {
   return (card: Card, cardPlayer: Player, owner: Player) => {
     if (owner == cardPlayer) {
-      return (card.cost >= min)
+      return card.cost >= min
     } else {
       return false
     }
   }
 }
 
-const AFTERCARDREGISTRY = {
+const AFTER_CARD_REGISTRY = {
   PlayedTagMatches,
   AnyPlayedTagMatches,
-  PlayedMinCost
+  PlayedMinCost,
 }
 
-export const applyAfterCardTrigger = (state: GameState, card: Card, player: Player, curCard: Card, curPlayer: Player) => {
+export const applyAfterCardTrigger = (
+  state: GameState,
+  card: Card,
+  player: Player,
+  curCard: Card,
+  curPlayer: Player
+) => {
   if (card.afterCardTriggers) {
     let [opName, ...args] = card.afterCardTriggers[0]
     let effect = card.afterCardTriggers[1]
-    
-    let condition = AFTERCARDREGISTRY[opName](...args)
+
+    let condition = AFTER_CARD_REGISTRY[opName](...args)
     if (condition(curCard, curPlayer, player)) {
-      applyEffects(state, {player, choices: []}, effect)  // Is it always true that choice is 0?
+      applyEffects(state, {player, choices: []}, effect) // Is it always true that choice is 0?
     }
   }
 }
 
-export const applyAfterCardTriggers = (state: GameState, currentCard: Card, currentPlayer: Player) => {
+export const applyAfterCardTriggers = (
+  state: GameState,
+  currentCard: Card,
+  currentPlayer: Player
+) => {
   state.players.forEach(otherPlayer => {
     state.playerState[otherPlayer].played.map(getCardByName).forEach(otherCard => {
       applyAfterCardTrigger(state, otherCard, otherPlayer, currentCard, currentPlayer)
@@ -270,8 +284,10 @@ export const applyAfterCardTriggers = (state: GameState, currentCard: Card, curr
 
 /* After project triggers */
 
-export const StandardProjectMatches = (projects: StandardProject[]): ((project: StandardProject) => boolean) => {
-  return (project: StandardProject) => projects.find(x => x === project) != null
+export const StandardProjectMatches = (
+  projects: StandardProject[]
+): ((project: StandardProject) => boolean) => {
+  return (project: StandardProject) => projects.indexOf(project) >= 0
 }
 
 export const GetCardResources = (resource: CardResource): ((state: GameState) => number) => {
