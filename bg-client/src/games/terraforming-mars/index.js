@@ -168,7 +168,7 @@ const DecreaseAnyInventory = (value, resource) => (
 
 const PlaceOceans = (value, card) => (
   <Flex mr="4px" p="3px" style={{background: '#b5b5fd'}}>
-    {withSign(value)} <Icon g="Ocean" />
+    <Icon g="Ocean" />
   </Flex>
 )
 const IncreaseTemperature = (value, card) => (
@@ -850,6 +850,9 @@ const TerraformingMars = props => (
       <Box flex="1 1 auto" p={2}>
         <Flex>
           <Box>
+            <Box style={{fontSize: 14}} mb={1}>
+              Generation {props.game.generation}
+            </Box>
             <GlobalParams />
             <Milestones />
             <Awards />

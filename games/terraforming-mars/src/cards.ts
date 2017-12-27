@@ -23,7 +23,7 @@ export const CARDS: Card[] = [
     vp: 1,
     effectText:
       'Requires that you have titanium production. Decrease any titanium production 1 step and increase your own 1 step.',
-    effects: [['DecreaseAnyProduction', -1, 'Titanium'], ['ChangeProduction', 1, 'Titanium']],
+    effects: [['DecreaseAnyProduction', 1, 'Titanium'], ['ChangeProduction', 1, 'Titanium']],
   },
   {
     name: 'Deep Well Heating',
@@ -112,7 +112,7 @@ export const CARDS: Card[] = [
       'Raise temperature 1 step and place an ocean tile. Remove up to 3 plants from any player.',
     effects: [
       ['IncreaseTemperature', 1],
-      ['PlaceOceans', 1],
+      ['PlaceOceans'],
       ['DecreaseAnyInventory', 3, ResourceType.Plant],
     ],
   },
@@ -234,7 +234,7 @@ export const CARDS: Card[] = [
           ['ChangeAnyCardResource', 2, 'Animals'],
         ],
       ],
-      ['PlaceOceans', 1],
+      ['PlaceOceans'],
     ],
   },
   {
@@ -270,7 +270,7 @@ export const CARDS: Card[] = [
     effectText:
       'Place an ocean tile. Decrease your MC production 2 steps and increase your heat production 3 steps.',
     effects: [
-      ['PlaceOceans', 1],
+      ['PlaceOceans'],
       ['ChangeProduction', -2, ResourceType.Money],
       ['ChangeProduction', 3, ResourceType.Heat],
     ],
@@ -684,7 +684,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText: 'Requires 0\u00b0C or warmer. Place 2 ocean tiles.',
     requires: [['MinHeat', 0]],
-    effects: [['PlaceOceans', 2]],
+    effects: [['PlaceOceans'], ['PlaceOceans']],
   },
   {
     name: 'Small Animals',
@@ -931,8 +931,8 @@ export const CARDS: Card[] = [
     actionText:
       'Effect: When you play a science tag, including this, you may discard a card from hand to draw a card.',
     afterCardTriggers: [
-      ['PlayedTagMatches', [[Tag.Science]]], 
-      ['Option', [['Discard', 1], ['Draw', 1]]]
+      ['PlayedTagMatches', [[Tag.Science]]],
+      ['Option', [['Discard', 1], ['Draw', 1]]],
     ],
   },
   {
@@ -956,7 +956,7 @@ export const CARDS: Card[] = [
     tags: ['Space', 'Event'],
     placeTiles: true,
     effectText: 'Gain 2 plants. Raise oxygen level 1 step and place an ocean tile.',
-    effects: [['ChangeInventory', 2, ResourceType.Plant], ['RaiseOxygen', 1], ['PlaceOceans', 1]],
+    effects: [['ChangeInventory', 2, ResourceType.Plant], ['RaiseOxygen', 1], ['PlaceOceans']],
   },
   {
     name: 'Space Mirrors',
@@ -989,7 +989,7 @@ export const CARDS: Card[] = [
     tags: ['Space', 'Event'],
     placeTiles: true,
     effectText: 'Place 2 ocean tiles.',
-    effects: [['PlaceOceans', 2]],
+    effects: [['PlaceOceans'], ['PlaceOceans']],
   },
   {
     name: 'Quantum Extractor',
@@ -1012,7 +1012,8 @@ export const CARDS: Card[] = [
       'Raise temperature 2 steps and place 2 ocean tiles. Remove up to 6 plants from any plyer.',
     effects: [
       ['IncreaseTemperature', 2],
-      ['PlaceOceans', 2],
+      ['PlaceOceans'],
+      ['PlaceOceans'],
       ['DecreaseAnyProduction', 6, ResourceType.Plant],
     ],
   },
@@ -1356,8 +1357,8 @@ export const CARDS: Card[] = [
     tags: ['Earth'],
     actionText: 'Effect: After you play an event card, you gain 3MC',
     afterCardTriggers: [
-      ['PlayedTagMatches', [[Tag.Event]]], 
-      [['ChangeInventory', 3, ResourceType.Money]]
+      ['PlayedTagMatches', [[Tag.Event]]],
+      [['ChangeInventory', 3, ResourceType.Money]],
     ],
   },
   {
@@ -1573,7 +1574,7 @@ export const CARDS: Card[] = [
     tags: ['Event'],
     placeTiles: true,
     effectText: 'Place 1 ocean tile.',
-    effects: [['PlaceOceans', 1]],
+    effects: [['PlaceOceans']],
   },
   {
     name: 'Ecological Zone',
@@ -1758,7 +1759,7 @@ export const CARDS: Card[] = [
     effectText:
       'Place an ocean tile and draw 2 cards. Gain 5 plants, or add 4 animals to ANOTHER card.',
     effects: [
-      ['PlaceOceans', 1],
+      ['PlaceOceans'],
       ['Draw', 2],
       [
         'Choice',
@@ -1973,7 +1974,7 @@ export const CARDS: Card[] = [
     tags: ['Space', 'Event'],
     placeTiles: true,
     effectText: 'Place 1 ocean tile and draw 1 card.',
-    effects: [['PlaceOceans', 1], ['Draw', 1]],
+    effects: [['PlaceOceans'], ['Draw', 1]],
   },
   {
     name: 'Imported GHG',
@@ -2222,7 +2223,7 @@ export const CARDS: Card[] = [
     tags: ['Event'],
     placeTiles: true,
     effectText: 'Requires +2\u00b0C or warmer. Place 1 ocean tile.',
-    effects: [['PlaceOceans', 1]],
+    effects: [['PlaceOceans']],
     requires: [['MinHeat', 2]],
   },
   {
@@ -2356,7 +2357,7 @@ export const CARDS: Card[] = [
     tags: ['Event'],
     placeTiles: true,
     effectText: 'Requires -8\u00b0C or warmer. Place 1 ocean tile.',
-    effects: [['PlaceOceans', 1]],
+    effects: [['PlaceOceans']],
     requires: [['MinHeat', -8]],
   },
   {

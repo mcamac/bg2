@@ -199,8 +199,14 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
     if (action.type === 'UI_STANDARD_PROJECT') {
       const project = STANDARD_PROJECTS[action.project]
       const [choices, nextChoice] = getNextChoice(project.effects, [])
+      const newAction = {
+        type: UserAction.Action,
+        actionType: TurnAction.StandardProject,
+        project: action.project,
+      }
       if (!nextChoice) {
         // Action is done -- send.
+        action.asyncDispatch(newAction)
         return state
       }
       return {
@@ -210,10 +216,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
         choice: nextChoice,
         choices,
         effects: project.effects,
-        action: {
-          actionType: TurnAction.StandardProject,
-          project: action.project,
-        },
+        action: newAction,
       }
     }
 
@@ -230,6 +233,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       if (!nextChoice) {
         // Action is done -- send.
         console.log('Card Action', {...newAction, choices: []})
+        action.asyncDispatch({...newAction, choices: [], type: UserAction.Action})
         return state
       }
       return {
@@ -274,13 +278,15 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
         choices,
         effects: [['PlaceGreenery']],
         action: {
-          actionType: TurnAction.PlayCard,
+          type: UserAction.Action,
+          actionType: TurnAction.PlantGreenery,
         },
       }
     }
 
     if (action.type === 'UI_HEAT_TEMPERATURE') {
       /// Raise heat
+      action.asyncDispatch({type: UserAction.Action, actionType: TurnAction.RaiseHeat})
       return UI_STATE
     }
   }
@@ -300,7 +306,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       const [choices, nextChoice] = getNextChoice(card.effects, [])
       if (!nextChoice) {
         console.log('Play Card', newAction)
-        // Action is done -- send.
+        action.asyncDispatch({...newAction, type: UserAction.Action})
         return UI_STATE
       }
       return {
@@ -318,7 +324,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
   if (state.phase === 'Choices') {
     let newChoices
     if (state.choice.type === 'tile' && action.type === 'UI_CHOOSE_TILE') {
-      newChoices = [...state.choices, {locations: [action.tile]}]
+      newChoices = [...state.choices, {location: action.tile}]
     }
     if (state.choice.type === 'player' && action.type === 'UI_CHOOSE_PLAYER') {
       newChoices = [...state.choices, {player: action.player}]

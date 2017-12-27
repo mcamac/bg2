@@ -310,6 +310,23 @@ export const turnActionHandlers = {
 
     return state
   },
+  [TurnAction.PlantGreenery]: (state, action) => {
+    const greeneryCost = state.playerState[state.player].corporation === 'Ecoline' ? 7 : 8
+    state = applyEffects(state, action, [
+      ['PlaceGreenery'],
+      ['ChangeInventory', -greeneryCost, ResourceType.Plant],
+    ])
+    return state
+  },
+  [TurnAction.RaiseHeat]: (state, action) => {
+    state = applyEffects(state, action, [
+      ['IncreaseTemperature', 1],
+      ['ChangeInventory', -8, ResourceType.Heat],
+    ])
+    // standard project triggers
+
+    return state
+  },
   [TurnAction.PlayCard]: (state: GameState, action): GameState => {
     const playerState = state.playerState[state.player]
     const cardName = <string>action.card

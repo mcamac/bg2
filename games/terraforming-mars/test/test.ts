@@ -479,7 +479,7 @@ test('Oceans card', t => {
     type: UserAction.Action,
     actionType: TurnAction.PlayCard,
     card: 'Lake Marineris',
-    choices: [{locations: [[0, 0], [-1, 0]]}],
+    choices: [{location: [0, 0]}, {location: [-1, 0]}],
   })
 
   t.is(state.map['0,0'].type, TileType.Ocean)
@@ -551,7 +551,7 @@ test('Project: Asteroid', t => {
     choices: [],
   })
   t.is(state.playerState['a'].TR, 21)
-  t.is(state.globalParameters.Heat, 1)
+  t.is(state.globalParameters.Heat, 2)
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 16)
   t.is(state.actionsDone, 1)
 })
@@ -566,7 +566,7 @@ test('Project: Aquifer', t => {
     type: UserAction.Action,
     actionType: TurnAction.StandardProject,
     project: StandardProject.Aquifer,
-    choices: [null, {locations: [[0, 0]]}],
+    choices: [null, {location: [0, 0]}],
   })
   t.is(state.playerState['a'].TR, 21)
   t.is(state.globalParameters.Oceans, 1)

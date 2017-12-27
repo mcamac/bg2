@@ -96,18 +96,16 @@ export const Draw = (n: number) => (state: GameState, action, choice): GameState
 export const IncreaseTR = (delta: number | ((state: GameState) => number)) => {}
 export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
   state.playerState[state.player].TR += n
-  state.globalParameters.Heat += n
+  state.globalParameters.Heat += 2 * n
   return state
 }
 export const RaiseOxygen = (delta: number) => {}
 
-export const PlaceOceans = (n: number) => (state: GameState, action, choice): GameState => {
-  for (let i = 0; i < n; i++) {
-    if (!isOcean(choice.locations[i])) throw Error('Not an ocean tile')
-    state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.locations[i])
-  }
-  state.playerState[state.player].TR += n
-  state.globalParameters.Oceans += n
+export const PlaceOceans = () => (state: GameState, action, choice): GameState => {
+  if (!isOcean(choice.location)) throw Error('Not an ocean tile')
+  state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.location)
+  state.playerState[state.player].TR += 1
+  state.globalParameters.Oceans += 1
   return state
 }
 

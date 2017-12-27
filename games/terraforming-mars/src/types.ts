@@ -146,6 +146,8 @@ export const enum TurnAction {
   StandardProject = 'StandardProject',
   PlayCard = 'PlayCard',
   CardAction = 'CardAction',
+  PlantGreenery = 'PlantGreenery',
+  RaiseHeat = 'RaiseHeat',
 }
 
 export interface PlayerDraftState {
