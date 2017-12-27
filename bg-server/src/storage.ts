@@ -4,6 +4,7 @@ import {GameStorage, PlayerConnection, Room} from './base'
 
 import {PowerGrid} from '../../games/power-grid/src/index'
 import {TerraformingMars} from '../../games/terraforming-mars/src/index'
+import {getStateAfterActions} from '../../games/terraforming-mars/src/fixtures'
 
 const GAMES = {
   PowerGrid,
@@ -94,13 +95,14 @@ export class RDBStorage implements GameStorage {
   async onRoomStart(id: string) {
     const room = (await this.getRoom(id)) as any
     console.log('start', room, GAMES[room.g])
-    const game = GAMES[room.g].getInitialState(room.users)
+    // const game = GAMES[room.g].get(room.users)
+    const game = getStateAfterActions()
     return this.updateRoom(id, {
       game,
     })
   }
 
-  async onRoomMove(room: string, player: string, move: any) {
+  async onRoomMove(id: string, player: string, move: any) {
     const room = (await this.getRoom(id)) as any
     const state = room.game
     const newState = GAMES[room.g].reducer(state, move)

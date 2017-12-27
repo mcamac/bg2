@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux'
 
-import {TerraformingMars} from '../../../../games/terraforming-mars/src/index'
+import {TerraformingMars, handleAction} from '../../../../games/terraforming-mars/src/index'
 import {UserAction, TurnAction, TileType} from '../../../../games/terraforming-mars/src/types'
 import {
   getStateAfterActions,
@@ -8,10 +8,12 @@ import {
 } from '../../../../games/terraforming-mars/src/fixtures'
 import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
 import {getCardByName, CARDS} from '../../../../games/terraforming-mars/src/cards'
+import {cloneState} from '../../../../games/terraforming-mars/src/utils'
 
-export const draftChoice = card => ({
+export const draftChoice = (card, player) => ({
   type: UserAction.DraftRoundChoice,
   choice: card,
+  player: player,
 })
 
 export const CardAction = (card, i) => ({
@@ -72,6 +74,10 @@ export const uiCancel = () => ({
   type: 'UI_CANCEL',
 })
 
+export const uiPass = () => ({
+  type: 'UI_PASS',
+})
+
 export const uiSetCardCost = resources => ({
   type: 'UI_SET_CARD_COST',
   resources,
@@ -100,7 +106,16 @@ STATE.playerState.a.hand = CARDS.slice(0, 50).map(x => x.name)
 STATE.playerState.a.played = ['Tardigrades', 'Symbiotic Fungus']
 // const STATE = getStateBeforeDraft()
 
-const game = (state = TerraformingMars.getClientState(STATE, 'a'), action) => {
+const ACTIONS = {
+  Pass: 1,
+  Action: 1,
+  DraftRoundChoice: 1,
+}
+
+const game = (state = STATE, action) => {
+  if (ACTIONS[action.type]) {
+    return handleAction(cloneState(state), action)
+  }
   return state
 }
 
@@ -196,6 +211,12 @@ const ui = (state = UI_STATE, action) => {
       }
     }
 
+    if (action.type === 'UI_PASS') {
+      // Play card -- go into resource choosing mode...
+      action.asyncDispatch({type: UserAction.Pass})
+      return state
+    }
+
     if (action.type === 'UI_CLICK_CARD') {
       // Play card -- go into resource choosing mode...
       return {
@@ -237,6 +258,7 @@ const ui = (state = UI_STATE, action) => {
       if (!card.effects) {
         // Just play it.
         console.log('Play Card', newAction)
+        action.asyncDispatch({...newAction, type: UserAction.Action})
         return UI_STATE
       }
 
@@ -308,4 +330,19 @@ const ui = (state = UI_STATE, action) => {
   return state
 }
 
-export const reducer = combineReducers({game, ui})
+export const reducer = (state = <any>{}, action) => {
+  if (action.type === 'SERVER_MESSAGE' && action.data.room) {
+    return {
+      game: action.data.room.game,
+      player: location.hash.slice(1),
+      ui: state.ui,
+    }
+  }
+  // const gameState = game(state.server, action)
+  // console.log('dfdafd', gameState)
+  const newState = {
+    ...state,
+    ui: ui(state.ui, action),
+  }
+  return newState
+}

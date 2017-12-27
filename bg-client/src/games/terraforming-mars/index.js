@@ -26,6 +26,7 @@ import {
   uiPlantGreenery,
   uiHeatTemperature,
   uiCardAction,
+  uiPass,
 } from './reducer'
 import {Grid} from './Grid'
 import {Icon, Tag} from './components'
@@ -559,18 +560,30 @@ const ChoosingCorporationsStatus = props => (
   </React.Fragment>
 )
 
-const ActionsStatus = props => (
+let ActionsStatus = props => (
   <React.Fragment>
     2 actions left. Choose an action or
-    <Button>pass</Button>
+    <Button onClick={props.onPass}>pass</Button>
   </React.Fragment>
 )
 
-const DraftStatus = props => (
+ActionsStatus = connect(
+  state => ({}),
+  dispatch => ({
+    onPass: () => dispatch(uiPass()),
+  })
+)(ActionsStatus)
+
+let DraftStatus = props => (
   <React.Fragment>
-    Drafting. Choose a card ({4 - props.game.draft.a.taken.length} left).
+    Drafting. Choose a card ({4 - props.game.draft[props.player].taken.length} left).
   </React.Fragment>
 )
+
+DraftStatus = connect(state => ({
+  game: state.game,
+  player: state.player,
+}))(DraftStatus)
 
 let ChoicesBar = props => (
   <React.Fragment>
@@ -631,7 +644,7 @@ ChooseResources = compose(
   })),
   connect(
     state => ({
-      resources: state.game.playerState.a.resources,
+      resources: state.game.playerState[state.game.player].resources,
     }),
     (dispatch, props) => ({
       onSubmit: () => dispatch(uiSetCardCost(props.count)),
@@ -644,11 +657,11 @@ let ActionBar = props => (
     <Flex mr="3px" style={{fontSize: '0.8em'}}>
       {props.ui.phase}
     </Flex>
+    {props.game.phase === 'Actions' && props.ui.phase === 'Game' && <ActionsStatus />}
     {props.ui.phase === 'CardCost' && <ChooseResources />}
     {props.ui.phase === 'Choices' && <ChoicesBar />}
     {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
-    {/* {props.game.phase === 'Actions' && <ActionsStatus />} */}
-    {props.game.phase === 'Draft' && <DraftStatus game={props.game} />}
+    {props.game.phase === 'Draft' && <DraftStatus />}
     {props.ui.phase !== 'Game' && <Button onClick={props.onCancel}>Cancel</Button>}
   </Flex>
 )
@@ -665,18 +678,20 @@ let Draft = props => (
     <Box p={1} style={{fontSize: 12, color: '#555'}}>
       DRAFT
     </Box>
+    {!props.cards.queued.length && <Box px={2}>Waiting...</Box>}
     <Box px={2}>
-      {props.cards.queued[0].map(name => (
-        <Card key={name} name={name} onClick={() => props.onClickCard(name)} />
-      ))}
+      {props.cards.queued[0] &&
+        props.cards.queued[0].map(name => (
+          <Card key={name} name={name} onClick={() => props.onClickCard(name)} />
+        ))}
     </Box>
   </React.Fragment>
 )
 
 Draft = connect(
   () => ({}),
-  dispatch => ({
-    onClickCard: card => dispatch(draftChoice(card)),
+  (dispatch, props) => ({
+    onClickCard: card => dispatch(draftChoice(card, props.player)),
   })
 )(Draft)
 
@@ -686,7 +701,7 @@ let Hand = props => (
       HAND
     </Box>
     <Box px={2}>
-      {props.game.playerState.a.hand.map(name => (
+      {props.game.playerState[props.game.player].hand.map(name => (
         <Card
           selected={props.selected[name]}
           key={name}
@@ -725,7 +740,7 @@ let PlayedCardMatches = props => (
 
 PlayedCardMatches = connect(
   state => {
-    const allPlayed = state.game.playerState.a.played.map(getCardByName)
+    const allPlayed = state.game.playerState[state.game.player].played.map(getCardByName)
     const cards = allPlayed
       .filter(card => card.resourceHeld === state.ui.choice.resource)
       .map(card => card.name)
@@ -742,9 +757,9 @@ PlayedCardMatches = connect(
 const TerraformingMars = props => (
   <Wrapper direction="column">
     <Box
+      align="center"
       py={1}
       px={2}
-      slign="center"
       style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #ddd', background: '#fafafa'}}
     >
       Terraforming Mars
@@ -770,10 +785,10 @@ const TerraformingMars = props => (
         </Flex>
         <Flex>
           <Box mr={1}>
-            {props.game.playerState.a.corporation && (
-              <Corporation name={props.game.playerState.a.corporation} collapsed />
+            {props.game.playerState[props.player].corporation && (
+              <Corporation name={props.game.playerState[props.player].corporation} collapsed />
             )}
-            {props.game.playerState.a.played.map(name => (
+            {props.game.playerState[props.player].played.map(name => (
               <Card played key={name} name={name} collapsed />
             ))}
           </Box>
@@ -788,27 +803,29 @@ const TerraformingMars = props => (
         </Flex>
       </Box>
       <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
-        {props.game.draft.a && <Draft cards={props.game.draft.a} />}
-        {props.game.choosingCorporations.a && (
+        {props.game.draft[props.player] && (
+          <Draft cards={props.game.draft[props.player]} player={props.player} />
+        )}
+        {props.game.choosingCorporations[props.player] && (
           <React.Fragment>
             <Box p={1} style={{fontSize: 12, color: '#555'}}>
               CORPORATIONS
             </Box>
             <Box px={2}>
-              {props.game.choosingCorporations.a.map(name => (
+              {props.game.choosingCorporations[props.player].map(name => (
                 <Corporation key={name} name={name} />
               ))}
             </Box>
           </React.Fragment>
         )}
         {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
-        {props.game.choosingCards.a && (
+        {props.game.choosingCards[props.player] && (
           <React.Fragment>
             <Box p={1} style={{fontSize: 12, color: '#555'}}>
               BUYING
             </Box>
             <Box px={2}>
-              {props.game.choosingCards.a.map(name => <Card key={name} name={name} />)}
+              {props.game.choosingCards[props.player].map(name => <Card key={name} name={name} />)}
             </Box>
           </React.Fragment>
         )}
@@ -819,6 +836,6 @@ const TerraformingMars = props => (
 )
 
 export default compose(
-  connect(state => ({game: state.game, ui: state.ui})),
+  connect(state => ({game: state.game, ui: state.ui, player: state.game.player})),
   branch(props => !props.game, renderNothing)
 )(TerraformingMars)

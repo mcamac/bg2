@@ -61,7 +61,7 @@ export class SocketServer implements PlayerConnection {
         const decoded = decodeToken(data.token)
         ws['token'] = decoded
       }
-      ws.send(JSON.stringify({auth: true}))
+      ws.send(JSON.stringify({auth: true, email: ws['token'].email}))
 
       this.userConnections[ws['token'].email] = ws
       this.storage.createUser(ws['token'].email)
@@ -80,7 +80,7 @@ export class SocketServer implements PlayerConnection {
       this.storage.onRoomLeave(room, player)
     } else if (action === 'ROOM_START') {
       this.storage.onRoomStart(room)
-    } else if (action === 'ROOM_START') {
+    } else if (action === 'ROOM_MOVE') {
       this.storage.onRoomMove(room, player, data.move)
     }
   }

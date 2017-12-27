@@ -9,6 +9,7 @@ import TerraformingMars from './games/terraforming-mars/index'
 import CardBrowser from './games/terraforming-mars/cardBrowser'
 import {Callback} from './components'
 import {Auth} from './pages/Login'
+import Game2 from './pages/Game2'
 
 const auth = new Auth()
 
@@ -28,7 +29,7 @@ class App extends Component {
               <Route exact path="/" component={Lobby} />
               <Route exact path="/tf/:uid" component={TerraformingMars} />
               <Route exact path="/tf-cards" component={CardBrowser} />
-              <Route exact path="/game/:uid" component={Game} />
+              <Route exact path="/game/:uid" component={Game2} />
               <Route exact path="/login" render={props => <Login auth={auth} {...props} />} />
               <Route
                 path="/callback"

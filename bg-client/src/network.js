@@ -28,7 +28,10 @@ class Socket {
   }
 
   onOpen() {
-    this.ws.send(JSON.stringify({type: 'token', token: localStorage.id_token}))
+    // this.ws.send(JSON.stringify({type: 'token', token: localStorage.id_token}))
+    this.ws.send(
+      JSON.stringify({type: 'token', token: 'DEV', email: location.hash.slice(1) || 'a'})
+    )
   }
 
   onMessage(message) {
@@ -55,3 +58,5 @@ class Socket {
 }
 
 export const socket = new Socket()
+
+window.socket = socket

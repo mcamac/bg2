@@ -404,6 +404,7 @@ export const handlers = {
       // Get next player.
       state = switchToNextPlayer(state)
     }
+    return state
   },
 
   [UserAction.Cede]: (state, action): GameState => {
