@@ -93,12 +93,13 @@ export class SocketServer implements PlayerConnection {
         if (room.game && getPlayerState) {
           playerRoom.game = getPlayerState(room.game, u)
         }
-        this.userConnections[u].send(
-          JSON.stringify({
-            type: 'ROOM_UPDATE',
-            room: playerRoom,
-          })
-        )
+        if (this.userConnections[u].readyState === this.userConnections[u].OPEN)
+          this.userConnections[u].send(
+            JSON.stringify({
+              type: 'ROOM_UPDATE',
+              room: playerRoom,
+            })
+          )
       })
     }
   }

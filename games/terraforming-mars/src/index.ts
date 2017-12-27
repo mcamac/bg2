@@ -31,6 +31,7 @@ import {
   checkCardRequirements,
   applyEffects,
   applyAfterCardTriggers,
+  cloneState,
 } from './utils'
 import {CORPORATIONS, getCorporationByName} from './corporations'
 import {STANDARD_PROJECTS} from './projects'
@@ -86,7 +87,7 @@ const placeCity = (state, action) => {
   return state
 }
 
-const generationProduction: Transform = state => {
+export const generationProduction: Transform = state => {
   state.players.forEach(player => {
     const playerState = state.playerState[player]
 
@@ -102,7 +103,7 @@ const generationProduction: Transform = state => {
       if (resource === ResourceType.Money) {
         production += playerState.TR
       }
-      playerState.resources[resource].count += playerState.resources[resource].production
+      playerState.resources[resource].count += production
     })
   })
 
@@ -115,6 +116,7 @@ const resetNewGeneration: Transform = state => {
   state.draft = {}
   state.firstPlayer =
     state.players[(state.players.indexOf(state.firstPlayer) + 1) % state.players.length]
+  state.actionsDone = 0
   state.player = state.firstPlayer
   state.players.forEach(player => {
     const playerState = state.playerState[player]
@@ -398,6 +400,7 @@ export const handlers = {
   },
   // During generation
   [UserAction.Action]: (state, action) => {
+    if (action.player && action.player !== state.player) throw Error('Invalid player')
     state = turnActionHandlers[action.actionType](state, action)
     state.actionsDone++
     if (state.actionsDone === 2) {
@@ -408,6 +411,7 @@ export const handlers = {
   },
 
   [UserAction.Cede]: (state, action): GameState => {
+    if (action.player && action.player !== state.player) throw Error('Invalid player')
     // Get next player.
     if (state.actionsDone === 0) throw Error('Cannot cede without acting.')
     state = switchToNextPlayer(state)
@@ -415,6 +419,7 @@ export const handlers = {
   },
 
   [UserAction.Pass]: (state, action) => {
+    if (action.player && action.player !== state.player) throw Error('Invalid player')
     // Get next player.
     state.passed[state.player] = true
     state = switchToNextPlayer(state)
@@ -429,14 +434,25 @@ export const handlers = {
 const startActions: Transform = state => {
   state.player = state.firstPlayer
   state.phase = Phase.CardBuying
+  state.players.forEach(player => {
+    state.choosingCards[player] = state.draft[player].taken
+    delete state.draft[player]
+  })
   return state
 }
 
 export const handleAction = (state: GameState, action): GameState => {
+  const stateCopy = cloneState(state)
   if (handlers[action.type]) {
+    // try {
     return handlers[action.type](state, action)
+    // } catch (e) {
+    //   console.error('Action failed', action, e)
+    // } finally {
+    //   return stateCopy
+    // }
   }
-  return state
+  return stateCopy
 }
 
 export const getClientState = (state: GameState, player: Player) => {

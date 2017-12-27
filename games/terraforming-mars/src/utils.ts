@@ -260,11 +260,11 @@ export const applyAfterCardTrigger = (
 ) => {
   if (card.afterCardTriggers) {
     let [opName, ...args] = card.afterCardTriggers[0]
-    let effect = card.afterCardTriggers[1]
+    let effects = card.afterCardTriggers[1]
 
     let condition = AFTER_CARD_REGISTRY[opName](...args)
     if (condition(curCard, curPlayer, player)) {
-      applyEffects(state, {player, choices: []}, effect) // Is it always true that choice is 0?
+      applyEffects(state, {player, choices: []}, effects) // Is it always true that choice is 0?
     }
   }
 }

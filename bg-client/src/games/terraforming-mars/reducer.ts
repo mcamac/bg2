@@ -78,6 +78,10 @@ export const uiPass = () => ({
   type: 'UI_PASS',
 })
 
+export const uiCede = () => ({
+  type: 'UI_CEDE',
+})
+
 export const uiSetCardCost = resources => ({
   type: 'UI_SET_CARD_COST',
   resources,
@@ -90,6 +94,10 @@ export const uiChoosePlayer = player => ({
 
 export const uiSubmitChoice = () => ({
   type: 'UI_SUBMIT_CHOICE',
+})
+
+export const uiSubmitBuyChoice = () => ({
+  type: 'UI_SUBMIT_BUY_CHOICE',
 })
 
 export const uiPlantGreenery = () => ({
@@ -141,6 +149,7 @@ interface UIState {
   choices?: any
   effects?: any[]
   card?: string
+  chosen?: any
 }
 
 const UI_STATE: UIState = {
@@ -159,9 +168,31 @@ const getNextChoice = (effects, choices) => {
   return [[...choices], null]
 }
 
-const ui = (state = UI_STATE, action) => {
+const ui = (state = UI_STATE, action, game = <any>{}, player) => {
   if (action.type === 'UI_CANCEL') {
     return UI_STATE
+  }
+  if (game.phase === 'CardBuying') {
+    if (!state.chosen) state.chosen = <any>{}
+
+    if (action.type === 'UI_CLICK_CARD') {
+      let chosenCards = state.chosen
+      chosenCards = {...chosenCards, [action.card]: !chosenCards[action.card]}
+
+      return {
+        ...state,
+        chosen: chosenCards,
+      }
+    }
+
+    if (action.type === 'UI_SUBMIT_BUY_CHOICE') {
+      const chosen = Object.keys(state.chosen).filter(key => state.chosen[key])
+      action.asyncDispatch({type: UserAction.BuyCards, chosen})
+      return UI_STATE
+    }
+  }
+  if (game.phase === 'Actions' && game.player !== player) {
+    return state
   }
 
   if (state.phase === 'Game') {
@@ -212,8 +243,12 @@ const ui = (state = UI_STATE, action) => {
     }
 
     if (action.type === 'UI_PASS') {
-      // Play card -- go into resource choosing mode...
       action.asyncDispatch({type: UserAction.Pass})
+      return state
+    }
+
+    if (action.type === 'UI_CEDE') {
+      action.asyncDispatch({type: UserAction.Cede})
       return state
     }
 
@@ -283,7 +318,7 @@ const ui = (state = UI_STATE, action) => {
   if (state.phase === 'Choices') {
     let newChoices
     if (state.choice.type === 'tile' && action.type === 'UI_CHOOSE_TILE') {
-      newChoices = [...state.choices, {location: action.tile}]
+      newChoices = [...state.choices, {locations: [action.tile]}]
     }
     if (state.choice.type === 'player' && action.type === 'UI_CHOOSE_PLAYER') {
       newChoices = [...state.choices, {player: action.player}]
@@ -316,7 +351,9 @@ const ui = (state = UI_STATE, action) => {
       const [choices, nextChoice] = getNextChoice(state.effects, newChoices)
       if (!nextChoice) {
         // Action is done -- send.
-        console.log('Finish Action', {...state.action, choices: newChoices})
+        const newAction = {...state.action, choices: newChoices}
+        console.log('Finish Action', newAction)
+        action.asyncDispatch({...newAction, type: UserAction.Action})
         return UI_STATE
       }
       return {
@@ -338,11 +375,14 @@ export const reducer = (state = <any>{}, action) => {
       ui: state.ui,
     }
   }
+  if (ACTIONS[action.type]) {
+    action.asyncDispatch(action)
+  }
   // const gameState = game(state.server, action)
   // console.log('dfdafd', gameState)
   const newState = {
     ...state,
-    ui: ui(state.ui, action),
+    ui: ui(state.ui, action, state.game, state.player),
   }
   return newState
 }

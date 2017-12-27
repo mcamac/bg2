@@ -8,6 +8,7 @@ import {
   buyCards,
   fundAward,
   getClientState,
+  generationProduction,
 } from '../src/index'
 import {getCardByName as C} from '../src/cards'
 import {setupDraft, handlePlayerChoice, isDraftDone} from '../src/deck'
@@ -24,7 +25,16 @@ import {
   StandardProject,
   Tag,
 } from '../src/types'
-import {cloneState, checkCardRequirements, applyEffects, IsSubset, PlayedTagMatches, AnyPlayedTagMatches, PlayedMinCost, StandardProjectMatches} from '../src/utils'
+import {
+  cloneState,
+  checkCardRequirements,
+  applyEffects,
+  IsSubset,
+  PlayedTagMatches,
+  AnyPlayedTagMatches,
+  PlayedMinCost,
+  StandardProjectMatches,
+} from '../src/utils'
 import {getStateAfterActions} from '../src/fixtures'
 
 const TEST_SEED = 'martin'
@@ -40,6 +50,22 @@ test(t => {
   const played = ['Quantum Extractor', 'Research Outpost'].map(C)
   const card = C('Optimal Aerobraking')
   t.is(getDiscount(played, card), 3)
+})
+
+test('Production', t => {
+  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.playerState['a'].played = ['Immigrant City', 'Underground City'] // When city placed, increase by 1
+  state.playerState['a'].resources[ResourceType.Energy].production = 2
+  state.playerState['a'].resources[ResourceType.Energy].count = 5
+  state.playerState['a'].TR = 25
+
+  state = generationProduction(state)
+
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Money].count, 55)
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Heat].count, 5)
+  t.deepEqual(state.playerState['a'].resources[ResourceType.Energy].count, 2)
 })
 
 // Initial state
@@ -232,7 +258,7 @@ test(t => {
 // After card triggers
 
 test('After card trigger: Test match finder util', t => {
-  let empty = [];
+  let empty = []
   let required1 = [Tag.Earth]
   let required2 = [Tag.Space, Tag.Event]
 
@@ -257,28 +283,31 @@ test('After card trigger: Look for matching tags', t => {
   let player01 = 'Player 01'
   let player02 = 'Player 02'
 
-  let card01 = {  // e.g., the one that will match
+  let card01 = {
+    // e.g., the one that will match
     cost: 0,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    tags: [Tag.Space, Tag.Event]
+    tags: [Tag.Space, Tag.Event],
   }
 
- let card02 = {  // e.g., one that will not match
+  let card02 = {
+    // e.g., one that will not match
     cost: 0,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    tags: [Tag.Animal]
+    tags: [Tag.Animal],
   }
 
-  let card03 = {  // e.g., one that will not match
+  let card03 = {
+    // e.g., one that will not match
     cost: 0,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    tags: []
+    tags: [],
   }
 
   let spaceEvent = [[Tag.Space, Tag.Event]]
@@ -308,20 +337,22 @@ test('After card trigger: min cost', t => {
   let player01 = 'Player 01'
   let player02 = 'Player 02'
 
-  let card01 = {  // e.g., the one that will match
+  let card01 = {
+    // e.g., the one that will match
     cost: 20,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    tags: [Tag.Space, Tag.Event]
+    tags: [Tag.Space, Tag.Event],
   }
 
- let card02 = {  // e.g., one that will not match
+  let card02 = {
+    // e.g., one that will not match
     cost: 0,
     name: 'test_card',
     type: 'Automated',
     deck: 'Basic',
-    tags: [Tag.Animal]
+    tags: [Tag.Animal],
   }
 
   t.true(PlayedMinCost(20)(card01, player01, player01))
