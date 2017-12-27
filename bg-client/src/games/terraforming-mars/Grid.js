@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 
 import {RESOURCE_BONUSES, OCEAN_POSITIONS} from '../../../../games/terraforming-mars/src/constants'
 import {chooseTile} from './reducer'
+import {isOcean} from '../../../../games/terraforming-mars/src/tiles'
 
 const hexPoints = (x, y, radius) => {
   var points = []
@@ -24,7 +25,7 @@ let Tile = props => {
     <g>
       <polygon
         stroke="black"
-        fill={props.hovered ? '#eee' : props.x === 3 ? '#95F58D' : 'transparent'}
+        fill={props.hovered ? '#eee' : isOcean([props.x, props.y]) ? '#daf1ff' : 'transparent'}
         onMouseEnter={() => props.setHovered(true)}
         onMouseLeave={() => props.setHovered(false)}
         onClick={() => props.onClick([props.x, props.y])}

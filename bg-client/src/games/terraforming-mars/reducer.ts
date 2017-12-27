@@ -52,13 +52,19 @@ export const startStandardProject = project => ({
   project,
 })
 
-export const uiPlayCard = card => ({
-  type: 'UI_PLAY_CARD',
+export const uiClickCard = card => ({
+  type: 'UI_CLICK_CARD',
   card,
 })
 
+export const uiCardAction = (card, index) => ({
+  type: 'UI_CARD_ACTION',
+  card,
+  index,
+})
+
 export const chooseTile = tile => ({
-  type: 'CHOOSE_TILE',
+  type: 'UI_CHOOSE_TILE',
   tile,
 })
 
@@ -76,9 +82,22 @@ export const uiChoosePlayer = player => ({
   player,
 })
 
+export const uiSubmitChoice = () => ({
+  type: 'UI_SUBMIT_CHOICE',
+})
+
+export const uiPlantGreenery = () => ({
+  type: 'UI_PLANT_GREENERY',
+})
+
+export const uiHeatTemperature = () => ({
+  type: 'UI_HEAT_TEMPERATURE',
+})
+
 // const STATE = TerraformingMars.getInitialState(['a', 'b', 'c'])
 const STATE = getStateAfterActions()
 STATE.playerState.a.hand = CARDS.slice(0, 50).map(x => x.name)
+STATE.playerState.a.played = ['Tardigrades', 'Symbiotic Fungus']
 // const STATE = getStateBeforeDraft()
 
 const game = (state = TerraformingMars.getClientState(STATE, 'a'), action) => {
@@ -89,9 +108,14 @@ const NEEDS_CHOICE = {
   PlaceOceans: () => ({type: 'tile', tileType: TileType.Ocean}),
   PlaceGreenery: () => ({type: 'tile', tileType: TileType.Greenery}),
   PlaceCity: () => ({type: 'tile', tileType: TileType.City}),
-  SellCards: () => ({type: 'cards', text: 'Choose cards to sell.'}),
+  SellCards: () => ({type: 'cards', text: 'Choose cards to sell.', chosen: {}, confirm: true}),
   DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
   DecreaseAnyInventory: () => ({type: 'player', text: 'Choose player to remove ...'}),
+  ChangeAnyCardResource: (count, resource) => ({
+    type: 'playedCard',
+    resource,
+    text: 'Choose a card to remove ...',
+  }),
 }
 
 interface UIState {
@@ -112,7 +136,8 @@ const UI_STATE: UIState = {
 const getNextChoice = (effects, choices) => {
   for (var i = choices.length; i < effects.length; i++) {
     if (NEEDS_CHOICE[effects[i][0]]) {
-      return [[...choices], NEEDS_CHOICE[effects[i][0]]()]
+      console.log(effects[i])
+      return [[...choices], NEEDS_CHOICE[effects[i][0]](...effects[i].slice(1))]
     }
     choices.push(null)
   }
@@ -146,8 +171,33 @@ const ui = (state = UI_STATE, action) => {
       }
     }
 
-    if (action.type === 'UI_PLAY_CARD') {
-      // Go into resource choosing mode...
+    if (action.type === 'UI_CARD_ACTION') {
+      const card = getCardByName(action.card)
+      const effects = card.actions[action.index]
+      const newAction = {
+        actionType: TurnAction.CardAction,
+        card: action.card,
+        index: action.index,
+      }
+
+      const [choices, nextChoice] = getNextChoice(effects, [])
+      if (!nextChoice) {
+        // Action is done -- send.
+        console.log('Card Action', {...newAction, choices: []})
+        return state
+      }
+      return {
+        ...state,
+        phase: 'Choices',
+        choice: nextChoice,
+        choices,
+        effects: effects,
+        action: newAction,
+      }
+    }
+
+    if (action.type === 'UI_CLICK_CARD') {
+      // Play card -- go into resource choosing mode...
       return {
         ...state,
         phase: 'CardCost',
@@ -156,6 +206,26 @@ const ui = (state = UI_STATE, action) => {
           card: action.card,
         },
       }
+    }
+
+    if (action.type === 'UI_PLANT_GREENERY') {
+      const [choices, nextChoice] = getNextChoice([['PlaceGreenery']], [])
+      return {
+        ...state,
+        phase: 'Choices',
+        choiceSource: 'Greenery',
+        choice: nextChoice,
+        choices,
+        effects: [['PlaceGreenery']],
+        action: {
+          actionType: TurnAction.PlayCard,
+        },
+      }
+    }
+
+    if (action.type === 'UI_HEAT_TEMPERATURE') {
+      /// Raise heat
+      return UI_STATE
     }
   }
   if (state.phase === 'CardCost') {
@@ -190,12 +260,36 @@ const ui = (state = UI_STATE, action) => {
 
   if (state.phase === 'Choices') {
     let newChoices
-    if (state.choice.type === 'tile' && action.type === 'CHOOSE_TILE') {
+    if (state.choice.type === 'tile' && action.type === 'UI_CHOOSE_TILE') {
       newChoices = [...state.choices, {location: action.tile}]
     }
     if (state.choice.type === 'player' && action.type === 'UI_CHOOSE_PLAYER') {
       newChoices = [...state.choices, {player: action.player}]
     }
+    if (state.choice.type === 'cards' && action.type === 'UI_CLICK_CARD') {
+      let chosenCards = state.choice.chosen
+      chosenCards = {...chosenCards, [action.card]: !chosenCards[action.card]}
+
+      return {
+        ...state,
+        choice: {
+          ...state.choice,
+          chosen: chosenCards,
+        },
+      }
+    }
+    if (state.choice.type === 'playedCard' && action.type === 'UI_CLICK_CARD') {
+      newChoices = [...state.choices, {card: action.card}]
+    }
+    if (state.choice.type === 'cards' && action.type === 'UI_SUBMIT_CHOICE') {
+      newChoices = [
+        ...state.choices,
+        {
+          cards: Object.keys(state.choice.chosen).filter(key => state.choice.chosen[key]),
+        },
+      ]
+    }
+
     if (newChoices) {
       const [choices, nextChoice] = getNextChoice(state.effects, newChoices)
       if (!nextChoice) {

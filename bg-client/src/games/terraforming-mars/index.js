@@ -2,17 +2,30 @@ import React, {Fragment, Component} from 'react'
 import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
-import {compose, branch, renderNothing, withProps, withState, withStateHandlers} from 'recompose'
+import {bindActionCreators} from 'redux'
+import {
+  compose,
+  pure,
+  branch,
+  renderNothing,
+  withProps,
+  withState,
+  withStateHandlers,
+} from 'recompose'
 import {toPairs, get} from 'lodash/fp'
 
 import {
   reducer,
   draftChoice,
   startStandardProject,
-  uiPlayCard,
+  uiClickCard,
   uiCancel,
   uiSetCardCost,
   uiChoosePlayer,
+  uiSubmitChoice,
+  uiPlantGreenery,
+  uiHeatTemperature,
+  uiCardAction,
 } from './reducer'
 import {Grid} from './Grid'
 import {Icon, Tag} from './components'
@@ -37,6 +50,7 @@ const CARD_COLORS = {
 
 const CardWrapper = styled(Box)`
   background: ${props => CARD_COLORS[props.type || (props.corporation && 'Corporation')]};
+  border: ${props => props.selected && '1px solid black'};
   min-width: 250px;
   font-size: 13px;
   margin-bottom: 5px;
@@ -271,14 +285,19 @@ const ActionWrapper = styled(Flex)`
   transition: 0.2s background;
 
   &:hover {
-    background: white;
+    background: ${props => props.enabled && 'white'};
   }
 `
 
-const CardActions = props => (
+let CardActions = props => (
   <Box>
     {props.actions.map((action, i) => (
-      <ActionWrapper align="center" key={i}>
+      <ActionWrapper
+        enabled={props.enabled}
+        align="center"
+        key={i}
+        onClick={props.enabled && (() => props.onAction(i))}
+      >
         <Box mr="4px" style={{color: '#555'}}>
           ACTION:
         </Box>
@@ -295,6 +314,13 @@ const CardActions = props => (
     ))}
   </Box>
 )
+
+CardActions = connect(
+  () => ({}),
+  (dispatch, props) => ({
+    onAction: i => dispatch(uiCardAction(props.card.name, i)),
+  })
+)(CardActions)
 
 const Effect = (effect, ...args) =>
   EFFECTS[effect] ? (
@@ -331,7 +357,7 @@ const CardDiscounts = props => (
 )
 
 let Card = props => (
-  <CardWrapper type={props.card.type} onClick={props.onClick}>
+  <CardWrapper type={props.card.type} selected={props.selected} onClick={props.onClick}>
     <Flex align="center" style={{padding: 5, borderBottom: '1px solid #aaa'}}>
       <div style={{fontWeight: 500, fontSize: 15, width: 18, color: '#333'}}>{props.card.cost}</div>
       {props.card.requires && <CardRequirements requires={props.card.requires} />}
@@ -340,7 +366,9 @@ let Card = props => (
       </Box>
       <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
-    {props.card.actions && <CardActions actions={props.card.actions} card={props.card} />}
+    {props.card.actions && (
+      <CardActions enabled={props.played} actions={props.card.actions} card={props.card} />
+    )}
     {!props.collapsed &&
       (props.card.effects || props.card.vp || props.card.discounts) && (
         <Flex style={{padding: 5}} direction="column">
@@ -356,7 +384,7 @@ let Card = props => (
   </CardWrapper>
 )
 
-Card = withProps(props => ({card: getCardByName(props.name)}))(Card)
+Card = compose(pure, withProps(props => ({card: getCardByName(props.name)})))(Card)
 export {Card}
 
 let Corporation = props => (
@@ -460,8 +488,8 @@ StandardProjects = connect(
 )(StandardProjects)
 
 let PlayerCard = props => (
-  <Box p={2} style={{borderBottom: '1px solid #eee'}} onClick={props.onClick}>
-    <Flex mb={1}>
+  <Box p={2} style={{borderBottom: '1px solid #eee'}}>
+    <Flex mb={1} onClick={props.onClickPlayer}>
       <Box flex="1 1 auto">{props.player}</Box>
       <Box>30</Box>
     </Flex>
@@ -486,7 +514,7 @@ let PlayerCard = props => (
       </Flex>
     </Flex>
     <Flex>
-      <Flex mr={1}>
+      <Flex mr={1} onClick={props.onClickPlant}>
         <Tag name="Plant" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Plant.count} (+{props.state.resources.Plant.production})
@@ -498,7 +526,7 @@ let PlayerCard = props => (
           {props.state.resources.Energy.count} (+{props.state.resources.Energy.production})
         </Box>
       </Flex>
-      <Flex>
+      <Flex onClick={props.onClickHeat}>
         <Tag name="Heat" />
         <Box ml="3px" style={{fontSize: 13}}>
           {props.state.resources.Heat.count} (+{props.state.resources.Heat.production})
@@ -511,7 +539,9 @@ let PlayerCard = props => (
 PlayerCard = connect(
   state => ({}),
   (dispatch, props) => ({
-    onClick: () => dispatch(uiChoosePlayer(props.player)),
+    onClickPlayer: () => dispatch(uiChoosePlayer(props.player)),
+    onClickPlant: () => dispatch(uiPlantGreenery()),
+    onClickHeat: () => dispatch(uiHeatTemperature()),
   })
 )(PlayerCard)
 
@@ -545,14 +575,18 @@ const DraftStatus = props => (
 let ChoicesBar = props => (
   <React.Fragment>
     {props.card}:
-    <pre>{JSON.stringify(props.choice)}</pre>
+    <pre style={{maxWidth: 400, overflowX: 'scroll'}}>{JSON.stringify(props.choice)}</pre>
+    {props.choice.confirm && <Button onClick={props.onDone}>Done</Button>}
   </React.Fragment>
 )
 
-ChoicesBar = connect(state => ({
-  choice: get(['ui', 'choice'], state),
-  card: get(['ui', 'action', 'card'], state),
-}))(ChoicesBar)
+ChoicesBar = connect(
+  state => ({
+    choice: get(['ui', 'choice'], state),
+    card: get(['ui', 'action', 'card'], state),
+  }),
+  dispatch => bindActionCreators({onDone: uiSubmitChoice}, dispatch)
+)(ChoicesBar)
 
 const ResourceInput = styled.input`
   width: 30px;
@@ -615,7 +649,7 @@ let ActionBar = props => (
     {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
     {/* {props.game.phase === 'Actions' && <ActionsStatus />} */}
     {props.game.phase === 'Draft' && <DraftStatus game={props.game} />}
-    <Button onClick={props.onCancel}>Cancel</Button>
+    {props.ui.phase !== 'Game' && <Button onClick={props.onCancel}>Cancel</Button>}
   </Flex>
 )
 
@@ -653,18 +687,57 @@ let Hand = props => (
     </Box>
     <Box px={2}>
       {props.game.playerState.a.hand.map(name => (
-        <Card key={name} name={name} onClick={() => props.onClickCard(name)} />
+        <Card
+          selected={props.selected[name]}
+          key={name}
+          name={name}
+          onClick={() => props.onClickCard(name)}
+        />
       ))}
     </Box>
   </React.Fragment>
 )
 
 Hand = connect(
-  state => ({game: state.game}),
+  state => ({game: state.game, selected: get(['ui', 'choice', 'chosen'], state) || {}}),
   dispatch => ({
-    onClickCard: card => dispatch(uiPlayCard(card)),
+    onClickCard: card => dispatch(uiClickCard(card)),
   })
 )(Hand)
+
+let PlayedCardMatches = props => (
+  <React.Fragment>
+    <Box p={1} style={{fontSize: 12, color: '#555'}}>
+      Matching Cards
+    </Box>
+    <Box px={2}>
+      {props.cards.map(name => (
+        <Card
+          selected={props.selected[name]}
+          key={name}
+          name={name}
+          onClick={() => props.onClickCard(name)}
+        />
+      ))}
+    </Box>
+  </React.Fragment>
+)
+
+PlayedCardMatches = connect(
+  state => {
+    const allPlayed = state.game.playerState.a.played.map(getCardByName)
+    const cards = allPlayed
+      .filter(card => card.resourceHeld === state.ui.choice.resource)
+      .map(card => card.name)
+    return {
+      cards,
+      selected: {},
+    }
+  },
+  dispatch => ({
+    onClickCard: card => dispatch(uiClickCard(card)),
+  })
+)(PlayedCardMatches)
 
 const TerraformingMars = props => (
   <Wrapper direction="column">
@@ -700,7 +773,9 @@ const TerraformingMars = props => (
             {props.game.playerState.a.corporation && (
               <Corporation name={props.game.playerState.a.corporation} collapsed />
             )}
-            <Card cost={23} name="Development Center" collapsed />
+            {props.game.playerState.a.played.map(name => (
+              <Card played key={name} name={name} collapsed />
+            ))}
           </Box>
           <Box mr={1}>
             <Card cost={23} name="Development Center" collapsed />
@@ -726,6 +801,7 @@ const TerraformingMars = props => (
             </Box>
           </React.Fragment>
         )}
+        {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
         {props.game.choosingCards.a && (
           <React.Fragment>
             <Box p={1} style={{fontSize: 12, color: '#555'}}>
@@ -743,6 +819,6 @@ const TerraformingMars = props => (
 )
 
 export default compose(
-  connect(state => ({game: state.game})),
+  connect(state => ({game: state.game, ui: state.ui})),
   branch(props => !props.game, renderNothing)
 )(TerraformingMars)
