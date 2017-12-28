@@ -73,6 +73,20 @@ export const RESOURCE_TYPES = [
 
 export type ResourcesState = {[resource in ResourceType]: ResourceState}
 
+export interface KeepCardsChoice {
+  type: 'KeepCards'
+  cards: string[]
+  nKeep: number
+  effects: any[]
+}
+
+export interface PlaceOceanChoice {
+  type: 'PlaceOcean'
+  effects: any[]
+}
+
+export type UserChoice = KeepCardsChoice | PlaceOceanChoice
+
 export interface PlayerState {
   resources: ResourcesState
   TR: number
@@ -82,6 +96,7 @@ export interface PlayerState {
   cardResources: {[key: string]: number}
   cardActionsUsedThisGeneration: {[key: string]: true}
   hasIncreasedTRThisGeneration: boolean // For UN.
+  choices: UserChoice[]
 }
 
 export const enum TileType {
@@ -127,6 +142,9 @@ export const enum Phase {
   ChoosingCorporations = 'ChoosingCorporations',
   Draft = 'Draft',
   FinalGreenery = 'FinalGreenery',
+
+  // User choices to be made.
+  Choices = 'Choices',
 }
 
 export const enum UserAction {
@@ -138,6 +156,7 @@ export const enum UserAction {
   Pass = 'Pass',
   StandardProject = 'StandardProject',
   ChooseDiscards = 'ChooseDiscards',
+  Choices = 'Choices',
 }
 
 export const enum TurnAction {

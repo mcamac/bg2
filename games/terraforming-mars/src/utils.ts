@@ -87,6 +87,18 @@ export const ChangeProduction = (
   return state
 }
 
+export const DrawAndChoose = (nDraw: number, nKeep: number): Transform => state => {
+  let [drawn, newState] = draw(nDraw, state)
+  state = newState
+  state.playerState[state.player].choices.push({
+    type: 'KeepCards',
+    cards: drawn,
+    nKeep,
+    effects: [['KeepCards', drawn, nKeep]],
+  })
+  return state
+}
+
 export const Draw = (n: number) => (state: GameState, action, choice): GameState => {
   let [drawn, newState] = draw(n, state)
   newState.playerState[state.player].hand = newState.playerState[state.player].hand.concat(drawn)
@@ -95,6 +107,13 @@ export const Draw = (n: number) => (state: GameState, action, choice): GameState
 
 export const IncreaseTR = (delta: number | ((state: GameState) => number)) => {}
 export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
+  if (state.globalParameters.Heat < 0 && state.globalParameters.Heat + 2 * n >= 0) {
+    // Player gets to place an ocean
+    state.playerState[state.player].choices.push({
+      type: 'PlaceOcean',
+      effects: [['PlaceOceans']],
+    })
+  }
   state.playerState[state.player].TR += n
   state.globalParameters.Heat += 2 * n
   return state
@@ -118,6 +137,11 @@ export const PlaceGreenery = () => (state: GameState, action, choice): GameState
   state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
   state.globalParameters.Oxygen += 1
   state.playerState[state.player].TR += 1
+  return state
+}
+
+export const KeepCards = cards => (state: GameState, action, choice): GameState => {
+  state.playerState[state.player].hand = state.playerState[state.player].hand.concat(choice.cards)
   return state
 }
 
@@ -334,6 +358,7 @@ const REGISTRY = {
   ChangeInventory,
   ChangeProduction,
   Draw,
+  DrawAndChoose,
   IncreaseTR,
   IncreaseTemperature,
   RaiseOxygen,
@@ -341,6 +366,8 @@ const REGISTRY = {
   PlaceCity,
   PlaceGreenery,
   SellCards,
+  // Choices only
+  KeepCards,
 }
 
 const fromJSON = obj => {

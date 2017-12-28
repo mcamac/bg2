@@ -24,6 +24,7 @@ import {
   TileType,
   StandardProject,
   Tag,
+  KeepCardsChoice,
 } from '../src/types'
 import {
   cloneState,
@@ -877,4 +878,65 @@ test('DecreaseAnyProduction: Hackers', t => {
 
   t.is(state.playerState['b'].resources[ResourceType.Money].production, 0)
   t.is(state.playerState['a'].resources[ResourceType.Money].production, 2)
+})
+
+// After-action choices
+
+test('Choices: DrawAndChoose', t => {
+  let state = getStateAfterActions()
+  state.playerState['a'].hand = ['Business Contacts']
+  state.playerState['a'].resources[ResourceType.Money].count = 30
+  state.player = 'a'
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Business Contacts',
+    choices: [],
+  })
+
+  t.is(state.phase, Phase.Choices)
+  t.is((<KeepCardsChoice>state.playerState['a'].choices[0]).nKeep, 2)
+  t.is(state.actionsDone, 0)
+
+  handleAction(state, {
+    type: UserAction.Choices,
+    choices: [
+      {
+        cards: ['Acquired Company', 'Underground Detonations'],
+      },
+    ],
+  })
+
+  t.is(state.playerState['a'].hand.length, 2)
+  t.is(state.actionsDone, 1)
+})
+
+test('Choices: Ocean after Heat', t => {
+  let state = getStateAfterActions()
+  state.playerState['a'].hand = ['Business Contacts']
+  state.playerState['a'].resources[ResourceType.Heat].count = 8
+  state.globalParameters.Heat = -2
+  state.player = 'a'
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.RaiseHeat,
+  })
+
+  t.is(state.phase, Phase.Choices)
+  t.is(state.playerState['a'].choices[0].type, 'PlaceOcean')
+  t.is(state.actionsDone, 0)
+
+  handleAction(state, {
+    type: UserAction.Choices,
+    choices: [
+      {
+        location: [0, 0],
+      },
+    ],
+  })
+
+  t.is(state.map['0,0'].type, TileType.Ocean)
+  t.is(state.actionsDone, 1)
 })

@@ -1,5 +1,5 @@
 import {getInitialGameState} from '../index'
-import {UserAction} from '../types'
+import {UserAction, ResourceType} from '../types'
 import {handleAction} from '../index'
 
 const TEST_SEED = 'martin'

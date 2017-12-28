@@ -1,4 +1,5 @@
 import {combineReducers} from 'redux'
+import {get} from 'lodash'
 
 import {TerraformingMars, handleAction} from '../../../../games/terraforming-mars/src/index'
 import {UserAction, TurnAction, TileType} from '../../../../games/terraforming-mars/src/types'
@@ -191,11 +192,45 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       return UI_STATE
     }
   }
+
+  // TODO: Combine with above.
+  if (
+    game.phase === 'Choices' &&
+    get(game.playerState, [player, 'choices', 0, 'type']) === 'KeepCards'
+  ) {
+    if (!state.chosen) state.chosen = <any>{}
+
+    if (action.type === 'UI_CLICK_CARD') {
+      let chosenCards = state.chosen
+      chosenCards = {...chosenCards, [action.card]: !chosenCards[action.card]}
+
+      return {
+        ...state,
+        chosen: chosenCards,
+      }
+    }
+
+    if (action.type === 'UI_SUBMIT_CHOICE') {
+      const chosen = Object.keys(state.chosen).filter(key => state.chosen[key])
+      action.asyncDispatch({type: UserAction.Choices, choices: [{cards: chosen}]})
+      return UI_STATE
+    }
+  }
+
+  if (
+    game.phase === 'Choices' &&
+    get(game.playerState, [player, 'choices', 0, 'type']) === 'PlaceOcean'
+  ) {
+    if (action.type === 'UI_CHOOSE_TILE') {
+      action.asyncDispatch({type: UserAction.Choices, choices: [{location: action.tile}]})
+    }
+  }
+
   if (game.phase === 'Actions' && game.player !== player) {
     return state
   }
 
-  if (state.phase === 'Game') {
+  if (game.phase === 'Actions' && state.phase === 'Game') {
     if (action.type === 'UI_STANDARD_PROJECT') {
       const project = STANDARD_PROJECTS[action.project]
       const [choices, nextChoice] = getNextChoice(project.effects, [])

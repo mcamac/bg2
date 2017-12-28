@@ -187,6 +187,13 @@ const Draw = (value, card) => (
     {withSign(value)} <Icon g="Card" />
   </Flex>
 )
+
+const DrawAndChoose = (value, nKeep, card) => (
+  <Flex>
+    {withSign(value)} <Icon g="Card" /> keep {nKeep}
+  </Flex>
+)
+
 const RoboticWorkforce = () => (
   <Flex>
     Copy the production box of any <Tag name="Building" />
@@ -266,6 +273,7 @@ const EFFECTS = {
   IncreaseTR,
   Choice,
   Draw,
+  DrawAndChoose,
   VPForTags,
   VPForCardResources,
   VPIfCardHasResources,
@@ -640,6 +648,22 @@ ChoicesBar = connect(
   dispatch => bindActionCreators({onDone: uiSubmitChoice}, dispatch)
 )(ChoicesBar)
 
+let GameChoicesBar = props => (
+  <React.Fragment>
+    {props.card}:
+    <pre style={{maxWidth: 400, overflowX: 'scroll'}}>{JSON.stringify(props.choice)}</pre>
+    <Button onClick={props.onDone}>Done</Button>
+  </React.Fragment>
+)
+
+GameChoicesBar = connect(
+  state => ({
+    choice: get(['game', 'playerState', state.player, 'choices'], state),
+    card: get(['ui', 'action', 'card'], state),
+  }),
+  dispatch => bindActionCreators({onDone: uiSubmitChoice}, dispatch)
+)(GameChoicesBar)
+
 const ResourceInput = styled.input`
   width: 30px;
   font-size: 1em;
@@ -700,6 +724,7 @@ let ActionBar = props => (
     <Flex mr="3px" style={{fontSize: '0.8em'}}>
       {props.game.player}
     </Flex>
+    {props.game.phase === 'Choices' && <GameChoicesBar />}
     {props.game.phase === 'Actions' && props.ui.phase === 'Game' && <ActionsStatus />}
     {props.game.phase === 'CardBuying' && <CardBuyingStatus />}
     {props.ui.phase === 'CardCost' && <ChooseResources />}
@@ -774,7 +799,7 @@ let CardBuy = props => (
       BUYING
     </Box>
     <Box px={2}>
-      {props.game.choosingCards[props.player].map(name => (
+      {props.cards.map(name => (
         <Card
           selected={props.selected[name]}
           key={name}
@@ -899,7 +924,13 @@ const TerraformingMars = props => (
           </React.Fragment>
         )}
         {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
-        {props.game.choosingCards[props.player] && <CardBuy />}
+        {props.game.choosingCards[props.player] && (
+          <CardBuy cards={props.game.choosingCards[props.player]} />
+        )}
+        {props.game.phase === 'Choices' &&
+          get(['playerState', props.player, 'choices', 0, 'type'], props.game) == 'KeepCards' && (
+            <CardBuy cards={props.game.playerState[props.player].choices[0].cards} />
+          )}
         <Hand />
       </Box>
     </Flex>

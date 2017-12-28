@@ -1,4 +1,4 @@
-import {omit, omitBy, pick, pull, mapValues} from 'lodash'
+import {omit, omitBy, pick, pull, mapValues, flatMap} from 'lodash'
 import {shuffle} from 'shuffle-seed'
 
 import {
@@ -183,6 +183,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
       cardActionsUsedThisGeneration: {},
       hasIncreasedTRThisGeneration: false,
       resources: clone<ResourcesState>(INITIAL_RESOURCES),
+      choices: [],
     }
   })
 
@@ -295,6 +296,7 @@ const switchToNextPlayer = state => {
     offset++
   }
   state.player = nextPlayer
+  state.playerState[state.player].choices = []
   state.actionsDone = 0
   return state
 }
@@ -396,7 +398,7 @@ export const handlers = {
 
     // Possible corporation effects
     if (corporation.effects) {
-      state = applyEffects(state, action.player, corporation.effects)
+      state = applyEffects(state, action, corporation.effects)
     }
 
     if (isDoneChoosingCorporations(state)) {
@@ -406,7 +408,7 @@ export const handlers = {
     }
     return state
   },
-  [UserAction.BuyCards]: (state, action) => {
+  [UserAction.BuyCards]: (state: GameState, action) => {
     state = buyCards(state, action.player, action.chosen)
     if (isDoneBuyingCards(state)) {
       state.phase = Phase.Actions
@@ -416,10 +418,37 @@ export const handlers = {
     return state
   },
   // During generation
-  [UserAction.Action]: (state, action) => {
+  [UserAction.Action]: (state: GameState, action) => {
     if (action.player && action.player !== state.player) throw Error('Invalid player')
     state = turnActionHandlers[action.actionType](state, action)
+
+    // Check if any remaining choices.
+    if (state.playerState[state.player].choices.length > 0) {
+      state.phase = Phase.Choices
+      return state
+    }
+
     state.actionsDone++
+    if (state.actionsDone === 2) {
+      // Get next player.
+      state = switchToNextPlayer(state)
+    }
+    return state
+  },
+
+  [UserAction.Choices]: (state: GameState, action) => {
+    if (action.player && action.player !== state.player) throw Error('Invalid player')
+    const currentChoice = state.playerState[state.player].choices[0]
+    state.playerState[state.player].choices.splice(0, 1)
+    state = applyEffects(state, action, currentChoice.effects)
+
+    if (state.playerState[state.player].choices.length > 0) {
+      state.phase = Phase.Choices
+      return state
+    }
+
+    state.actionsDone++
+    state.phase = Phase.Actions
     if (state.actionsDone === 2) {
       // Get next player.
       state = switchToNextPlayer(state)
