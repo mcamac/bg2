@@ -24,9 +24,12 @@ const COLORS = {
   city: '#ccc',
 }
 
+const PLAYER_COLORS = ['blue', 'red', 'cyan', 'black']
+
 let Tile = props => {
   const xc = 220 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
   const yc = 210 + 3 / 2 * RADIUS * -props.y
+  const tile = props.map[`${props.x},${props.y}`]
   return (
     <g>
       <polygon
@@ -44,9 +47,15 @@ let Tile = props => {
           points={hexPoints(xc, yc, RADIUS - 4)}
         />
       )}
-      {props.map[`${props.x},${props.y}`] &&
+      {tile &&
         !isOcean([props.x, props.y]) && (
-          <rect x={xc - 5} y={yc - 5} width={10} height={10} fill="blue" />
+          <rect
+            x={xc - 5}
+            y={yc - 5}
+            width={10}
+            height={10}
+            fill={PLAYER_COLORS[props.players.indexOf(tile.owner)]}
+          />
         )}
     </g>
   )
@@ -59,7 +68,14 @@ let Grid = props => (
     <g>
       {range(-4, 5).map(row =>
         range(Math.max(-4, -4 - row), Math.min(4, 4 - row) + 1).map(col => (
-          <Tile key={`${col}-${row}`} y={row} x={col} onClick={props.onClickTile} map={props.map} />
+          <Tile
+            key={`${col}-${row}`}
+            y={row}
+            x={col}
+            onClick={props.onClickTile}
+            players={props.players}
+            map={props.map}
+          />
         ))
       )}
     </g>
@@ -69,6 +85,7 @@ let Grid = props => (
 Grid = connect(
   state => ({
     map: state.game.map,
+    players: state.game.players,
   }),
   dispatch => ({
     onClickTile: position => dispatch(chooseTile(position)),
