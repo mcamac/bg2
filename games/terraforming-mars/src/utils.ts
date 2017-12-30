@@ -37,12 +37,14 @@ export const DecreaseAnyInventory = (delta: number, type: string) => (
   return state
 }
 
-export const ChangeAnyCardResource = (n: number, type: string) => (
+export const ChangeAnyCardResource = (n: number, type: string, minimum?: number) => (
   state: GameState,
   action: {sold: string[]},
   choice: {card: string},
   card: Card
 ): GameState => {
+  // todo: check type, min
+
   if (!state.playerState[state.player].cardResources[card.name])
     state.playerState[state.player].cardResources[card.name] = 0
 
@@ -105,7 +107,23 @@ export const Draw = (n: number) => (state: GameState, action, choice): GameState
   return newState
 }
 
-export const IncreaseTR = (delta: number | ((state: GameState) => number)) => {}
+export const IncreaseTR = (n: number | any[]) => (state: GameState): GameState => {
+  if (typeof n !== 'number') {
+    const [effect, ...args] = n
+    n = <number>REGISTRY[effect](...args)
+  }
+  state.playerState[state.player].TR += n
+  state.playerState[state.player].hasIncreasedTRThisGeneration = true
+  return state
+}
+
+export const IncreaseResourceValue = (n: number, resource: ResourceType) => (
+  state: GameState
+): GameState => {
+  state.playerState[state.player].conversions[resource] += n
+  return state
+}
+
 export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
   if (state.globalParameters.Heat < 0 && state.globalParameters.Heat + 2 * n >= 0) {
     // Player gets to place an ocean
@@ -115,6 +133,7 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
     })
   }
   state.playerState[state.player].TR += n
+  state.playerState[state.player].hasIncreasedTRThisGeneration = true
   state.globalParameters.Heat += 2 * n
   return state
 }
@@ -124,6 +143,7 @@ export const PlaceOceans = () => (state: GameState, action, choice): GameState =
   if (!isOcean(choice.location)) throw Error('Not an ocean tile')
   state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.location)
   state.playerState[state.player].TR += 1
+  state.playerState[state.player].hasIncreasedTRThisGeneration = true
   state.globalParameters.Oceans += 1
   return state
 }
@@ -132,11 +152,17 @@ export const PlaceCity = () => (state: GameState, action, choice): GameState => 
   return placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
 }
 
+export const PlaceIndustrialCenter = () => (state: GameState, action, choice): GameState => {
+  // todo: check adjacency
+  return placeTile(state, {owner: state.player, type: TileType.IndustrialCenter}, choice.location)
+}
+
 export const PlaceGreenery = () => (state: GameState, action, choice): GameState => {
   // todo: check adjacency
   state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
   state.globalParameters.Oxygen += 1
   state.playerState[state.player].TR += 1
+  state.playerState[state.player].hasIncreasedTRThisGeneration = true
   return state
 }
 
@@ -361,10 +387,12 @@ const REGISTRY = {
   DrawAndChoose,
   IncreaseTR,
   IncreaseTemperature,
+  IncreaseResourceValue,
   RaiseOxygen,
   PlaceOceans,
   PlaceCity,
   PlaceGreenery,
+  PlaceIndustrialCenter,
   SellCards,
   // Choices only
   KeepCards,

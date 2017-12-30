@@ -114,9 +114,9 @@ const requiresByType = (type, count, tag) => {
   return type
 }
 
-const CardRequirements = ({requires: [[type, ...args]]}) => (
+const CardRequirements = ({requires}) => (
   <Flex px="4px" ml="4px" style={{background: 'rgba(255, 255, 255, 0.5)'}}>
-    {requiresByType(type, ...args)}
+    {requires.map(([type, ...args], i) => <Box key={i}>{requiresByType(type, ...args)}</Box>)}
   </Flex>
 )
 
@@ -130,15 +130,18 @@ const ChangeProduction = (value, resource) => (
 )
 
 const ChangeInventory = (value, resource) => (
-  <Flex>
-    {withSign(value)} {typeof resource === 'string' ? <Icon g={resource} /> : resource}
+  <Flex align="center">
+    {typeof value === 'number' ? withSign(value) : Effect(...value)}
+    {typeof resource === 'string' ? <Icon g={resource} /> : resource}
   </Flex>
 )
 
-const ChangeCardResource = (value, resource) => (
+const ChangeCardResource = (value, card) => (
   <Flex align="center">
     <Box>{withSign(value)}</Box>
-    <Box px="4px">{typeof resource === 'string' ? <Icon g={resource} /> : resource}</Box>{' '}
+    <Box px="4px">
+      <Icon g={card.resource} />
+    </Box>
     <Box> on card</Box>
   </Flex>
 )
@@ -194,6 +197,12 @@ const DrawAndChoose = (value, nKeep, card) => (
   </Flex>
 )
 
+const BuyOrDiscard = () => (
+  <Flex align="center">
+    <Icon g="Card" /> buy or discard
+  </Flex>
+)
+
 const RoboticWorkforce = () => (
   <Flex>
     Copy the production box of any <Tag name="Building" />
@@ -211,7 +220,15 @@ const Choice = (choices, card) => (
 )
 
 const TR = () => (
-  <span style={{background: '#e82f2f', color: 'white', fontWeight: 500, padding: '2px 4px'}}>
+  <span
+    style={{
+      margin: '0 4px',
+      background: '#e82f2f',
+      color: 'white',
+      fontWeight: 500,
+      padding: '2px 4px',
+    }}
+  >
     TR
   </span>
 )
@@ -227,10 +244,40 @@ const PlaceCity = () => (
   </div>
 )
 
+const PlaceCapitalCity = () => (
+  <div>
+    Capital <Tag name="City" />
+  </div>
+)
+
+const MultiCost = (value, resources) => (
+  <Flex align="center">
+    Pay {value} (can use <Icon g={resources[0]} />)
+  </Flex>
+)
+
+const IncreaseResourceValue = (value, resource) => (
+  <Flex align="center">
+    {withSign(value)} to <Icon g={resource} /> value
+  </Flex>
+)
+
+const PlaceNoctis = () => (
+  <Flex align="center">
+    Place Noctis <Tag name="City" />
+  </Flex>
+)
+
 const PlaceGreenery = () => (
   <div>
     <Tag name="Greenery" />
   </div>
+)
+
+const PlaceGreeneryOnOcean = () => (
+  <Flex align="center">
+    <Tag name="Greenery" /> on ocean
+  </Flex>
 )
 
 const VPForCardResources = (resource, count) => (
@@ -246,8 +293,26 @@ const VPForTags = tag => (
 )
 
 const GetTags = (tag, ratio) => (
-  <Flex>
+  <Flex ailgn="center">
     1 / {ratio && ratio} <Tag name={tag} />
+  </Flex>
+)
+
+const GetCities = (tag, ratio) => (
+  <Flex ailgn="center">
+    1 / {ratio && ratio} <Tag name="City" />
+  </Flex>
+)
+
+const OffsetRequirements = value => (
+  <Flex ailgn="center">
+    -{value}/+{value} to global reqs.
+  </Flex>
+)
+
+const GetCitiesOnMars = (tag, ratio) => (
+  <Flex ailgn="center">
+    1 / {ratio && ratio} <Tag name="City" /> on mars
   </Flex>
 )
 
@@ -257,42 +322,60 @@ const VPIfCardHasResources = (resource, count, vp) => (
   </Flex>
 )
 
+const UNTerraform = () => (
+  <Flex align="center">
+    If <TR /> this gen, -3 <Icon g="Money" /> +1 <TR />
+  </Flex>
+)
+
 const EFFECTS = {
   ChangeProduction,
   ChangeInventory,
   ChangeCardResource,
   ChangeAnyCardResource,
+  OffsetRequirements,
   PlaceOceans,
   PlaceCity,
+  PlaceNoctis,
+  PlaceCapitalCity,
   PlaceGreenery,
+  PlaceGreeneryOnOcean,
+  MultiCost,
   RaiseOxygen,
   DecreaseAnyProduction,
   DecreaseAnyInventory,
   IncreaseTemperature,
   RoboticWorkforce,
   IncreaseTR,
+  IncreaseResourceValue,
   Choice,
+  BuyOrDiscard,
   Draw,
   DrawAndChoose,
   VPForTags,
   VPForCardResources,
   VPIfCardHasResources,
   GetTags,
+  GetCities,
+  GetCitiesOnMars,
+  UNTerraform,
 }
 
-const CardEffects = props => (
-  <Flex align="center">
-    {props.effects.map(([effect, ...args], i) => (
-      <Box key={i}>
-        {EFFECTS[effect] ? (
-          EFFECTS[effect](...args, props.card)
-        ) : (
-          <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
-        )}
-      </Box>
-    ))}
-  </Flex>
-)
+const CardEffects = props => {
+  return (
+    <Flex align="center">
+      {props.effects.map(([effect, ...args], i) => (
+        <Box key={i}>
+          {EFFECTS[effect] ? (
+            EFFECTS[effect](...args, props.card)
+          ) : (
+            <pre>{JSON.stringify([effect, ...args], null, 2)}</pre>
+          )}
+        </Box>
+      ))}
+    </Flex>
+  )
+}
 
 const ActionWrapper = styled(Flex)`
   padding: 2px 8px;
@@ -355,6 +438,12 @@ const CardVP = props => (
   </Flex>
 )
 
+const CardTriggers = props => (
+  <Flex ml={1} flex="1 1 auto" align="center">
+    <pre>{JSON.stringify(props.triggers)}</pre>
+  </Flex>
+)
+
 const CardDiscounts = props => (
   <Flex ml={1} flex="1 1 auto" align="center">
     {props.discounts.map(([discount, tags], i) => (
@@ -383,18 +472,19 @@ let Card = props => (
     {props.card.actions && (
       <CardActions enabled={props.played} actions={props.card.actions} card={props.card} />
     )}
-    {!props.collapsed &&
-      (props.card.effects || props.card.vp || props.card.discounts) && (
-        <Flex style={{padding: 5}} direction="column">
-          <Flex align="center">
-            {props.card.effects && <CardEffects effects={props.card.effects} card={props.card} />}
-            {props.card.discounts && (
-              <CardDiscounts discounts={props.card.discounts} card={props.card} />
-            )}
-            {props.card.vp && <CardVP card={props.card} />}
-          </Flex>
-        </Flex>
-      )}
+    <Flex px="5px" mt="5px" direction="column">
+      <Flex align="center">
+        {props.card.effects &&
+          !props.collapsed && <CardEffects effects={props.card.effects} card={props.card} />}
+        {props.card.discounts && (
+          <CardDiscounts discounts={props.card.discounts} card={props.card} />
+        )}
+        {props.card.afterCardTriggers && (
+          <CardTriggers triggers={props.card.afterCardTriggers} card={props.card} />
+        )}
+        {props.card.vp && <CardVP card={props.card} />}
+      </Flex>
+    </Flex>
   </CardWrapper>
 )
 
@@ -413,17 +503,22 @@ let Corporation = props => (
       <Flex ml={5}>{(props.corp.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
     {props.corp.actions && <CardActions actions={props.corp.actions} card={props.corp} />}
-    {!props.collapsed &&
-      (props.corp.effects || props.corp.discounts) && (
-        <Flex style={{padding: 5}} direction="column">
-          <Flex align="center">
-            {props.corp.effects && <CardEffects effects={props.corp.effects} card={props.corp} />}
-            {props.corp.discounts && (
-              <CardDiscounts discounts={props.corp.discounts} card={props.corp} />
-            )}
-          </Flex>
-        </Flex>
-      )}
+    <Flex px="5px" my="5px" direction="column">
+      <Flex align="center">
+        {!props.collapsed && props.corp.text && <Box py="4px">{props.corp.text}</Box>}
+        {!props.collapsed &&
+          props.corp.effects && <CardEffects effects={props.corp.effects} card={props.corp} />}
+        {props.corp.discounts && (
+          <CardDiscounts discounts={props.corp.discounts} card={props.corp} />
+        )}
+        {props.corp.afterCardTriggers && (
+          <CardTriggers triggers={props.corp.afterCardTriggers} card={props.corp} />
+        )}
+        {props.corp.afterTileTriggers && (
+          <CardTriggers triggers={props.corp.afterTileTriggers} card={props.corp} />
+        )}
+      </Flex>
+    </Flex>
   </CardWrapper>
 )
 
@@ -711,7 +806,14 @@ ChooseResources = compose(
       resources: state.game.playerState[state.player].resources,
     }),
     (dispatch, props) => ({
-      onSubmit: () => dispatch(uiSetCardCost(props.count)),
+      onSubmit: () =>
+        dispatch(
+          uiSetCardCost({
+            Money: parseInt(props.count.money) || 0,
+            Titanium: parseInt(props.count.titanium) || 0,
+            Steel: parseInt(props.count.steel) || 0,
+          })
+        ),
     })
   )
 )(ChooseResources)

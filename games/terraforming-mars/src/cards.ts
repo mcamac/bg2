@@ -68,7 +68,7 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Science'],
     actionText: 'Action: Look at the top card and either buy it or discard it',
-    // otodo
+    actions: [[['BuyOrDiscard']]],
   },
   {
     name: 'Martian Rail',
@@ -77,7 +77,12 @@ export const CARDS: Card[] = [
     deck: 'Basic',
     tags: ['Building'],
     actionText: 'Action: Spend 1 energy to gain 1 MC for each city tile ON MARS.',
-    // todo
+    actions: [
+      [
+        ['ChangeInventory', -1, ResourceType.Energy],
+        ['ChangeInventory', ['GetCitiesOnMars'], ResourceType.Money],
+      ],
+    ],
   },
   {
     name: 'Capital',
@@ -85,11 +90,15 @@ export const CARDS: Card[] = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building', 'City'],
-    placeTiles: true,
+    vp: ['CapitalCity'],
     effectText:
       'Requires 4 ocean tiles. Place [the capital city] tile. Decrease your energy production 2 steps and increase your MC production 5 steps. 1 ADDITIONAL VP FOR EACH OCEAN TILE ADJACENT TO THIS CITY TILE.',
     requires: [['MinOceans', 4]],
-    // todo
+    effects: [
+      ['PlaceCapitalCity'],
+      ['ChangeProduction', -2, ResourceType.Energy],
+      ['ChangeProduction', 5, ResourceType.Money],
+    ],
   },
   {
     name: 'Asteroid',
@@ -99,7 +108,11 @@ export const CARDS: Card[] = [
     tags: ['Space', 'Event'],
     effectText:
       'Raise temperature 1 step and gain 2 titanium. Remove up to 3 plants from any player.',
-    // todo
+    effects: [
+      ['IncreaseTemperature', 1],
+      ['ChangeInventory', 2, ResourceType.Titanium],
+      ['DecreaseAnyInventory', 3, ResourceType.Plant],
+    ],
   },
   {
     name: 'Comet',
@@ -140,6 +153,7 @@ export const CARDS: Card[] = [
     actionText:
       'Action: Pay 12 MC to place an ocean tile. TITANIUM MAY BE USED as if playing a space card.',
     effectText: '1 VP for each Jovian tag you have.',
+    actions: [[['MultiCost', 12, [ResourceType.Titanium]], ['PlaceOceans']]],
   },
   {
     name: 'Space Elevator',
@@ -259,7 +273,10 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText:
       'Increase your titanium production 1 step and place a city tile ON THE RESERVED AREA.',
-    // todo
+    effects: [
+      ['ChangeProduction', 1, ResourceType.Titanium],
+      ['PlaceSpecialCity', 'Phobos Space Haven'],
+    ],
   },
   {
     name: 'Black Polar Dust',
@@ -295,12 +312,7 @@ export const CARDS: Card[] = [
     vp: ['VPForCardResources', CardResource.Animals],
     actionText: 'Action: Remove 1 animal from any card and add it to this card.',
     effectText: 'Requires 11% oxygen. 1 VP per animal on this card.',
-    actions: [
-      [
-        ['ChangeAnyCardResource', -1, CardResource.Animals],
-        ['ChangeCardResource', 1, CardResource.Animals],
-      ],
-    ],
+    actions: [[['ChangeAnyCardResource', -1, CardResource.Animals], ['ChangeCardResource', 1]]],
     resourceHeld: CardResource.Animals,
     requires: [['MinOxygen', 11]],
   },
@@ -349,12 +361,7 @@ export const CARDS: Card[] = [
     vp: ['VPForCardResources', CardResource.Fighters],
     actionText: 'Action: Spend 1 titanium to add 1 fighter resource to this card.',
     effectText: '1 VP for each fighter resource on this card.',
-    actions: [
-      [
-        ['ChangeInventory', -1, ResourceType.Titanium],
-        ['ChangeCardResource', 1, CardResource.Fighters],
-      ],
-    ],
+    actions: [[['ChangeInventory', -1, ResourceType.Titanium], ['ChangeCardResource', 1]]],
     resourceHeld: CardResource.Fighters,
   },
   {
@@ -422,10 +429,7 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Microbe'],
     actionText:
       'Action: Add 1 microbe to this card, or remove 2 microbe from this card to raise oxygen level 1 step.',
-    actions: [
-      [['ChangeCardResource', 1, CardResource.Microbes]],
-      [['ChangeCardResource', -2, CardResource.Microbes], ['RaiseOxygen', 1]],
-    ],
+    actions: [[['ChangeCardResource', 1]], [['ChangeCardResource', -2], ['RaiseOxygen', 1]]],
     resourceHeld: CardResource.Microbes,
   },
   {
@@ -437,8 +441,8 @@ export const CARDS: Card[] = [
     actionText:
       'Action: Add 1 microbe to this card, or remove 2 microbes to raise temperature 1 step.',
     actions: [
-      [['ChangeCardResource', 1, CardResource.Microbes]],
-      [['ChangeCardResource', -2, CardResource.Microbes], ['IncreaseTemperature', 1]],
+      [['ChangeCardResource', 1]],
+      [['ChangeCardResource', -2], ['IncreaseTemperature', 1]],
     ],
     effectText: 'Requires 4% oxygen.',
     resourceHeld: CardResource.Microbes,
@@ -454,12 +458,7 @@ export const CARDS: Card[] = [
     actionText: 'Action: Remove 1 microbe from any card to add 1 to this card.',
     effectText: 'Requires 4% oxygen. 1 VP per 2 microbes on this card.',
     resourceHeld: CardResource.Microbes,
-    actions: [
-      [
-        ['ChangeAnyCardResource', -1, CardResource.Microbes],
-        ['ChangeCardResource', 1, CardResource.Microbes],
-      ],
-    ],
+    actions: [[['ChangeAnyCardResource', -1, CardResource.Microbes], ['ChangeCardResource', 1]]],
     requires: [['MinOxygen', 4]],
   },
   {
@@ -571,6 +570,7 @@ export const CARDS: Card[] = [
     effectText:
       'Oxygen must be 4% or less. Place this tile NEXT TO NO OTHER TILE. Increase your MC production 1 step.',
     requires: [['MaxOxygen', 4]],
+    effects: [['PlaceNaturalPreserve'], ['ChangeProduction', 1, ResourceType.Money]],
   },
   {
     name: 'Nuclear Power',
@@ -630,7 +630,7 @@ export const CARDS: Card[] = [
     vp: ['VPForCardResources', CardResource.Microbes, 4],
     actionText: 'Action: Add 1 microbe to this card.',
     effectText: '1 VP per 4 microbes on this card.',
-    actions: [[['ChangeCardResource', 1, CardResource.Microbes]]],
+    actions: [[['ChangeCardResource', 1]]],
     resourceHeld: CardResource.Microbes,
   },
   {
@@ -670,7 +670,7 @@ export const CARDS: Card[] = [
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
       'Requires 2\u00b0C or warmer. Decrease any plant production 1 step. 1 VP for each animal on this card.',
-    actions: [[['ChangeCardResource', 1, CardResource.Animals]]],
+    actions: [[['ChangeCardResource', 1]]],
     effects: [['DecreaseAnyProduction', 1, ResourceType.Plant]],
     resourceHeld: CardResource.Animals,
     requires: [['MinHeat', 2]],
@@ -696,7 +696,7 @@ export const CARDS: Card[] = [
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
       'Requires 6% oxygen. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
-    actions: [[['ChangeCardResource', 1, CardResource.Animals]]],
+    actions: [[['ChangeCardResource', 1]]],
     effects: [['DecreaseAnyProduction', 1, ResourceType.Plant]],
     resourceHeld: CardResource.Animals,
     requires: [['MinOxygen', 6]],
@@ -904,7 +904,10 @@ export const CARDS: Card[] = [
     tags: ['Science'],
     actionText:
       'Effect: Each titanium you have is worth 1MC extra. Each steel you have is worth 1 MC extra.',
-    // TODO
+    effects: [
+      ['IncreaseResourceValue', 1, ResourceType.Steel],
+      ['IncreaseResourceValue', 1, ResourceType.Titanium],
+    ],
   },
   {
     name: 'Birds',
@@ -916,7 +919,7 @@ export const CARDS: Card[] = [
     actionText: 'Action: Add an animal to this card.',
     effectText:
       'Requires 13% oxygen. Decrease any plant production 2 steps. 1 VP for each animal on this card',
-    actions: [[['ChangeCardResource', 1, CardResource.Animals]]],
+    actions: [[['ChangeCardResource', 1]]],
     effects: [['DecreaseAnyProduction', 2, ResourceType.Plant]],
     resourceHeld: CardResource.Animals,
     requires: [['MinOxygen', 13]],
@@ -1027,7 +1030,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText:
       'Place a city tile ON THE RESERVED AREA [for Ganymede Colony]. 1 VP per Jovian tag you have.',
-    // TODO
+    effects: [['PlaceSpecialCity', 'Ganymede Colony']],
   },
   {
     name: 'Callisto Penal Mines',
@@ -1055,7 +1058,6 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Science', 'Space'],
     vp: 1,
-    // TODO wat
   },
   {
     name: 'Commercial District',
@@ -1063,10 +1065,15 @@ export const CARDS: Card[] = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
+    vp: ['CommericalDistrict'],
     placeTiles: true,
     effectText:
       'Decrease your energy production 1 step and increase your MC production 4 steps. Place [the commercial district] tile. 1 VP PER ADJACENT CITY TILE.',
-    // TODO wat
+    effects: [
+      ['ChangeProduction', -1, ResourceType.Energy],
+      ['ChangeProduction', 4, ResourceType.Money],
+      ['PlaceCommercialDistrict'],
+    ],
   },
   {
     name: 'Robotic Workforce',
@@ -1187,12 +1194,7 @@ export const CARDS: Card[] = [
     vp: ['VPForCardResources', CardResource.Science, 0.5],
     actionText: 'Action: Spend 6 energy to add a science resource to this card.',
     effectText: '2 VP for each science resource on this card.',
-    actions: [
-      [
-        ['ChangeInventory', -6, ResourceType.Energy],
-        ['ChangeCardResource', 1, CardResource.Science],
-      ],
-    ],
+    actions: [[['ChangeInventory', -6, ResourceType.Energy], ['ChangeCardResource', 1]]],
     resourceHeld: CardResource.Science,
   },
   {
@@ -1211,9 +1213,8 @@ export const CARDS: Card[] = [
     deck: 'Basic',
     tags: ['Earth'],
     vp: -2,
-    placeTiles: true,
     effectText: 'Place [the nuclear zone] tile and raise the temperature 2 steps.',
-    // TODO
+    effects: [['PlaceNuclearZone'], ['IncreaseTemperature', 2]],
   },
   {
     name: 'Tropical Resort',
@@ -1369,8 +1370,8 @@ export const CARDS: Card[] = [
     tags: ['Earth'],
     actionText: 'Action: Look at the top card and either buy it or discard it',
     effectText: 'Decrease your MC production 1 step.',
-    // TODO act
     effects: [['ChangeProduction', -1, ResourceType.Money]],
+    actions: [[['BuyOrDiscard']]],
   },
   {
     name: 'Business Contacts',
@@ -1529,7 +1530,10 @@ export const CARDS: Card[] = [
     placeTiles: true,
     actionText: 'Action: Spend 7 MC to increase your steel production 1 step.',
     effectText: 'Place [the Industrial Center] tile ADJACENT TO A CITY TILE.',
-    // todo
+    actions: [
+      [['ChangeInventory', -7, ResourceType.Money], ['ChangeProduction', 1, ResourceType.Steel]],
+    ],
+    effects: [['PlaceIndustrialCenter']],
   },
   {
     name: 'Hired Raiders',
@@ -1538,7 +1542,12 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Event'],
     effectText: 'Steal up to 2 steel, or 3MC from any player.',
-    // todo
+    effects: [
+      [
+        'Choice',
+        [[['StealInventory', 2, ResourceType.Steel]], [['StealInventory', 3, ResourceType.Money]]],
+      ],
+    ],
   },
   {
     name: 'Hackers',
@@ -1589,6 +1598,7 @@ export const CARDS: Card[] = [
     effectText:
       'Requires that you have a greenery tile. Place [the Ecological Zone] tile ADJACENT TO ANY GREENERY TILE. 1 VP per 2 animals on this card.',
     resourceHeld: CardResource.Animals,
+    todo: true,
   },
   {
     name: 'Zeppelins',
@@ -1622,9 +1632,12 @@ export const CARDS: Card[] = [
     actionText:
       'Effect: When you play an animal, plant, or microbe tag, including this, add a microbe to this card.',
     effectText: 'Requires 3# oxygen. 1 VP per 3 microbes on this card.',
-    // todo
     resourceHeld: CardResource.Microbes,
     requires: [['MinOxygen', 3]],
+    afterCardTriggers: [
+      ['PlayedTagMatches', [[Tag.Plant], [Tag.Microbe], [Tag.Animal]]],
+      [['ChangeCardResource', 1]],
+    ],
   },
   {
     name: 'Fusion Power',
@@ -1723,10 +1736,9 @@ export const CARDS: Card[] = [
     type: 'Event',
     deck: 'Basic',
     tags: ['Event'],
-    placeTiles: true,
     effectText:
       'Raise the temperature 2 steps and place this [the Lava Flow] tile ON EITHER THARSIS THOLUS, ASCRAEUS MONS, PAVONIS MONS OR ARSIA MONS.',
-    // todo
+    effects: [['IncreaseTemperature', 2], ['PlaceLavaFlow']],
   },
   {
     name: 'Power Plant',
@@ -1814,9 +1826,10 @@ export const CARDS: Card[] = [
     actionText: 'Effect: When you place a greenery tile, add an animal to this card.',
     effectText:
       'Requires 8% oxygen. Add 1 animal to this card. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
-    // todo
     resourceHeld: CardResource.Animals,
     requires: [['MinOxygen', 8]],
+    afterTileTriggers: [[TileType.Greenery, true], [['ChangeCardResource', 1]]],
+    effects: [['ChangeCardResource', 1], ['DecreaseAnyProduction', 1, ResourceType.Plant]],
   },
   {
     name: 'Insects',
@@ -1836,7 +1849,7 @@ export const CARDS: Card[] = [
     deck: 'Corporate',
     tags: ['Event'],
     effectText: 'Add 1 resource to a card with at least 1 resource on it.',
-    // todo
+    effects: [['ChangeAnyCardResource', 1, null, 1]],
   },
   {
     name: 'Anti-Gravity Technology',
@@ -1882,7 +1895,7 @@ export const CARDS: Card[] = [
     tags: ['Science'],
     vp: 1,
     actionText: 'Effect: Your global requirements are +2 or -2 steps, your choice in each case.',
-    // todo
+    effects: [['OffsetRequirements', 2]],
   },
   {
     name: 'Caretaker Contract',
@@ -1922,13 +1935,9 @@ export const CARDS: Card[] = [
     actionText:
       'Action: Add 1 microbe to this card, or remove 3 microbes to increase your TR 1 step.',
     effectText: 'Add 3 microbes to this card.',
-    actions: [
-      [['ChangeCardResource', 1, CardResource.Microbes]],
-      [['ChangeCardResource', -3, CardResource.Microbes], ['IncreaseTR', 1]],
-    ],
+    actions: [[['ChangeCardResource', 1]], [['ChangeCardResource', -3], ['IncreaseTR', 1]]],
     effects: [['ChangeCardResource', 3, CardResource.Microbes]],
     resourceHeld: CardResource.Microbes,
-    // todo
   },
   {
     name: 'Industrial Microbes',
@@ -2117,8 +2126,8 @@ export const CARDS: Card[] = [
       'Effect: When any city tile is placed, add an animal to this card. Animals may not be removed from this card.',
     effectText: 'Add 1 animal to this card. 1 VP per 2 animals here.',
     resourceHeld: CardResource.Animals,
-    afterTileTriggers: [[TileType.City], [['ChangeCardResource', 1, CardResource.Animals]]],
-    // todo
+    afterTileTriggers: [[TileType.City], [['ChangeCardResource', 1]]],
+    effects: [['ChangeCardResource', 1]],
   },
   {
     name: 'Protected Habitats',
@@ -2126,7 +2135,7 @@ export const CARDS: Card[] = [
     type: 'Active',
     deck: 'Corporate',
     actionText: '[Effect: ]Opponents may not remove your [plants, animals or microbes]',
-    // todo
+    effects: [['ApplyStatus', 'ProtectedHabitats']],
   },
   {
     name: 'Protected Valley',
@@ -2267,7 +2276,7 @@ export const CARDS: Card[] = [
     actionText: 'Action: Add 1 animal to this card.',
     effectText:
       'Requires 9% oxygen. Decrease your plant production 1 step and increase your MC production 2 steps. 1 VP for each animal on this card.',
-    actions: [[['ChangeCardResource', 1, CardResource.Animals]]],
+    actions: [[['ChangeCardResource', 1]]],
     effects: [
       ['ChangeProduction', -1, ResourceType.Plant],
       ['ChangeProduction', 2, ResourceType.Money],
@@ -2287,15 +2296,7 @@ export const CARDS: Card[] = [
     resourceHeld: CardResource.Science,
     afterCardTriggers: [
       ['PlayedTagMatches', [[Tag.Space]]],
-      [
-        [
-          'Choice',
-          [
-            ['ChangeCardResource', 1, CardResource.Science],
-            [['ChangeCardResource', -1, CardResource.Science], ['Draw', 1]],
-          ],
-        ],
-      ],
+      [['Choice', [['ChangeCardResource', 1], [['ChangeCardResource', -1], ['Draw', 1]]]]],
     ],
   },
   {
@@ -2317,7 +2318,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     actionText:
       'Action: Spend 8 MC to place 1 ocean tile. STEEL MAY BE USED as if you were playing a building card.',
-    // todo
+    actions: [[['MultiCost', 8, [ResourceType.Steel]], ['PlaceOceans']]],
   },
   {
     name: 'Flooding',
@@ -2329,7 +2330,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText:
       'Place an ocean tile. IF THERE ARE TILES ADJACENT TO THIS OCEAN TILE, YOU MAY REMOVE 4 MC FROM THE OWNER OF ONE OF THOSE TILES.',
-    // todo
+    todo: true,
   },
   {
     name: 'Energy Saving',
@@ -2347,7 +2348,16 @@ export const CARDS: Card[] = [
     deck: 'Basic',
     tags: ['Event'],
     effectText: 'Spend 5 heat to either gain 4 plants, or to add 2 animals to ANOTHER card.',
-    // todo
+    effects: [
+      ['ChangeInventory', -5, ResourceType.Heat],
+      [
+        'Choice',
+        [
+          ['ChangeInventory', 4, ResourceType.Plant],
+          ['ChangeAnyCardResource', 2, CardResource.Animals],
+        ],
+      ],
+    ],
   },
   {
     name: 'Permafrost extraction',
@@ -2403,7 +2413,7 @@ export const CARDS: Card[] = [
     tags: ['Event'],
     vp: -1,
     effectText: 'The next card you play this generation costs 8MC less.',
-    // todo
+    effects: [['AddNextCardEffect', ['Discount', 8]]],
   },
   {
     name: 'Lagrange Observatory',
@@ -2441,10 +2451,10 @@ export const CARDS: Card[] = [
     type: 'Active',
     deck: 'Corporate',
     tags: ['Science'],
-    placeTiles: true,
     actionText: 'Action: Spend 2MC to draw a card.',
     effectText: 'Place [the restricted area] tile.',
-    // todo
+    actions: [[['ChangeInventory', -2, ResourceType.Money], ['Draw', 1]]],
+    effects: [['PlaceRestrictedArea']],
   },
   {
     name: 'Immigrant City',
@@ -2523,7 +2533,7 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Event'],
     effectText:
       'The next card you play this generation is +2 or -2 in global requirements, your choice.',
-    // todo
+    effects: [['AddNextCardEffect', ['GlobalRequirements', 2]]],
   },
   {
     name: 'Medical Lab',
@@ -2566,7 +2576,7 @@ export const CARDS: Card[] = [
     actionText:
       'Action: Reveal and place a SPACE OR BUILDING card here from hand, and place 2 resources on it, OR double the resources on a card here. Effect: Cards here may be played as if from hand with its cost reduced by the number of resources on it.',
     effectText: 'Requires 2 science tags.',
-    // todo,
+    todo: true,
     requires: [['HasTags', 2, Tag.Science]],
   },
   {
@@ -2578,7 +2588,10 @@ export const CARDS: Card[] = [
     effectText:
       'Requires 2 oceans. Increase your plant production and your heat production 1 step each.',
     requires: [['MinOceans', 2]],
-    // todo
+    effects: [
+      ['ChangeProduction', 2, ResourceType.Plant],
+      ['ChangeProduction', 1, ResourceType.Heat],
+    ],
   },
 ]
 

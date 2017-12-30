@@ -381,6 +381,7 @@ test('Industrial Microbes', t => {
     type: UserAction.Action,
     actionType: TurnAction.PlayCard,
     card: 'Industrial Microbes',
+    resources: {Money: 12},
   })
 
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 18)
@@ -397,6 +398,7 @@ test('Algae (fail)', t => {
       type: UserAction.Action,
       actionType: TurnAction.PlayCard,
       card: 'Algae',
+      resources: {Money: 10},
     })
   )
 })
@@ -461,6 +463,7 @@ test('Card triggers its own tile trigger', t => {
     type: UserAction.Action,
     actionType: TurnAction.PlayCard,
     card: 'Immigrant City',
+    resources: {Money: 13},
     choices: [null, null, {location: [-4, 4]}],
   })
 
@@ -480,6 +483,7 @@ test('Oceans card', t => {
     type: UserAction.Action,
     actionType: TurnAction.PlayCard,
     card: 'Lake Marineris',
+    resources: {Money: 18},
     choices: [{location: [0, 0]}, {location: [-1, 0]}],
   })
 
@@ -498,6 +502,7 @@ test('Oceans card with invalid choice', t => {
       type: UserAction.Action,
       actionType: TurnAction.PlayCard,
       card: 'Lake Marineris',
+      resources: {Money: 18},
       choices: [{locations: [[3, 3], [-1, 0]]}],
     })
   )
@@ -873,6 +878,7 @@ test('DecreaseAnyProduction: Hackers', t => {
     type: UserAction.Action,
     actionType: TurnAction.PlayCard,
     card: 'Hackers',
+    resources: {Money: 3},
     choices: [null, {player: 'b'}],
   })
 
@@ -892,6 +898,7 @@ test('Choices: DrawAndChoose', t => {
     type: UserAction.Action,
     actionType: TurnAction.PlayCard,
     card: 'Business Contacts',
+    resources: {Money: 7},
     choices: [],
   })
 

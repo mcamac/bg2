@@ -23,10 +23,12 @@ export interface Corporation {
   startingMoney: number
   tags?: string[]
   effects?: any[]
+  actions?: any[]
   afterCardTriggers?: any[]
   afterTileTriggers?: any[]
   afterStandardProjectTriggers?: any[]
   discounts?: any
+  text?: string
 }
 
 export interface Card {
@@ -45,7 +47,7 @@ export interface Card {
   effects?: any[]
   actions?: any[][]
   afterCardTriggers?: [any[], any[]]
-  afterTileTriggers?: [TileType[], any[]]
+  afterTileTriggers?: [any[], any[]]
   afterStandardProjectTriggers?: any[]
   todo?: boolean
 }
@@ -80,12 +82,18 @@ export interface KeepCardsChoice {
   effects: any[]
 }
 
+export interface BuyOrDiscardChoice {
+  type: 'BuyOrDiscard'
+  cards: string[]
+  effects: any[]
+}
+
 export interface PlaceOceanChoice {
   type: 'PlaceOcean'
   effects: any[]
 }
 
-export type UserChoice = KeepCardsChoice | PlaceOceanChoice
+export type UserChoice = KeepCardsChoice | PlaceOceanChoice | BuyOrDiscardChoice
 
 export interface PlayerState {
   resources: ResourcesState
@@ -97,6 +105,13 @@ export interface PlayerState {
   cardActionsUsedThisGeneration: {[key: string]: true}
   hasIncreasedTRThisGeneration: boolean // For UN.
   choices: UserChoice[]
+  statuses: {[key: string]: true} // Protected habitat, etc...
+  nextCardEffect?: any // Discount or requirements
+  globalRequirementsOffset: number
+  conversions: {
+    Titanium: number
+    Steel: number
+  }
 }
 
 export const enum TileType {

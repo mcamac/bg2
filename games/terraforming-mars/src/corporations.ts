@@ -15,13 +15,10 @@ export const CORPORATIONS: Corporation[] = [
   {
     name: 'Credicor',
     startingMoney: 57,
-    afterCardTriggers: [
-      ['PlayedMinCost', 20], 
-      [['ChangeInventory', 4, ResourceType.Money]]
-    ],
+    afterCardTriggers: [['PlayedMinCost', 20], [['ChangeInventory', 4, ResourceType.Money]]],
     afterStandardProjectTriggers: [
       ['StandardProjectMatches', [StandardProject.Greenery, StandardProject.City]],
-      [['ChangeInventory', 4, ResourceType.Money]]
+      [['ChangeInventory', 4, ResourceType.Money]],
     ],
     // TODO: MinCostCard not currently implemented / i think after card triggers only take tags rn
     // e.g., get 4 money back whenever player plays card with minimum base cost of 20
@@ -32,8 +29,8 @@ export const CORPORATIONS: Corporation[] = [
     tags: ['Jovian'],
     effects: [['ChangeProduction', 1, ResourceType.Titanium]],
     afterCardTriggers: [
-      ['PlayedTagMatchesAny', [Tag.Jovian]], 
-      [['ChangeProduction', 1, ResourceType.Money]]
+      ['PlayedTagMatchesAny', [Tag.Jovian]],
+      [['ChangeProduction', 1, ResourceType.Money]],
     ],
     // TODO: Must activate when ANY player plays a Jovian (i think rn, this is just for player played)
   },
@@ -59,7 +56,7 @@ export const CORPORATIONS: Corporation[] = [
     name: 'Inventrix',
     startingMoney: 45,
     tags: ['Science'],
-    effects: [['Draw', 3]], // Todo: match the effects of Adaptation Technology
+    effects: [['Draw', 3], ['OffsetRequirements', 2]],
   },
   {
     name: 'Mining Guild',
@@ -85,12 +82,15 @@ export const CORPORATIONS: Corporation[] = [
     name: 'Phoblog',
     startingMoney: 23,
     tags: ['Space'],
-    effects: [['ChangeInventory', 10, ResourceType.Titanium]],
-    // TODO: implement AdvancedAlloys-like effect to rasie value of titanium
+    effects: [
+      ['ChangeInventory', 10, ResourceType.Titanium],
+      ['IncreaseResourceValue', 1, ResourceType.Titanium],
+    ],
   },
   {
     name: 'Beginner Corporation',
     startingMoney: 42,
+    text: 'Keep all 10 cards.',
   },
   {
     name: 'Interplanetary Cinematics',
@@ -98,8 +98,9 @@ export const CORPORATIONS: Corporation[] = [
     tags: ['Building'],
     effects: [['ChangeInventory', 20, ResourceType.Steel]],
     afterCardTriggers: [
-      ['PlayedTagMatches', [Tag.Event]], 
-      [['ChangeInventory', 2, ResourceType.Money]]],
+      ['PlayedTagMatches', [Tag.Event]],
+      [['ChangeInventory', 2, ResourceType.Money]],
+    ],
   },
   {
     name: 'Teractor',
@@ -111,7 +112,7 @@ export const CORPORATIONS: Corporation[] = [
     name: 'United Nations Mars Initiative (UNMI)',
     startingMoney: 40,
     tags: ['Earth'],
-    // TODO: Implement ability after every generation to pay 3 Money increase Terraforming Rating by 1
+    actions: [[['UNTerraform']]],
   },
 ]
 

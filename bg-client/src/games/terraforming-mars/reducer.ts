@@ -132,6 +132,7 @@ const NEEDS_CHOICE = {
   PlaceOceans: () => ({type: 'tile', tileType: TileType.Ocean}),
   PlaceGreenery: () => ({type: 'tile', tileType: TileType.Greenery}),
   PlaceCity: () => ({type: 'tile', tileType: TileType.City}),
+  PlaceIndustrialCenter: () => ({type: 'tile', tileType: TileType.IndustrialCenter}),
   SellCards: () => ({type: 'cards', text: 'Choose cards to sell.', chosen: {}, confirm: true}),
   DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
   DecreaseAnyInventory: () => ({type: 'player', text: 'Choose player to remove ...'}),

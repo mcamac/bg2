@@ -184,6 +184,12 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
       hasIncreasedTRThisGeneration: false,
       resources: clone<ResourcesState>(INITIAL_RESOURCES),
       choices: [],
+      statuses: {},
+      nextCardEffect: null,
+      conversions: {
+        Titanium: 3,
+        Steel: 2,
+      },
     }
   })
 
@@ -343,7 +349,26 @@ export const turnActionHandlers = {
     const discount = getDiscount(played, card)
     const actualCost = Math.max(0, card.cost - discount)
 
-    changeInventory(state, state.player, ResourceType.Money, -actualCost)
+    const resources = {
+      Money: action.resources.Money || 0,
+      Steel: action.resources.Steel || 0,
+      Titanium: action.resources.Titanium || 0,
+    }
+
+    const paidFor =
+      resources.Money +
+      playerState.conversions.Steel * resources.Steel +
+      playerState.conversions.Titanium * resources.Titanium
+
+    if ((card.tags || []).indexOf(Tag.Building) === -1 && resources.Steel > 0)
+      throw Error('Cannot use steel.')
+    if ((card.tags || []).indexOf(Tag.Space) === -1 && resources.Titanium > 0)
+      throw Error('Cannot use titanium.')
+    if (paidFor < actualCost) throw Error('Did not pay enough.')
+
+    changeInventory(state, state.player, ResourceType.Money, -resources.Money)
+    changeInventory(state, state.player, ResourceType.Steel, -resources.Steel)
+    changeInventory(state, state.player, ResourceType.Titanium, -resources.Titanium)
 
     // Play to board and remove from hand
     playerState.played.push(cardName)

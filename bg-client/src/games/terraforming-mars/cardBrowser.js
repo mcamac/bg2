@@ -15,7 +15,6 @@ const CardBrowser = props => (
     {CARDS.map(card => (
       <div key={card.name}>
         <Card name={card.name} />
-        {card.todo && <div>TODO</div>}
       </div>
     ))}
   </div>
