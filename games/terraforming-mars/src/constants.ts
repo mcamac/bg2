@@ -15,6 +15,8 @@ export const OCEAN_POSITIONS: Position[] = [
   [4, -4],
 ]
 
+export const VOLCANO_POSITIONS: Position[] = [[-4, 0], [-4, 1], [-4, 2], [-3, 3]]
+
 export const RESOURCE_BONUSES = {
   '-4,4': [ResourceBonus.Steel, ResourceBonus.Steel],
   '-4,2': [ResourceBonus.Card],

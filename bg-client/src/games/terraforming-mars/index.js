@@ -140,7 +140,7 @@ const ChangeCardResource = (value, card) => (
   <Flex align="center">
     <Box>{withSign(value)}</Box>
     <Box px="4px">
-      <Icon g={card.resource} />
+      <Icon g={card.resourceHeld} />
     </Box>
     <Box> on card</Box>
   </Flex>
@@ -174,6 +174,7 @@ const PlaceOceans = (value, card) => (
     <Icon g="Ocean" />
   </Flex>
 )
+
 const IncreaseTemperature = (value, card) => (
   <Flex>
     {withSign(value)} <Icon g="Temp" />
@@ -328,6 +329,13 @@ const UNTerraform = () => (
   </Flex>
 )
 
+const Branch = (cond, effectsTrue, effectsFalse) => (
+  <Flex align="center">
+    If {requiresByType(...cond)} <CardEffects effects={effectsTrue} /> else{' '}
+    <CardEffects effects={effectsFalse} />
+  </Flex>
+)
+
 const EFFECTS = {
   ChangeProduction,
   ChangeInventory,
@@ -359,6 +367,7 @@ const EFFECTS = {
   GetCities,
   GetCitiesOnMars,
   UNTerraform,
+  Branch,
 }
 
 const CardEffects = props => {
@@ -995,17 +1004,19 @@ const TerraformingMars = props => (
             {props.game.playerState[props.player].corporation && (
               <Corporation name={props.game.playerState[props.player].corporation} collapsed />
             )}
-            {props.game.playerState[props.player].played.map(name => (
-              <Card played key={name} name={name} collapsed />
-            ))}
+            {props.game.playerState[props.player].played
+              .slice(0, 10)
+              .map(name => <Card played key={name} name={name} collapsed />)}
           </Box>
           <Box mr={1}>
-            <Card cost={23} name="Development Center" collapsed />
-            <Card cost={23} name="Development Center" collapsed />
+            {props.game.playerState[props.player].played
+              .slice(10, 20)
+              .map(name => <Card played key={name} name={name} collapsed />)}
           </Box>
           <Box>
-            <Card cost={23} name="Development Center" type="Active" />
-            <Card cost={23} name="Development Center" type="Active" />
+            {props.game.playerState[props.player].played
+              .slice(20)
+              .map(name => <Card played key={name} name={name} collapsed />)}
           </Box>
         </Flex>
       </Box>

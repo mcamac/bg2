@@ -131,8 +131,11 @@ const game = (state = STATE, action) => {
 const NEEDS_CHOICE = {
   PlaceOceans: () => ({type: 'tile', tileType: TileType.Ocean}),
   PlaceGreenery: () => ({type: 'tile', tileType: TileType.Greenery}),
+  PlaceGreeneryOnOcean: () => ({type: 'tile', tileType: TileType.Greenery}),
+  PlaceNaturalPreserve: () => ({type: 'tile', tileType: TileType.NaturalPreserve}),
   PlaceCity: () => ({type: 'tile', tileType: TileType.City}),
   PlaceIndustrialCenter: () => ({type: 'tile', tileType: TileType.IndustrialCenter}),
+  PlaceResearchOutpost: () => ({type: 'tile', tileType: TileType.City}),
   SellCards: () => ({type: 'cards', text: 'Choose cards to sell.', chosen: {}, confirm: true}),
   DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
   DecreaseAnyInventory: () => ({type: 'player', text: 'Choose player to remove ...'}),

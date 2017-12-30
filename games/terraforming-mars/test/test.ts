@@ -387,6 +387,239 @@ test('Industrial Microbes', t => {
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 18)
 })
 
+test('Branch: Nitrogen-Rich Asteroid', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 31
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Nitrogen-Rich Asteroid',
+    resources: {Money: 31},
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Plant].production, 3)
+})
+
+test('Branch: Nitrogen-Rich Asteroid (true)', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 31
+  state.playerState['a'].played = ['Algae', 'Adapted Lichen']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Nitrogen-Rich Asteroid',
+    resources: {Money: 31},
+  })
+
+  // ecoline
+  t.is(state.playerState['a'].resources[ResourceType.Plant].production, 6)
+})
+
+test('Media Archives', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 8
+  state.playerState['a'].played = ['Business Contacts']
+  state.playerState['b'].played = ['Bribed Committee']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Media Archives',
+    resources: {Money: 8},
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 2)
+})
+
+test('Cartel', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 8
+  state.playerState['a'].played = ['Investment Loan', 'Pets']
+  state.playerState['b'].played = ['Olympus Conference']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Cartel',
+    resources: {Money: 8},
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].production, 2)
+})
+
+test('Mining Area', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 8
+  state.map['-4,3'] = {owner: 'a', type: TileType.City}
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Mining Area',
+    resources: {Money: 4},
+    choices: [{location: [-4, 4], resource: 'Steel'}],
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Steel].production, 1)
+  t.is(state.playerState['a'].resources[ResourceType.Steel].count, 2)
+})
+
+test('Mining Area (fail bonus)', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 8
+  state.map['-4,2'] = {owner: 'a', type: TileType.City}
+
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Mining Area',
+      resources: {Money: 4},
+      choices: [{location: [-4, 3], resource: 'Steel'}],
+    })
+  )
+})
+
+test('Mining Area (fail adjacent)', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 8
+
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Mining Area',
+      resources: {Money: 4},
+      choices: [{location: [-4, 4], resource: 'Steel'}],
+    })
+  )
+})
+
+test('Mining Rights', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 9
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Mining Rights',
+    resources: {Money: 9},
+    choices: [{location: [-4, 4], resource: 'Steel'}],
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Steel].production, 1)
+  t.is(state.playerState['a'].resources[ResourceType.Steel].count, 2)
+})
+
+test('Mangrove', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 12
+  state.globalParameters.Heat = 4
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Mangrove',
+    resources: {Money: 12},
+    choices: [{location: [-1, 0]}],
+  })
+
+  t.is(state.map['-1,0'].owner, 'a')
+})
+
+test('Ganymede Colony', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 20
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Ganymede Colony',
+    resources: {Money: 20},
+  })
+
+  t.is(state.map['Ganymede Colony'].owner, 'a')
+})
+
+test('Natural Preserve', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 12
+  state.globalParameters.Heat = 4
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Natural Preserve',
+    resources: {Money: 9},
+    choices: [{location: [-1, 1]}],
+  })
+
+  t.is(state.map['-1,1'].owner, 'a')
+})
+
+test('Adaptation Technology: Heat', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 20
+  state.globalParameters.Heat = -28
+
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Lichen',
+      resources: {Money: 7},
+    })
+  )
+
+  state = handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Adaptation Technology',
+    resources: {Money: 12},
+  })
+
+  t.notThrows(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Lichen',
+      resources: {Money: 7},
+    })
+  )
+})
+
+test('Natural Preserve (fail)', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 12
+  state.globalParameters.Heat = 4
+  state.map['0,0'] = {owner: 'a', type: TileType.Ocean}
+
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Natural Preserve',
+      resources: {Money: 9},
+      choices: [{location: [-1, 0]}],
+    })
+  )
+})
+
 test('Algae (fail)', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.player = 'a'
@@ -520,7 +753,7 @@ test('Project: Sell Patents', t => {
     type: UserAction.Action,
     actionType: TurnAction.StandardProject,
     project: StandardProject.SellPatents,
-    choices: [{sold: ['r', 's']}],
+    choices: [{cards: ['r', 's']}],
   })
 
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 32)

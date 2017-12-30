@@ -60,6 +60,7 @@ export const CARDS: Card[] = [
     effectText: 'Oxygen must be 6% or less. 3 VPs if you have one or more science resource here.',
     resourceHeld: CardResource.Science,
     requires: [['MaxOxygen', 6]],
+    effects: [['SearchForLife']],
   },
   {
     name: "Inventors' Guild",
@@ -199,6 +200,12 @@ export const CARDS: Card[] = [
     effectText:
       'Oxygen must be 7% or less. Gain 3 plants and place a city tile. Decrease your energy production 1 step and increase MC production 3 steps.',
     requires: [['MaxOxygen', 7]],
+    effects: [
+      ['PlaceCity'],
+      ['ChangeInventory', 3, ResourceType.Plant],
+      ['ChangeProduction', -1, ResourceType.Energy],
+      ['ChangeProduction', 3, ResourceType.Money],
+    ],
   },
   {
     name: 'Noctis City',
@@ -302,6 +309,7 @@ export const CARDS: Card[] = [
     effectText: 'It must be -12\u00b0C or colder to play. Gain 1 plant.',
     effects: [['ChangeInventory', 1, ResourceType.Plant]],
     requires: [['MaxHeat', -12]],
+    afterTileTriggers: [[TileType.Ocean], ['ChangeInventory', 2, ResourceType.Plant]],
   },
   {
     name: 'Predators',
@@ -483,11 +491,9 @@ export const CARDS: Card[] = [
       ['IncreaseTemperature', 1],
       [
         'Branch',
-        [
-          ['HasTags', 3, Tag.Plant],
-          ['ChangeProduction', 4, ResourceType.Plant],
-          ['ChangeProduction', 1, ResourceType.Plant],
-        ],
+        ['HasTags', 3, Tag.Plant],
+        [['ChangeProduction', 4, ResourceType.Plant]],
+        [['ChangeProduction', 1, ResourceType.Plant]],
       ],
     ],
   },
@@ -566,6 +572,7 @@ export const CARDS: Card[] = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Science', 'Building'],
+    vp: 1,
     placeTiles: true,
     effectText:
       'Oxygen must be 4% or less. Place this tile NEXT TO NO OTHER TILE. Increase your MC production 1 step.',
@@ -822,6 +829,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText:
       'Place [the mining] tile on an area with a steel or titanium placement bonus, adjacent to another of your tiles. Increase your production of that resource 1 step.',
+    effects: [['PlaceMiningArea']],
   },
   {
     name: 'Building Industries',
@@ -842,7 +850,6 @@ export const CARDS: Card[] = [
     type: 'Event',
     deck: 'Corporate',
     tags: ['Event'],
-    placeTiles: true,
     effectText: 'Place your marker on a non-reserved area. Only you may place a tile here',
     effects: [['LandClaim']],
   },
@@ -852,9 +859,9 @@ export const CARDS: Card[] = [
     type: 'Automated',
     deck: 'Basic',
     tags: ['Building'],
-    placeTiles: true,
     effectText:
       'Place [the mining] tile on an area with a steel or titanium placement bonus. Increase that production 1 step.',
+    effects: [['PlaceMiningRights']],
   },
   {
     name: 'Sponsors',
@@ -1083,6 +1090,7 @@ export const CARDS: Card[] = [
     tags: ['Science'],
     effectText: 'Duplicate only the production box of one of your building cards.',
     effects: [['RoboticWorkforce']],
+    todo: true,
   },
   {
     name: 'Grass',
@@ -1738,7 +1746,7 @@ export const CARDS: Card[] = [
     tags: ['Event'],
     effectText:
       'Raise the temperature 2 steps and place this [the Lava Flow] tile ON EITHER THARSIS THOLUS, ASCRAEUS MONS, PAVONIS MONS OR ARSIA MONS.',
-    effects: [['IncreaseTemperature', 2], ['PlaceLavaFlow']],
+    effects: [['IncreaseTemperature', 2], ['PlaceLavaFlows']],
   },
   {
     name: 'Power Plant',
@@ -1758,7 +1766,7 @@ export const CARDS: Card[] = [
     placeTiles: true,
     effectText:
       'Increase your heat production 4 steps. Place [the Mohole Area] tile ON AN AREA RESERVED FOR OCEAN.',
-    effects: [['ChangeProduction', 4, ResourceType.Heat], ['Mohole']],
+    effects: [['ChangeProduction', 4, ResourceType.Heat], ['PlaceMohole']],
   },
   {
     name: 'Large Convoy',

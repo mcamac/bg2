@@ -182,6 +182,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
       cardResources: {},
       cardActionsUsedThisGeneration: {},
       hasIncreasedTRThisGeneration: false,
+      globalRequirementsOffset: 0,
       resources: clone<ResourcesState>(INITIAL_RESOURCES),
       choices: [],
       statuses: {},

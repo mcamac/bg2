@@ -1,4 +1,4 @@
-import {cloneDeep, pull, zip} from 'lodash'
+import {cloneDeep, pull, flatMap, sum, zip} from 'lodash'
 import {
   GameState,
   Transform,
@@ -12,10 +12,12 @@ import {
   Tile,
   Position,
   StandardProject,
+  ResourceBonus,
 } from './types'
-import {isOcean} from './tiles'
+import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles} from './tiles'
 import {getCardByName} from './cards'
 import {draw} from './deck'
+import {getCorporationByName} from './corporations'
 
 export const DecreaseAnyProduction = (delta: number, type: string) => (
   state: GameState,
@@ -66,26 +68,30 @@ export const ChangeCardResource = (n: number, type: string) => (
 }
 
 export const SellCards = () => (state: GameState, action: {sold: string[]}, choice): GameState => {
-  state = ChangeInventory(choice.sold.length, ResourceType.Money)(state)
-  state.playerState[state.player].hand = pull(state.playerState[state.player].hand, ...choice.sold)
+  state = ChangeInventory(choice.cards.length, ResourceType.Money)(state)
+  state.playerState[state.player].hand = pull(state.playerState[state.player].hand, ...choice.cards)
   return state
 }
 
 export const ChangeInventory = (
-  delta: number | ((state: GameState) => number),
-  resource: string
+  n: number | ((state: GameState) => number),
+  resource: ResourceType
 ): Transform => state => {
-  const playerState = state.playerState[state.player]
-  playerState.resources[resource].count += delta
-  return state
+  if (typeof n !== 'number') {
+    n = n(state)
+  }
+  return changeInventory(state, state.player, resource, n)
 }
 
 export const ChangeProduction = (
-  delta: number | ((state: GameState) => number),
+  n: number | ((state: GameState) => number),
   resource: string
 ): Transform => state => {
+  if (typeof n !== 'number') {
+    n = n(state)
+  }
   const playerState = state.playerState[state.player]
-  playerState.resources[resource].production += delta
+  playerState.resources[resource].production += n
   return state
 }
 
@@ -148,8 +154,39 @@ export const PlaceOceans = () => (state: GameState, action, choice): GameState =
   return state
 }
 
+export const PlaceLavaFlows = () => (state: GameState, action, choice): GameState => {
+  if (!isVolcano(choice.location)) throw Error('Not an volcano tile')
+  state = placeTile(state, {owner: state.player, type: TileType.LavaFlows}, choice.location)
+  return state
+}
+
 export const PlaceCity = () => (state: GameState, action, choice): GameState => {
   return placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
+}
+
+export const PlaceSpecialCity = (name: string) => (state: GameState, action, choice): GameState => {
+  return placeSpecialTile(state, {owner: state.player, type: TileType.City}, name)
+}
+
+export const PlaceMiningArea = () => (state: GameState, action, choice): GameState => {
+  const bonus = getTileBonus(choice.location)
+  if (bonus.indexOf(ResourceBonus.Steel) < 0 && bonus.indexOf(ResourceBonus.Titanium) < 0)
+    throw Error('Invalid tile for mining area')
+  if (!isAdjacentToOwn(state, choice.location)) throw Error('Not adjacent to own tile.')
+
+  state = placeTile(state, {owner: state.player, type: TileType.MiningArea}, choice.location)
+  state = ChangeProduction(1, choice.resource)(state)
+  return state
+}
+
+export const PlaceMiningRights = () => (state: GameState, action, choice): GameState => {
+  const bonus = getTileBonus(choice.location)
+  if (bonus.indexOf(ResourceBonus.Steel) < 0 && bonus.indexOf(ResourceBonus.Titanium) < 0)
+    throw Error('Invalid tile for mining area')
+
+  state = placeTile(state, {owner: state.player, type: TileType.MiningArea}, choice.location)
+  state = ChangeProduction(1, choice.resource)(state)
+  return state
 }
 
 export const PlaceIndustrialCenter = () => (state: GameState, action, choice): GameState => {
@@ -171,17 +208,63 @@ export const KeepCards = cards => (state: GameState, action, choice): GameState 
   return state
 }
 
-export const PlaceGreeneryOnOcean = {}
-export const PlaceNoctis = {}
+export const PlaceGreeneryOnOcean = () => (state: GameState, action, choice): GameState => {
+  if (!isOcean(choice.location)) throw Error('Not an ocean tile.')
+  state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
+  state.globalParameters.Oxygen += 1
+  state.playerState[state.player].TR += 1
+  state.playerState[state.player].hasIncreasedTRThisGeneration = true
+  return state
+}
+
+export const OffsetRequirements = (n: number) => (state: GameState, action, choice): GameState => {
+  if (!state.playerState[state.player].globalRequirementsOffset)
+    state.playerState[state.player].globalRequirementsOffset = 0
+
+  state.playerState[state.player].globalRequirementsOffset += n
+  return state
+}
+
 export const PlaceResearchOutpost = {}
 export const LandClaim = {}
 export const RoboticWorkforce = {}
 export const ArtificialLake = {}
 export const UrbanizedArea = {}
-export const Mohole = {}
+
+export const PlaceNuclearZone = () => (state: GameState, action, choice): GameState => {
+  state = placeTile(state, {owner: state.player, type: TileType.NuclearZone}, choice.location)
+  return state
+}
+
+export const PlaceNaturalPreserve = () => (state: GameState, action, choice): GameState => {
+  getAdjacentTiles(choice.location).forEach(([x, y]) => {
+    if (state.map[`${x},${y}`]) throw Error('Cannot be next to another tile.')
+  })
+
+  state = placeTile(state, {owner: state.player, type: TileType.NaturalPreserve}, choice.location)
+  return state
+}
+
+export const PlaceNoctis = () => (state: GameState, action, choice): GameState => {
+  state = placeTile(state, {owner: state.player, type: TileType.City}, [-2, 0])
+  return state
+}
+
+export const PlaceMohole = () => (state: GameState, action, choice): GameState => {
+  if (!isOcean(choice.location)) throw Error('Not an ocean tile')
+  state = placeTile(state, {owner: state.player, type: TileType.MoholeArea}, choice.location)
+  return state
+}
 
 export const Choice = (...args: any[]) => {}
-export const Branch = (condition: (state: GameState) => boolean, ifTrue, ifFalse) => {}
+export const Branch = (predicate: ((state: GameState) => boolean), ifTrue, ifFalse) => (
+  state: GameState,
+  action
+): GameState => {
+  const ok = predicate(state)
+  state = applyEffects(state, action, ok ? ifTrue : ifFalse)
+  return state
+}
 
 export const Discount = (delta: number, tags?: Tag[]) => ({
   delta,
@@ -193,12 +276,14 @@ export const AfterTile = {}
 
 /* Global Parameter Requirement Checks (for playing cards) */
 
-export const GlobalTypeWithinRange = (
-  param: GlobalType,
-  min: number,
-  max: number
-): ((state: GameState) => boolean) => {
-  return state => state.globalParameters[param] >= min && state.globalParameters[param] <= max
+export const GlobalTypeWithinRange = (param: GlobalType, min: number, max: number) => (
+  state: GameState
+): boolean => {
+  let offset = state.playerState[state.player].globalRequirementsOffset || 0
+  if (param === GlobalType.Heat) offset *= 2
+  return (
+    state.globalParameters[param] >= min - offset && state.globalParameters[param] <= max + offset
+  )
 }
 
 export const MinOxygen = (thresh: number) =>
@@ -220,7 +305,7 @@ export const MaxOceans = (thresh: number) =>
 /* Card Tag Requirement Check */
 
 export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boolean) => {
-  return state => true
+  return state => GetTags(tag)(state) >= minimum
 }
 
 export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
@@ -342,24 +427,30 @@ export const GetCardResources = (resource: CardResource): ((state: GameState) =>
   return state => 0
 }
 
-export const GetTags = (tag: Tag, ratio?: number): ((state: GameState) => number) => {
-  return state => 0
+export const GetTags = (tag: Tag, ratio: number = 1) => (state: GameState): number => {
+  return Math.floor(GetPlayerTags(tag, state.player)(state) / ratio)
 }
 
-export const GetAllTags = (tag: Tag): ((state: GameState) => number) => {
-  return state => 0
+export const GetAllTags = (tag: Tag) => (state: GameState): number => {
+  return sum(state.players.map(player => GetPlayerTags(tag, player)(state)))
 }
 
-export const GetPlayerTags = (tag: Tag, player: Player): ((state: GameState) => number) => {
-  return state => 0
+export const GetPlayerTags = (tag: Tag, player: Player) => (state: GameState): number => {
+  const allPlayed = [
+    ...state.playerState[player].played
+      .map(getCardByName)
+      .filter(card => tag === 'Event' || card.type !== 'Event'),
+    getCorporationByName(state.playerState[player].corporation),
+  ]
+  return (<any>flatMap(allPlayed, card => card.tags || [])).filter(t => t === tag).length
 }
 
 export const GetOpponentTags = (tag: Tag): ((state: GameState) => number) => {
   return state => 0
 }
 
-export const GetCities = (): ((state: GameState) => number) => {
-  return state => 0
+export const GetCities = () => (state: GameState): number => {
+  return 0
 }
 
 export const GetCitiesOnMars = (): ((state: GameState) => number) => {
@@ -385,15 +476,29 @@ const REGISTRY = {
   ChangeProduction,
   Draw,
   DrawAndChoose,
+  GetAllTags,
+  GetX,
+  GetTags,
   IncreaseTR,
   IncreaseTemperature,
   IncreaseResourceValue,
   RaiseOxygen,
   PlaceOceans,
   PlaceCity,
+  PlaceSpecialCity,
   PlaceGreenery,
+  PlaceGreeneryOnOcean,
+  PlaceLavaFlows,
+  PlaceMohole,
+  PlaceMiningArea,
+  PlaceMiningRights,
+  PlaceNaturalPreserve,
   PlaceIndustrialCenter,
+  PlaceNoctis,
   SellCards,
+  Branch,
+  HasTags,
+  OffsetRequirements,
   // Choices only
   KeepCards,
 }
@@ -401,7 +506,7 @@ const REGISTRY = {
 const fromJSON = obj => {
   if (obj instanceof Array && typeof obj[0] === 'string') {
     const [opName, ...args] = obj
-    if (!REGISTRY[opName]) return null
+    if (!REGISTRY[opName]) return obj
     return REGISTRY[opName](...args.map(fromJSON))
   } else {
     return obj
@@ -487,11 +592,7 @@ export const checkCardRequirements = (card: Card, state: GameState): boolean => 
   }
 }
 
-export const applyAfterTileTriggers = (
-  state: GameState,
-  tile: Tile,
-  position: Position
-): GameState => {
+export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState => {
   state.players.forEach(player => {
     state.playerState[player].played.map(getCardByName).forEach(card => {
       if (card.afterTileTriggers) {
@@ -505,13 +606,34 @@ export const applyAfterTileTriggers = (
   return state
 }
 
+const placeSpecialTile = (state: GameState, tile: Tile, name: string): GameState => {
+  state.map[name] = tile
+  state = applyAfterTileTriggers(state, tile)
+
+  return state
+}
+
 const placeTile = (state: GameState, tile: Tile, position: Position): GameState => {
   const [x, y] = position
+
   const key = `${x},${y}`
+  if (state.map[key]) throw Error('Tile location taken.')
   state.map[key] = tile
   // todo: check restrictions on tiles
+  const bonuses = getTileBonus(position)
+  bonuses.forEach(bonus => {
+    if (bonus === ResourceBonus.Card) {
+      state = Draw(1)(state, {}, {})
+    } else if (bonus === ResourceBonus.Plant) {
+      state = changeInventory(state, state.player, ResourceType.Plant, 1)
+    } else if (bonus === ResourceBonus.Steel) {
+      state = changeInventory(state, state.player, ResourceType.Steel, 1)
+    } else if (bonus === ResourceBonus.Titanium) {
+      state = changeInventory(state, state.player, ResourceType.Titanium, 1)
+    }
+  })
 
-  state = applyAfterTileTriggers(state, tile, position)
+  state = applyAfterTileTriggers(state, tile)
 
   return state
 }
