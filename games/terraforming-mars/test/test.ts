@@ -436,6 +436,29 @@ test('Media Archives', t => {
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 2)
 })
 
+test('Media Group', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 13
+  state.playerState['a'].hand = ['Bribed Committee', 'Media Group']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Media Group',
+    resources: {Money: 6},
+  })
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Bribed Committee',
+    resources: {Money: 7},
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 3)
+})
+
 test('Cartel', t => {
   let state = getStateAfterActions()
   state.player = 'a'
@@ -568,6 +591,128 @@ test('Natural Preserve', t => {
   })
 
   t.is(state.map['-1,1'].owner, 'a')
+})
+
+test('Urbanized Area', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 10
+  state.map['0,2'] = {owner: 'a', type: TileType.City}
+  state.map['2,2'] = {owner: 'a', type: TileType.City}
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Urbanized Area',
+    resources: {Money: 10},
+    choices: [null, null, {location: [1, 2]}],
+  })
+
+  t.is(state.map['1,2'].owner, 'a')
+})
+
+test('Urbanized Area (Fail)', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 10
+  state.map['0,2'] = {owner: 'a', type: TileType.City}
+
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: 'Urbanized Area',
+      resources: {Money: 10},
+      choices: [null, null, {location: [1, 2]}],
+    })
+  )
+})
+
+test('Large Convoy', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 36
+  state.playerState['a'].played = ['Pets']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Large Convoy',
+    resources: {Money: 36},
+    choices: [{location: [0, 0]}, null, {index: 1, card: 'Pets'}],
+  })
+
+  t.is(state.playerState['a'].cardResources['Pets'], 4)
+})
+
+test('CEOs Favorite (Fail)', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 1
+  state.playerState['a'].played = ['Security Fleet']
+
+  t.throws(() =>
+    handleAction(state, {
+      type: UserAction.Action,
+      actionType: TurnAction.PlayCard,
+      card: "CEO's Favourite Project",
+      resources: {Money: 36},
+      choices: [{card: 'Security Fleet'}],
+    })
+  )
+})
+
+test('CEOs Favorite', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 1
+  state.playerState['a'].played = ['Security Fleet']
+  state.playerState['a'].cardResources['Security Fleet'] = 1
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: "CEO's Favourite Project",
+    resources: {Money: 1},
+    choices: [{card: 'Security Fleet'}],
+  })
+
+  t.is(state.playerState['a'].cardResources['Security Fleet'], 2)
+})
+
+test('Research Outpost', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 18
+  state.globalParameters.Heat = 4
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Research Outpost',
+    resources: {Money: 18},
+    choices: [{location: [-1, 1]}],
+  })
+
+  t.is(state.map['-1,1'].owner, 'a')
+})
+
+test('Insulation', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 2
+  state.playerState['a'].resources[ResourceType.Heat].production = 3
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Insulation',
+    resources: {Money: 2},
+    choices: [{x: 3}],
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Heat].production, 0)
+  t.is(state.playerState['a'].resources[ResourceType.Money].production, 3)
 })
 
 test('Adaptation Technology: Heat', t => {

@@ -139,6 +139,7 @@ const NEEDS_CHOICE = {
   SellCards: () => ({type: 'cards', text: 'Choose cards to sell.', chosen: {}, confirm: true}),
   DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
   DecreaseAnyInventory: () => ({type: 'player', text: 'Choose player to remove ...'}),
+  ChooseX: () => ({type: 'number'}),
   ChangeAnyCardResource: (count, resource) => ({
     type: 'playedCard',
     resource,

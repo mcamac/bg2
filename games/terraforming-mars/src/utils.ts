@@ -39,24 +39,31 @@ export const DecreaseAnyInventory = (delta: number, type: string) => (
   return state
 }
 
-export const ChangeAnyCardResource = (n: number, type: string, minimum?: number) => (
-  state: GameState,
-  action: {sold: string[]},
-  choice: {card: string},
-  card: Card
-): GameState => {
-  // todo: check type, min
+export const ChangeAnyCardResource = (
+  n: number,
+  type: CardResource | null,
+  minimum: number = 0
+) => (state: GameState, action, choice: {card: string}): GameState => {
+  const cardOwner = state.players.find(
+    player => state.playerState[player].played.indexOf(choice.card) >= 0
+  )
+  if (!cardOwner) throw Error('Invalid card.')
+  const cardObj = getCardByName(choice.card)
+  if (type && cardObj.resourceHeld !== type) throw Error('Invalid card resource type.')
 
-  if (!state.playerState[state.player].cardResources[card.name])
-    state.playerState[state.player].cardResources[card.name] = 0
+  if (!state.playerState[cardOwner].cardResources[choice.card])
+    state.playerState[cardOwner].cardResources[choice.card] = 0
 
-  state.playerState[state.player].cardResources[card.name] += n
+  if (state.playerState[cardOwner].cardResources[choice.card] < minimum)
+    throw Error('Card does not have minimum resources.')
+
+  state.playerState[state.player].cardResources[choice.card] += n
   return state
 }
 
 export const ChangeCardResource = (n: number, type: string) => (
   state: GameState,
-  action: {sold: string[]},
+  action,
   choice,
   card: Card
 ): GameState => {
@@ -73,22 +80,24 @@ export const SellCards = () => (state: GameState, action: {sold: string[]}, choi
   return state
 }
 
-export const ChangeInventory = (
-  n: number | ((state: GameState) => number),
-  resource: ResourceType
-): Transform => state => {
+export const ChangeInventory = (n: number | NumGetter, resource: ResourceType) => (
+  state: GameState,
+  action?,
+  choice?
+) => {
   if (typeof n !== 'number') {
-    n = n(state)
+    n = n(state, action, choice)
   }
   return changeInventory(state, state.player, resource, n)
 }
 
-export const ChangeProduction = (
-  n: number | ((state: GameState) => number),
-  resource: string
-): Transform => state => {
+export const ChangeProduction = (n: number | NumGetter, resource: string) => (
+  state: GameState,
+  action?,
+  choice?
+) => {
   if (typeof n !== 'number') {
-    n = n(state)
+    n = n(state, action, choice)
   }
   const playerState = state.playerState[state.player]
   playerState.resources[resource].production += n
@@ -225,14 +234,32 @@ export const OffsetRequirements = (n: number) => (state: GameState, action, choi
   return state
 }
 
-export const PlaceResearchOutpost = {}
+export const PlaceResearchOutpost = () => (state: GameState, action, choice): GameState => {
+  getAdjacentTiles(choice.location).forEach(([x, y]) => {
+    if (state.map[`${x},${y}`]) throw Error('Cannot be next to another tile.')
+  })
+
+  state = placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
+  return state
+}
+
 export const LandClaim = {}
 export const RoboticWorkforce = {}
 export const ArtificialLake = {}
-export const UrbanizedArea = {}
 
 export const PlaceNuclearZone = () => (state: GameState, action, choice): GameState => {
   state = placeTile(state, {owner: state.player, type: TileType.NuclearZone}, choice.location)
+  return state
+}
+
+export const PlaceUrbanizedArea = () => (state: GameState, action, choice): GameState => {
+  const nAdjacentCities = getAdjacentTiles(choice.location).filter(
+    ([x, y]) => state.map[`${x},${y}`] && state.map[`${x},${y}`].type === TileType.City
+  ).length
+
+  if (nAdjacentCities < 2) throw Error('Not next to 2 cities.')
+
+  state = placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
   return state
 }
 
@@ -256,7 +283,18 @@ export const PlaceMohole = () => (state: GameState, action, choice): GameState =
   return state
 }
 
-export const Choice = (...args: any[]) => {}
+export const ChooseX = effects => (state: GameState, action, choice): GameState => {
+  const x = choice.x
+  state = applyEffects(state, {choices: effects.map(eff => ({x}))}, effects)
+  return state
+}
+
+export const Choice = (args: any[]) => (state: GameState, action, choice): GameState => {
+  const chosenEffects = args[choice.index]
+  state = applyEffects(state, {choices: chosenEffects.map(() => choice)}, chosenEffects)
+  return state
+}
+
 export const Branch = (predicate: ((state: GameState) => boolean), ifTrue, ifFalse) => (
   state: GameState,
   action
@@ -457,14 +495,14 @@ export const GetCitiesOnMars = (): ((state: GameState) => number) => {
   return state => 0
 }
 
-type NumGetter = (state: GameState, action?: any) => number
+type NumGetter = (state: GameState, action?: any, choice?) => number
 
-export const GetX: NumGetter = (state, action) => {
-  return 0
+export const GetX = () => (state: GameState, action, choice): number => {
+  return choice.x
 }
 
-export const Neg = (fn: NumGetter): NumGetter => {
-  return (state, action) => -fn(state, action)
+export const Neg = (fn: NumGetter): NumGetter => (state, action, choice) => {
+  return -fn(state, action, choice)
 }
 
 const REGISTRY = {
@@ -474,9 +512,12 @@ const REGISTRY = {
   ChangeAnyCardResource,
   ChangeInventory,
   ChangeProduction,
+  Choice,
   Draw,
   DrawAndChoose,
   GetAllTags,
+  ChooseX,
+  Neg,
   GetX,
   GetTags,
   IncreaseTR,
@@ -486,6 +527,7 @@ const REGISTRY = {
   PlaceOceans,
   PlaceCity,
   PlaceSpecialCity,
+  PlaceUrbanizedArea,
   PlaceGreenery,
   PlaceGreeneryOnOcean,
   PlaceLavaFlows,
@@ -493,6 +535,7 @@ const REGISTRY = {
   PlaceMiningArea,
   PlaceMiningRights,
   PlaceNaturalPreserve,
+  PlaceResearchOutpost,
   PlaceIndustrialCenter,
   PlaceNoctis,
   SellCards,
@@ -596,8 +639,8 @@ export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState 
   state.players.forEach(player => {
     state.playerState[player].played.map(getCardByName).forEach(card => {
       if (card.afterTileTriggers) {
-        const [types, effects] = card.afterTileTriggers
-        if (types.indexOf(tile.type) >= 0) {
+        const [[type, ownTile], effects] = card.afterTileTriggers
+        if (type === tile.type) {
           state = applyEffects(state, {player, choices: []}, effects, card)
         }
       }

@@ -1494,7 +1494,7 @@ export const CARDS: Card[] = [
     effects: [
       ['ChangeProduction', -1, ResourceType.Energy],
       ['ChangeProduction', 2, ResourceType.Money],
-      ['UrbanizedArea'],
+      ['PlaceUrbanizedArea'],
     ],
   },
   {
@@ -1784,8 +1784,8 @@ export const CARDS: Card[] = [
       [
         'Choice',
         [
-          ['ChangeInventory', 5, ResourceType.Plant],
-          ['ChangeAnyCardResource', 4, CardResource.Animals],
+          [['ChangeInventory', 5, ResourceType.Plant]],
+          [['ChangeAnyCardResource', 4, CardResource.Animals]],
         ],
       ],
     ],
@@ -1891,8 +1891,13 @@ export const CARDS: Card[] = [
     effectText:
       'Decrease your heat production any number of steps and increase your MC production the same number of steps.',
     effects: [
-      ['ChangeProduction', ['Neg', ['GetX']], ResourceType.Heat],
-      ['ChangeProduction', ['GetX'], ResourceType.Money],
+      [
+        'ChooseX',
+        [
+          ['ChangeProduction', ['Neg', ['GetX']], ResourceType.Heat],
+          ['ChangeProduction', ['GetX'], ResourceType.Money],
+        ],
+      ],
     ],
   },
   {
@@ -2408,8 +2413,13 @@ export const CARDS: Card[] = [
     actionText: 'Action: Spend any amount of energy to gain that amount of MC.',
     actions: [
       [
-        ['ChangeInventory', ['Neg', ['GetX']], ResourceType.Energy],
-        ['ChangeInventory', ['GetX'], ResourceType.Money],
+        [
+          'ChooseX',
+          [
+            ['ChangeInventory', ['Neg', ['GetX']], ResourceType.Energy],
+            ['ChangeInventory', ['GetX'], ResourceType.Money],
+          ],
+        ],
       ],
     ],
   },

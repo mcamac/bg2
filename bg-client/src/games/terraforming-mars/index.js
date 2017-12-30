@@ -281,6 +281,12 @@ const PlaceGreeneryOnOcean = () => (
   </Flex>
 )
 
+const PlaceNuclearZone = () => <Flex align="center">Place Nuclear Zone.</Flex>
+const PlaceMohole = () => <Flex align="center">Place Mohole on Ocean.</Flex>
+const PlaceLavaFlows = () => <Flex align="center">Place Lava Flows on Volcano.</Flex>
+const PlaceRestrictedArea = () => <Flex align="center">Place Restricted Area.</Flex>
+const PlaceResearchOutpost = () => <Flex align="center">Place Research Outpost.</Flex>
+
 const VPForCardResources = (resource, count) => (
   <Flex>
     1 VP / {count} <Icon g={resource} />
@@ -336,6 +342,20 @@ const Branch = (cond, effectsTrue, effectsFalse) => (
   </Flex>
 )
 
+const ChooseX = effects => (
+  <Flex align="center">
+    <CardEffects effects={effects} />
+  </Flex>
+)
+
+const GetX = () => 'X'
+
+const Neg = effect => (
+  <Flex align="center">
+    -<CardEffects effects={[effect]} />
+  </Flex>
+)
+
 const EFFECTS = {
   ChangeProduction,
   ChangeInventory,
@@ -345,9 +365,14 @@ const EFFECTS = {
   PlaceOceans,
   PlaceCity,
   PlaceNoctis,
+  PlaceNuclearZone,
+  PlaceMohole,
+  PlaceLavaFlows,
   PlaceCapitalCity,
   PlaceGreenery,
   PlaceGreeneryOnOcean,
+  PlaceRestrictedArea,
+  PlaceResearchOutpost,
   MultiCost,
   RaiseOxygen,
   DecreaseAnyProduction,
@@ -368,6 +393,9 @@ const EFFECTS = {
   GetCitiesOnMars,
   UNTerraform,
   Branch,
+  ChooseX,
+  GetX,
+  Neg,
 }
 
 const CardEffects = props => {
@@ -736,10 +764,18 @@ CardBuyingStatus = connect(
   })
 )(CardBuyingStatus)
 
+const Input = styled.input`
+  width: 30px;
+  font-size: 1em;
+  text-align: right;
+  margin: 0 4px;
+`
+
 let ChoicesBar = props => (
   <React.Fragment>
     {props.card}:
     <pre style={{maxWidth: 400, overflowX: 'scroll'}}>{JSON.stringify(props.choice)}</pre>
+    {props.choice.type === 'number' && <Input />}
     {props.choice.confirm && <Button onClick={props.onDone}>Done</Button>}
   </React.Fragment>
 )
