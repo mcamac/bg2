@@ -20,8 +20,6 @@ export const CORPORATIONS: Corporation[] = [
       ['StandardProjectMatches', [StandardProject.Greenery, StandardProject.City]],
       [['ChangeInventory', 4, ResourceType.Money]],
     ],
-    // TODO: MinCostCard not currently implemented / i think after card triggers only take tags rn
-    // e.g., get 4 money back whenever player plays card with minimum base cost of 20
   },
   {
     name: 'Saturn Systems',
@@ -32,7 +30,6 @@ export const CORPORATIONS: Corporation[] = [
       ['PlayedTagMatchesAny', [Tag.Jovian]],
       [['ChangeProduction', 1, ResourceType.Money]],
     ],
-    // TODO: Must activate when ANY player plays a Jovian (i think rn, this is just for player played)
   },
   {
     name: 'Tharsis Republic',
