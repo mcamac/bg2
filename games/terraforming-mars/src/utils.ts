@@ -14,7 +14,7 @@ import {
   StandardProject,
   ResourceBonus,
 } from './types'
-import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles, isPlayedOcean, makeKeyFromPosition} from './tiles'
+import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles, makeKeyFromPosition} from './tiles'
 import {getCardByName} from './cards'
 import {draw} from './deck'
 import {getCorporationByName} from './corporations'
@@ -651,9 +651,10 @@ export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState 
 
 export const getOceanRefund = (state: GameState, position: Position): number => {
   const numAdjacentOceans = getAdjacentTiles(position)
-    .map(makeKeyFromPosition)
-    .map((key: string): number => state.map[key].type === TileType.Ocean ? 1 : 0)
-    .reduce((x, y) => x + y)
+    .map(makeKeyFromPosition)  // Make string key from the position
+    .map(key => state.map[key] ? state.map[key].type === TileType.Ocean : false)  // Check if ocean
+    .map((foundOcean: boolean): number => foundOcean ? 1 : 0)  
+    .reduce((x, y) => x + y)  // Sum together number of oceans found
   let oceanMultiplier = 2
   return numAdjacentOceans * oceanMultiplier
 }
