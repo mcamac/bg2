@@ -1,11 +1,11 @@
 import * as r from 'rethinkdb'
-import {SocketServer} from './socket'
-import {GameStorage, PlayerConnection, Room} from './base'
+import {SocketServer} from '../socket'
+import {GameStorage, PlayerConnection, Room} from '../base'
 
-import {PowerGrid} from '../../games/power-grid/src/index'
-import {TerraformingMars} from '../../games/terraforming-mars/src/index'
-import {getStateAfterActions} from '../../games/terraforming-mars/src/fixtures'
-import {cloneState} from '../../games/terraforming-mars/src/utils'
+import {PowerGrid} from '../../../games/power-grid/src/index'
+import {TerraformingMars} from '../../../games/terraforming-mars/src/index'
+import {getStateAfterActions} from '../../../games/terraforming-mars/src/fixtures'
+import {cloneState} from '../../../games/terraforming-mars/src/utils'
 
 const GAMES = {
   PowerGrid,

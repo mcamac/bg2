@@ -1,7 +1,13 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "lib": ["es2015"]
+    "lib": [
+      "es6"
+    ],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
-  "files": ["./src/index.ts"]
+  "filesGlob": [
+    "src/**/*.ts"
+  ]
 }

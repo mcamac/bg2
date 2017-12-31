@@ -1,0 +1,4 @@
+env: flex
+runtime: custom
+runtime_config:
+  document_root: .

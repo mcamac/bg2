@@ -101,6 +101,11 @@ export const ChangeProduction = (n: number | NumGetter, resource: string) => (
   }
   const playerState = state.playerState[state.player]
   playerState.resources[resource].production += n
+
+  if (resource !== ResourceType.Money && playerState.resources[resource].production < 0) {
+    throw Error('Not enough production')
+  }
+
   return state
 }
 

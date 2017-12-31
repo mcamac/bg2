@@ -35,8 +35,12 @@ import {Icon, Tag} from './components'
 
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
 import {getCorporationByName} from '../../../../games/terraforming-mars/src/corporations'
-import {StandardProject} from '../../../../games/terraforming-mars/src/types'
+import {StandardProject, Phase} from '../../../../games/terraforming-mars/src/types'
 import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
+import AnimateOnChange from './animator'
+
+import cs from './index.css'
+
 console.log(CARDS)
 
 const Wrapper = styled(Flex)`
@@ -637,8 +641,19 @@ StandardProjects = connect(
   })
 )(StandardProjects)
 
+let Count = props => (
+  <AnimateOnChange baseClassName="Score" animationClassName="test--bounce" animate={() => true}>
+    {props.value}
+  </AnimateOnChange>
+)
+
+Count = pure(Count)
+
 let PlayerCard = props => (
-  <Box p={2} style={{borderBottom: '1px solid #eee'}}>
+  <Box
+    p={2}
+    style={{borderBottom: '1px solid #eee', background: props.isActive && 'rgba(0, 0, 255, 0.1)'}}
+  >
     <Flex mb={1} onClick={props.onClickPlayer}>
       <Box flex="1 1 auto">{props.player}</Box>
       <Flex align="center">
@@ -655,19 +670,19 @@ let PlayerCard = props => (
       <Flex mr={1}>
         <Tag name="Money" />
         <Box ml="3px" style={{fontSize: 13}}>
-          {props.state.resources.Money.count} (+{props.state.resources.Money.production})
+          <Count value={props.state.resources.Money.count} /> (+{props.state.resources.Money.production})
         </Box>
       </Flex>
       <Flex mr={1}>
         <Tag name="Steel" />
         <Box ml="3px" style={{fontSize: 13}}>
-          {props.state.resources.Steel.count} (+{props.state.resources.Steel.production})
+          <Count value={props.state.resources.Steel.count} /> (+{props.state.resources.Steel.production})
         </Box>
       </Flex>
       <Flex>
         <Tag name="Titanium" />
         <Box ml="3px" style={{fontSize: 13}}>
-          {props.state.resources.Titanium.count} (+{props.state.resources.Titanium.production})
+          <Count value={props.state.resources.Titanium.count} /> (+{props.state.resources.Titanium.production})
         </Box>
       </Flex>
     </Flex>
@@ -675,19 +690,19 @@ let PlayerCard = props => (
       <Flex mr={1} onClick={props.onClickPlant}>
         <Tag name="Plant" />
         <Box ml="3px" style={{fontSize: 13}}>
-          {props.state.resources.Plant.count} (+{props.state.resources.Plant.production})
+          <Count value={props.state.resources.Plant.count} /> (+{props.state.resources.Plant.production})
         </Box>
       </Flex>
       <Flex mr={1}>
         <Tag name="Energy" />
         <Box ml="3px" style={{fontSize: 13}}>
-          {props.state.resources.Energy.count} (+{props.state.resources.Energy.production})
+          <Count value={props.state.resources.Energy.count} /> (+{props.state.resources.Energy.production})
         </Box>
       </Flex>
       <Flex onClick={props.onClickHeat}>
         <Tag name="Heat" />
         <Box ml="3px" style={{fontSize: 13}}>
-          {props.state.resources.Heat.count} (+{props.state.resources.Heat.production})
+          <Count value={props.state.resources.Heat.count} /> (+{props.state.resources.Heat.production})
         </Box>
       </Flex>
     </Flex>
@@ -695,7 +710,11 @@ let PlayerCard = props => (
 )
 
 PlayerCard = connect(
-  state => ({}),
+  (state, props) => ({
+    isActive:
+      (state.game.phase === Phase.Actions && props.player === state.game.player) ||
+      (state.game.phase === Phase.CardBuying && state.game.choosingCards[props.player]),
+  }),
   (dispatch, props) => ({
     onClickPlayer: () => dispatch(uiChoosePlayer(props.player)),
     onClickPlant: () => dispatch(uiPlantGreenery()),

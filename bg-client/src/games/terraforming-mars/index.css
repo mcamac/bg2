@@ -1,0 +1,13 @@
+.test--bounce {
+  animation: test-keyframes--bounce 0.8s ease-out;
+}
+
+@keyframes test-keyframes--bounce {
+  0%,
+  100% {
+    background: #fff;
+  }
+  50% {
+    background: #aaa;
+  }
+}

@@ -42,6 +42,8 @@ export class SocketServer implements PlayerConnection {
   }
 
   onConnection(ws: WebSocket) {
+    ws.on('error', () => console.log('errored'))
+
     ws.on('message', (message: string) => {
       try {
         const data = JSON.parse(message)

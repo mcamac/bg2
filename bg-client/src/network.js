@@ -1,7 +1,7 @@
 import uuidv4 from 'uuid/v4'
 
 class Socket {
-  constructor(host = 'ws://localhost:3000') {
+  constructor(host = 'wss://ws.bgames.io') {
     const ws = new WebSocket(host)
 
     this.resolveConnecting = null
