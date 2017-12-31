@@ -10,7 +10,6 @@ export const CORPORATIONS: Corporation[] = [
       ['ChangeProduction', 2, ResourceType.Plant],
       ['ChangeInventory', 3, ResourceType.Plant],
     ],
-    // Need to implement "Always pay 7 plants instead of 8 to place greenery"
   },
   {
     name: 'Credicor',
@@ -46,8 +45,7 @@ export const CORPORATIONS: Corporation[] = [
     startingMoney: 48,
     tags: ['Power'],
     effects: [['ChangeProduction', 1, ResourceType.Energy]],
-    discounts: [[3, [Tag.Power]], [3, ['PlaceholderForStandardProjectPowerPlant']]],
-    // TODO: implement discount for standard project power plants
+    discounts: [[3, [Tag.Power]], [3, [StandardProject.PowerPlant]]],
   },
   {
     name: 'Inventrix',
