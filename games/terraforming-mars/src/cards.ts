@@ -2551,7 +2551,7 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Event'],
     effectText:
       'The next card you play this generation is +2 or -2 in global requirements, your choice.',
-    effects: [['AddNextCardEffect', ['GlobalRequirements', 2]]],
+    effects: [['AddNextCardEffect', ['OffsetRequirements', 2]]],
   },
   {
     name: 'Medical Lab',
