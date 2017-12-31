@@ -2308,7 +2308,7 @@ export const CARDS: Card[] = [
       'Effect: When you play a science tag, including this, either add a science resource to this card, or remove a science resource from this card to draw a card.',
     resourceHeld: CardResource.Science,
     afterCardTriggers: [
-      ['PlayedTagMatches', [[Tag.Space]]],
+      ['PlayedTagMatches', [[Tag.Science]]],
       [['Choice', [['ChangeCardResource', 1], [['ChangeCardResource', -1], ['Draw', 1]]]]],
     ],
   },
