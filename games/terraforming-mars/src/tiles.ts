@@ -8,11 +8,13 @@ export const isValid = ([x, y]: Position): boolean => {
 }
 
 export const isOcean = ([x, y]: Position): boolean => {
-  return OCEAN_POSITIONS.map(p => `${p[0]},${p[1]}`).indexOf(`${x},${y}`) >= 0
+  const key = makeKeyFromPosition([x, y])
+  return OCEAN_POSITIONS.map(makeKeyFromPosition).indexOf(key) >= 0
 }
 
 export const isVolcano = ([x, y]: Position): boolean => {
-  return VOLCANO_POSITIONS.map(p => `${p[0]},${p[1]}`).indexOf(`${x},${y}`) >= 0
+  const key = makeKeyFromPosition([x, y])
+  return VOLCANO_POSITIONS.map(makeKeyFromPosition).indexOf(key) >= 0
 }
 
 const ADJACENT_OFFSETS: Position[] = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]]
@@ -23,15 +25,20 @@ export const getAdjacentTiles = ([x, y]: Position): Position[] => {
 
 export const isAdjacentToOwn = (state: GameState, [x, y]: Position): boolean => {
   return getAdjacentTiles([x, y])
+    .map(makeKeyFromPosition)
     .map(
-      ([ax, ay]) =>
-        state.map[`${ax},${ay}`] &&
-        state.map[`${ax},${ay}`].type !== TileType.Ocean &&
-        state.map[`${ax},${ay}`].owner == state.player
+      (key) =>
+        state.map[key] &&
+        state.map[key].type !== TileType.Ocean &&
+        state.map[key].owner == state.player
     )
     .some(x => x)
 }
 
 export const getTileBonus = ([x, y]: Position): ResourceBonus[] => {
-  return RESOURCE_BONUSES[`${x},${y}`] || []
+  return RESOURCE_BONUSES[makeKeyFromPosition([x, y])] || []
+}
+
+export const makeKeyFromPosition = ([x, y]: Position): string => {
+  return `${x},${y}`
 }
