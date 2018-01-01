@@ -847,6 +847,25 @@ test('Underground City', t => {
 })
 
 // Tile Triggers
+test('City Tiles: Other player', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 18
+  state.playerState['a'].resources[ResourceType.Energy].production = 2
+  state.playerState['b'].corporation = 'Tharsis Republic' // When city placed, increase by 1
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Underground City',
+    resources: {Money: 18},
+    choices: [{location: [-4, 4]}, null, null],
+  })
+
+  t.is(state.playerState['b'].resources[ResourceType.Money].production, 1)
+  t.is(state.playerState['b'].resources[ResourceType.Money].count, 42)
+})
+
 test('City Tiles', t => {
   let state = getStateAfterActions()
   state.player = 'a'

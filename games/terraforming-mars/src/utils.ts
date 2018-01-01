@@ -89,7 +89,7 @@ export const ChangeInventory = (n: number | NumGetter, resource: ResourceType) =
   if (typeof n !== 'number') {
     n = n(state, action, choice)
   }
-  return changeInventory(state, action.player || state.player, resource, n)
+  return changeInventory(state, (action && action.player) || state.player, resource, n)
 }
 
 export const ChangeProduction = (n: number | NumGetter, resource: string) => (
@@ -100,7 +100,7 @@ export const ChangeProduction = (n: number | NumGetter, resource: string) => (
   if (typeof n !== 'number') {
     n = n(state, action, choice)
   }
-  const playerState = state.playerState[action.player || state.player]
+  const playerState = state.playerState[(action && action.player) || state.player]
   playerState.resources[resource].production += n
 
   if (resource !== ResourceType.Money && playerState.resources[resource].production < 0) {
@@ -657,7 +657,7 @@ export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState 
         const triggers = <any>card.afterTileTriggers
         triggers.forEach(trigger => {
           const [[type, ownTile], effects] = trigger
-          if (type === tile.type) {
+          if (type === tile.type && (!ownTile || tile.owner === player)) {
             state = applyEffects(state, {player, choices: []}, effects, card)
           }
         })
