@@ -593,10 +593,44 @@ test('Natural Preserve', t => {
   t.is(state.map['-1,1'].owner, 'a')
 })
 
+test('Arctic Algae', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 15
+  state.playerState['b'].played = ['Arctic Algae']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Convoy From Europa',
+    resources: {Money: 15},
+    choices: [{location: [0, 0]}],
+  })
+
+  t.is(state.playerState['b'].resources[ResourceType.Plant].count, 2)
+})
+
+test('Pets Trigger', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 25
+  state.playerState['b'].played = ['Pets']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.StandardProject,
+    project: StandardProject.City,
+    choices: [null, {location: [0, 1]}],
+  })
+
+  t.is(state.playerState['b'].cardResources['Pets'], 1)
+})
+
 test('Urbanized Area', t => {
   let state = getStateAfterActions()
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 10
+  state.playerState['a'].resources[ResourceType.Energy].production = 1
   state.map['0,2'] = {owner: 'a', type: TileType.City}
   state.map['2,2'] = {owner: 'a', type: TileType.City}
 
@@ -796,8 +830,8 @@ test(t => {
   t.deepEqual(state.playerState['a'].resources[ResourceType.Plant], {production: 2, count: 1})
 })
 
-test(t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+test('Underground City', t => {
+  let state = getStateAfterActions()
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
   state.playerState['a'].resources[ResourceType.Energy].production = 2
@@ -814,7 +848,7 @@ test(t => {
 
 // Tile Triggers
 test('City Tiles', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
   state.playerState['a'].played = ['Immigrant City', 'Underground City'] // When city placed, increase by 1
@@ -832,7 +866,7 @@ test('City Tiles', t => {
 
 // Tile Triggers
 test('Card triggers its own tile trigger', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
   state.playerState['a'].resources[ResourceType.Energy].production = 1
@@ -851,7 +885,7 @@ test('Card triggers its own tile trigger', t => {
 
 // Oceans
 test('Oceans card', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -870,7 +904,7 @@ test('Oceans card', t => {
 })
 
 test('Oceans card with invalid choice', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -889,7 +923,7 @@ test('Oceans card with invalid choice', t => {
 // Standard Projects
 
 test('Project: Sell Patents', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
   state.playerState['a'].hand = ['r', 's', 't']
@@ -906,7 +940,7 @@ test('Project: Sell Patents', t => {
 })
 
 test('Project: Power Plant', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -923,7 +957,7 @@ test('Project: Power Plant', t => {
 })
 
 test('Project: Asteroid', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -941,7 +975,7 @@ test('Project: Asteroid', t => {
 })
 
 test('Project: Aquifer', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -959,7 +993,7 @@ test('Project: Aquifer', t => {
 })
 
 test('Project: Greenery', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30
@@ -977,7 +1011,7 @@ test('Project: Greenery', t => {
 })
 
 test('Project: City', t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
+  let state = getStateAfterActions()
   state.globalParameters.Heat = 0
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30

@@ -36,7 +36,7 @@ export const CORPORATIONS: Corporation[] = [
     tags: ['Building'],
     afterTileTriggers: [
       [[TileType.City], [['ChangeProduction', 1, ResourceType.Money]]], // TODO: any player
-      [[TileType.City], [['ChangeInventory', 3, ResourceType.Money]]], // TODO: just this player
+      [[TileType.City, true], [['ChangeInventory', 3, ResourceType.Money]]], // TODO: just this player
     ],
     // TODO: implement function where first action must be to place a city
   },

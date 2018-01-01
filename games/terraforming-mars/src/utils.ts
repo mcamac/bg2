@@ -13,6 +13,7 @@ import {
   Position,
   StandardProject,
   ResourceBonus,
+  Corporation,
 } from './types'
 import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles} from './tiles'
 import {getCardByName} from './cards'
@@ -67,10 +68,10 @@ export const ChangeCardResource = (n: number, type: string) => (
   choice,
   card: Card
 ): GameState => {
-  if (!state.playerState[state.player].cardResources[card.name])
-    state.playerState[state.player].cardResources[card.name] = 0
+  const playerState = state.playerState[action.player || state.player]
+  if (!playerState.cardResources[card.name]) playerState.cardResources[card.name] = 0
 
-  state.playerState[state.player].cardResources[card.name] += n
+  playerState.cardResources[card.name] += n
   return state
 }
 
@@ -88,7 +89,7 @@ export const ChangeInventory = (n: number | NumGetter, resource: ResourceType) =
   if (typeof n !== 'number') {
     n = n(state, action, choice)
   }
-  return changeInventory(state, state.player, resource, n)
+  return changeInventory(state, action.player || state.player, resource, n)
 }
 
 export const ChangeProduction = (n: number | NumGetter, resource: string) => (
@@ -99,7 +100,7 @@ export const ChangeProduction = (n: number | NumGetter, resource: string) => (
   if (typeof n !== 'number') {
     n = n(state, action, choice)
   }
-  const playerState = state.playerState[state.player]
+  const playerState = state.playerState[action.player || state.player]
   playerState.resources[resource].production += n
 
   if (resource !== ResourceType.Money && playerState.resources[resource].production < 0) {
@@ -561,7 +562,12 @@ const fromJSON = obj => {
   }
 }
 
-export const applyEffects = (state: GameState, action, effects: any[], card?: Card): GameState => {
+export const applyEffects = (
+  state: GameState,
+  action,
+  effects: any[],
+  card?: Card | Corporation
+): GameState => {
   zip(action.choices || [], effects).forEach(([choice, effect]) => {
     const effectFn = fromJSON(effect)
     state = effectFn(state, action, choice, card)
@@ -642,12 +648,19 @@ export const checkCardRequirements = (card: Card, state: GameState): boolean => 
 
 export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState => {
   state.players.forEach(player => {
-    state.playerState[player].played.map(getCardByName).forEach(card => {
+    const cards = [
+      ...state.playerState[player].played.map(getCardByName),
+      getCorporationByName(state.playerState[player].corporation),
+    ]
+    cards.forEach(card => {
       if (card.afterTileTriggers) {
-        const [[type, ownTile], effects] = card.afterTileTriggers
-        if (type === tile.type) {
-          state = applyEffects(state, {player, choices: []}, effects, card)
-        }
+        const triggers = <any>card.afterTileTriggers
+        triggers.forEach(trigger => {
+          const [[type, ownTile], effects] = trigger
+          if (type === tile.type) {
+            state = applyEffects(state, {player, choices: []}, effects, card)
+          }
+        })
       }
     })
   })

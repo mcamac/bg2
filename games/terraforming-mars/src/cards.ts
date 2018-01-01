@@ -309,7 +309,7 @@ export const CARDS: Card[] = [
     effectText: 'It must be -12\u00b0C or colder to play. Gain 1 plant.',
     effects: [['ChangeInventory', 1, ResourceType.Plant]],
     requires: [['MaxHeat', -12]],
-    afterTileTriggers: [[TileType.Ocean], ['ChangeInventory', 2, ResourceType.Plant]],
+    afterTileTriggers: [[[TileType.Ocean], [['ChangeInventory', 2, ResourceType.Plant]]]],
   },
   {
     name: 'Predators',
@@ -505,7 +505,7 @@ export const CARDS: Card[] = [
     tags: ['Building'],
     vp: 1,
     actionText: 'Effect: When any city tile is placed, gain 2 MC',
-    afterTileTriggers: [[TileType.City], [['ChangeInventory', 2, ResourceType.Money]]],
+    afterTileTriggers: [[[TileType.City], [['ChangeInventory', 2, ResourceType.Money]]]],
   },
   {
     name: 'Deimos Down',
@@ -1836,7 +1836,7 @@ export const CARDS: Card[] = [
       'Requires 8% oxygen. Add 1 animal to this card. Decrease any plant production 1 step. 1 VP per 2 animals on this card.',
     resourceHeld: CardResource.Animals,
     requires: [['MinOxygen', 8]],
-    afterTileTriggers: [[TileType.Greenery, true], [['ChangeCardResource', 1]]],
+    afterTileTriggers: [[[TileType.Greenery, true], [['ChangeCardResource', 1]]]],
     effects: [['ChangeCardResource', 1], ['DecreaseAnyProduction', 1, ResourceType.Plant]],
   },
   {
@@ -2139,7 +2139,7 @@ export const CARDS: Card[] = [
       'Effect: When any city tile is placed, add an animal to this card. Animals may not be removed from this card.',
     effectText: 'Add 1 animal to this card. 1 VP per 2 animals here.',
     resourceHeld: CardResource.Animals,
-    afterTileTriggers: [[TileType.City], [['ChangeCardResource', 1]]],
+    afterTileTriggers: [[[TileType.City], [['ChangeCardResource', 1]]]],
     effects: [['ChangeCardResource', 1]],
   },
   {
@@ -2485,7 +2485,7 @@ export const CARDS: Card[] = [
       'Effect: Each time a city tile is placed, including this, increase your MC production 1 step.',
     effectText:
       'Decrease your energy production 1 step and decrease your MC production 2 steps. Place a city tile.',
-    afterTileTriggers: [[TileType.City], [['ChangeProduction', 1, ResourceType.Money]]],
+    afterTileTriggers: [[[TileType.City], [['ChangeProduction', 1, ResourceType.Money]]]],
     effects: [
       ['ChangeProduction', -1, ResourceType.Energy],
       ['ChangeProduction', -2, ResourceType.Money],

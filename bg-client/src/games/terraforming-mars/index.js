@@ -485,6 +485,19 @@ const CardTriggers = props => (
   </Flex>
 )
 
+const CardTileTriggers = props => {
+  return (
+    <Flex ml={1} flex="1 1 auto" align="center">
+      {props.triggers.map(([[type, yours], effects], i) => (
+        <Flex key={i} align="center">
+          when {yours ? 'your' : 'any'} {type}:
+          <CardEffects effects={effects} card={props.card} />
+        </Flex>
+      ))}
+    </Flex>
+  )
+}
+
 const CardDiscounts = props => (
   <Flex ml={1} flex="1 1 auto" align="center">
     {props.discounts.map(([discount, tags], i) => (
@@ -523,6 +536,9 @@ let Card = props => (
         {props.card.afterCardTriggers && (
           <CardTriggers triggers={props.card.afterCardTriggers} card={props.card} />
         )}
+        {props.card.afterTileTriggers && (
+          <CardTileTriggers triggers={props.card.afterTileTriggers} card={props.card} />
+        )}
         {props.card.vp && <CardVP card={props.card} />}
       </Flex>
     </Flex>
@@ -556,7 +572,7 @@ let Corporation = props => (
           <CardTriggers triggers={props.corp.afterCardTriggers} card={props.corp} />
         )}
         {props.corp.afterTileTriggers && (
-          <CardTriggers triggers={props.corp.afterTileTriggers} card={props.corp} />
+          <CardTileTriggers triggers={props.corp.afterTileTriggers} card={props.corp} />
         )}
       </Flex>
     </Flex>
@@ -1061,17 +1077,41 @@ const TerraformingMars = props => (
             )}
             {props.game.playerState[props.player].played
               .slice(0, 10)
-              .map(name => <Card played key={name} name={name} collapsed />)}
+              .map(name => (
+                <Card
+                  played
+                  key={name}
+                  name={name}
+                  collapsed
+                  resources={props.game.playerState[props.player].cardResources[name]}
+                />
+              ))}
           </Box>
           <Box mr={1}>
             {props.game.playerState[props.player].played
               .slice(10, 20)
-              .map(name => <Card played key={name} name={name} collapsed />)}
+              .map(name => (
+                <Card
+                  played
+                  key={name}
+                  name={name}
+                  collapsed
+                  resources={props.game.playerState[props.player].cardResources[name]}
+                />
+              ))}
           </Box>
           <Box>
             {props.game.playerState[props.player].played
               .slice(20)
-              .map(name => <Card played key={name} name={name} collapsed />)}
+              .map(name => (
+                <Card
+                  played
+                  key={name}
+                  name={name}
+                  collapsed
+                  resources={props.game.playerState[props.player].cardResources[name]}
+                />
+              ))}
           </Box>
         </Flex>
       </Box>

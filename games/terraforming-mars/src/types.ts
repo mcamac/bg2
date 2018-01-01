@@ -47,7 +47,7 @@ export interface Card {
   effects?: any[]
   actions?: any[][]
   afterCardTriggers?: [any[], any[]]
-  afterTileTriggers?: [any[], any[]]
+  afterTileTriggers?: [any[], any[]][]
   afterStandardProjectTriggers?: any[]
   todo?: boolean
 }
