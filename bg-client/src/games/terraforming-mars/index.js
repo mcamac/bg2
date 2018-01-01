@@ -250,9 +250,9 @@ const PlaceCity = () => (
 )
 
 const PlaceCapitalCity = () => (
-  <div>
+  <Flex align="center">
     Capital <Tag name="City" />
-  </div>
+  </Flex>
 )
 
 const MultiCost = (value, resources) => (
@@ -285,6 +285,7 @@ const PlaceGreeneryOnOcean = () => (
   </Flex>
 )
 
+const PlaceNaturalPreserve = () => <Flex align="center">Place Natural Preserve.</Flex>
 const PlaceNuclearZone = () => <Flex align="center">Place Nuclear Zone.</Flex>
 const PlaceMohole = () => <Flex align="center">Place Mohole on Ocean.</Flex>
 const PlaceLavaFlows = () => <Flex align="center">Place Lava Flows on Volcano.</Flex>
@@ -333,6 +334,12 @@ const VPIfCardHasResources = (resource, count, vp) => (
   </Flex>
 )
 
+const CapitalCity = (resource, count, vp) => (
+  <Flex>
+    1 VP for adj. <Icon g="Ocean" />
+  </Flex>
+)
+
 const UNTerraform = () => (
   <Flex align="center">
     If <TR /> this gen, -3 <Icon g="Money" /> +1 <TR />
@@ -360,6 +367,37 @@ const Neg = effect => (
   </Flex>
 )
 
+const PlayedTagMatches = tags => (
+  <Flex align="center">
+    when{' '}
+    {tags.map((tagAnd, i) => (
+      <React.Fragment key={i}>
+        {tagAnd.map(tag => (
+          <React.Fragment key={tag}>
+            <Tag name={tag} />
+          </React.Fragment>
+        ))}{' '}
+        /
+      </React.Fragment>
+    ))}
+  </Flex>
+)
+
+const PlayedTagMatchesAny = tags => (
+  <Flex align="center">
+    when any{' '}
+    {tags.map((tagAnd, i) => (
+      <React.Fragment key={i}>
+        {tagAnd.map(tag => (
+          <React.Fragment key={tag}>
+            <Tag name={tag} />
+          </React.Fragment>
+        ))}{' '}
+        /
+      </React.Fragment>
+    ))}
+  </Flex>
+)
 const EFFECTS = {
   ChangeProduction,
   ChangeInventory,
@@ -377,6 +415,7 @@ const EFFECTS = {
   PlaceGreeneryOnOcean,
   PlaceRestrictedArea,
   PlaceResearchOutpost,
+  PlaceNaturalPreserve,
   MultiCost,
   RaiseOxygen,
   DecreaseAnyProduction,
@@ -392,6 +431,7 @@ const EFFECTS = {
   VPForTags,
   VPForCardResources,
   VPIfCardHasResources,
+  CapitalCity,
   GetTags,
   GetCities,
   GetCitiesOnMars,
@@ -400,6 +440,8 @@ const EFFECTS = {
   ChooseX,
   GetX,
   Neg,
+  PlayedTagMatches,
+  PlayedTagMatchesAny,
 }
 
 const CardEffects = props => {
@@ -481,7 +523,12 @@ const CardVP = props => (
 
 const CardTriggers = props => (
   <Flex ml={1} flex="1 1 auto" align="center">
-    <pre>{JSON.stringify(props.triggers)}</pre>
+    {[props.triggers].map(([cond, effects], i) => (
+      <Flex key={i} align="center">
+        <CardEffects effects={[cond]} card={props.card} />:
+        <CardEffects effects={effects} card={props.card} />
+      </Flex>
+    ))}
   </Flex>
 )
 

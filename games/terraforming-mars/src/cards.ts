@@ -942,7 +942,7 @@ export const CARDS: Card[] = [
       'Effect: When you play a science tag, including this, you may discard a card from hand to draw a card.',
     afterCardTriggers: [
       ['PlayedTagMatches', [[Tag.Science]]],
-      ['Option', [['Discard', 1], ['Draw', 1]]],
+      [['Option', [['Discard', 1], ['Draw', 1]]]],
     ],
   },
   {
@@ -955,7 +955,7 @@ export const CARDS: Card[] = [
       'Effect: When you play a plant, microbe, or an animal tag, including this, gain 1 plant or add 1 resource TO THAT CARD.',
     afterCardTriggers: [
       ['PlayedTagMatches', [[Tag.Plant], [Tag.Microbe], [Tag.Animal]]],
-      ['Choice', [['ChangeInventory', 1, ResourceType.Plant], ['ChangePlayedCardResource', 1]]],
+      [['Choice', [['ChangeInventory', 1, ResourceType.Plant], ['ChangePlayedCardResource', 1]]]],
     ],
   },
   {

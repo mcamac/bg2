@@ -26,7 +26,7 @@ export const CORPORATIONS: Corporation[] = [
     tags: ['Jovian'],
     effects: [['ChangeProduction', 1, ResourceType.Titanium]],
     afterCardTriggers: [
-      ['PlayedTagMatchesAny', [Tag.Jovian]],
+      ['PlayedTagMatchesAny', [[Tag.Jovian]]],
       [['ChangeProduction', 1, ResourceType.Money]],
     ],
   },
@@ -71,6 +71,7 @@ export const CORPORATIONS: Corporation[] = [
     startingMoney: 42,
     tags: ['Space'],
     effects: [['ChangeProduction', 3, ResourceType.Heat]],
+    text: 'Can use heat as money.',
     // TODO: implement additional power to use heat as money
   },
   {
@@ -93,7 +94,7 @@ export const CORPORATIONS: Corporation[] = [
     tags: ['Building'],
     effects: [['ChangeInventory', 20, ResourceType.Steel]],
     afterCardTriggers: [
-      ['PlayedTagMatches', [Tag.Event]],
+      ['PlayedTagMatches', [[Tag.Event]]],
       [['ChangeInventory', 2, ResourceType.Money]],
     ],
   },
