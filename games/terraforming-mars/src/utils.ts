@@ -15,7 +15,7 @@ import {
   ResourceBonus,
   Corporation,
 } from './types'
-import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles} from './tiles'
+import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles, makeKeyFromPosition} from './tiles'
 import {getCardByName} from './cards'
 import {draw} from './deck'
 import {getCorporationByName} from './corporations'
@@ -242,7 +242,7 @@ export const OffsetRequirements = (n: number) => (state: GameState, action, choi
 
 export const PlaceResearchOutpost = () => (state: GameState, action, choice): GameState => {
   getAdjacentTiles(choice.location).forEach(([x, y]) => {
-    if (state.map[`${x},${y}`]) throw Error('Cannot be next to another tile.')
+    if (state.map[makeKeyFromPosition([x, y])]) throw Error('Cannot be next to another tile.')
   })
 
   state = placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
@@ -260,7 +260,7 @@ export const PlaceNuclearZone = () => (state: GameState, action, choice): GameSt
 
 export const PlaceUrbanizedArea = () => (state: GameState, action, choice): GameState => {
   const nAdjacentCities = getAdjacentTiles(choice.location).filter(
-    ([x, y]) => state.map[`${x},${y}`] && state.map[`${x},${y}`].type === TileType.City
+    ([x, y]) => state.map[makeKeyFromPosition([x, y])] && state.map[makeKeyFromPosition([x, y])].type === TileType.City
   ).length
 
   if (nAdjacentCities < 2) throw Error('Not next to 2 cities.')
@@ -271,7 +271,7 @@ export const PlaceUrbanizedArea = () => (state: GameState, action, choice): Game
 
 export const PlaceNaturalPreserve = () => (state: GameState, action, choice): GameState => {
   getAdjacentTiles(choice.location).forEach(([x, y]) => {
-    if (state.map[`${x},${y}`]) throw Error('Cannot be next to another tile.')
+    if (state.map[makeKeyFromPosition([x, y])]) throw Error('Cannot be next to another tile.')
   })
 
   state = placeTile(state, {owner: state.player, type: TileType.NaturalPreserve}, choice.location)
@@ -667,6 +667,16 @@ export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState 
   return state
 }
 
+export const getOceanRefund = (state: GameState, position: Position): number => {
+  const numAdjacentOceans = getAdjacentTiles(position)
+    .map(makeKeyFromPosition)  // Make string key from the position
+    .map(key => state.map[key] ? state.map[key].type === TileType.Ocean : false)  // Check if ocean
+    .map((foundOcean: boolean): number => foundOcean ? 1 : 0)  
+    .reduce((x, y) => x + y)  // Sum together number of oceans found
+  let oceanMultiplier = 2
+  return numAdjacentOceans * oceanMultiplier
+}
+
 const placeSpecialTile = (state: GameState, tile: Tile, name: string): GameState => {
   state.map[name] = tile
   state = applyAfterTileTriggers(state, tile)
@@ -677,7 +687,7 @@ const placeSpecialTile = (state: GameState, tile: Tile, name: string): GameState
 const placeTile = (state: GameState, tile: Tile, position: Position): GameState => {
   const [x, y] = position
 
-  const key = `${x},${y}`
+  const key = makeKeyFromPosition(position)
   if (state.map[key]) throw Error('Tile location taken.')
   state.map[key] = tile
   // todo: check restrictions on tiles
@@ -693,6 +703,9 @@ const placeTile = (state: GameState, tile: Tile, position: Position): GameState 
       state = changeInventory(state, state.player, ResourceType.Titanium, 1)
     }
   })
+
+  const oceanRefund = getOceanRefund(state, position)
+  state = changeInventory(state, state.player, ResourceType.Money, oceanRefund)
 
   state = applyAfterTileTriggers(state, tile)
 
