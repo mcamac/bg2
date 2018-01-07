@@ -12,7 +12,7 @@ import {
   withState,
   withStateHandlers,
 } from 'recompose'
-import {toPairs, get} from 'lodash/fp'
+import {toPairs, get, reverse} from 'lodash/fp'
 
 import {
   reducer,
@@ -1097,14 +1097,20 @@ const TerraformingMars = props => (
       Terraforming Mars
     </Box>
     <Flex flex="1 1 auto">
-      <Box w={270} style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}>
+      <Flex
+        direction="column"
+        w={270}
+        style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}
+      >
         {props.game.players.map(player => (
           <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
         ))}
-        <Box px={2}>
-          <GameLog log={props.game.log} />
+
+        <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
+          GAME LOG
         </Box>
-      </Box>
+        <GameLog log={props.game.log} />
+      </Flex>
       <Box flex="1 1 auto" p={2}>
         <Flex>
           <Box>

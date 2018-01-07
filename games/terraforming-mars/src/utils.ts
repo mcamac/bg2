@@ -15,7 +15,14 @@ import {
   ResourceBonus,
   Corporation,
 } from './types'
-import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles, makeKeyFromPosition} from './tiles'
+import {
+  isOcean,
+  isVolcano,
+  getTileBonus,
+  isAdjacentToOwn,
+  getAdjacentTiles,
+  makeKeyFromPosition,
+} from './tiles'
 import {getCardByName} from './cards'
 import {draw} from './deck'
 import {getCorporationByName} from './corporations'
@@ -335,7 +342,9 @@ export const PlaceNuclearZone = () => (state: GameState, action, choice): GameSt
 
 export const PlaceUrbanizedArea = () => (state: GameState, action, choice): GameState => {
   const nAdjacentCities = getAdjacentTiles(choice.location).filter(
-    ([x, y]) => state.map[makeKeyFromPosition([x, y])] && state.map[makeKeyFromPosition([x, y])].type === TileType.City
+    ([x, y]) =>
+      state.map[makeKeyFromPosition([x, y])] &&
+      state.map[makeKeyFromPosition([x, y])].type === TileType.City
   ).length
 
   if (nAdjacentCities < 2) throw Error('Not next to 2 cities.')
@@ -668,6 +677,16 @@ export const changeInventory = (
   resource: ResourceType,
   delta: number
 ): GameState => {
+  if (delta != 0) {
+    state.log.push({
+      type: 'ChangeInventory',
+      player: player,
+      resource,
+      from: state.playerState[player].resources[resource].count,
+      to: state.playerState[player].resources[resource].count + delta,
+    })
+  }
+
   state.playerState[player].resources[resource].count += delta
   if (state.playerState[player].resources[resource].count < 0) {
     throw Error('Not enough resources')
@@ -744,10 +763,10 @@ export const applyAfterTileTriggers = (state: GameState, tile: Tile): GameState 
 
 export const getOceanRefund = (state: GameState, position: Position): number => {
   const numAdjacentOceans = getAdjacentTiles(position)
-    .map(makeKeyFromPosition)  // Make string key from the position
-    .map(key => state.map[key] ? state.map[key].type === TileType.Ocean : false)  // Check if ocean
-    .map((foundOcean: boolean): number => foundOcean ? 1 : 0)  
-    .reduce((x, y) => x + y)  // Sum together number of oceans found
+    .map(makeKeyFromPosition) // Make string key from the position
+    .map(key => (state.map[key] ? state.map[key].type === TileType.Ocean : false)) // Check if ocean
+    .map((foundOcean: boolean): number => (foundOcean ? 1 : 0))
+    .reduce((x, y) => x + y) // Sum together number of oceans found
   let oceanMultiplier = 2
   return numAdjacentOceans * oceanMultiplier
 }

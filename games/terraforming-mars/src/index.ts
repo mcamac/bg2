@@ -196,7 +196,6 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
   })
 
   state = setupInitialHands(state)
-  console.log('here', state)
   return state
 }
 
@@ -232,6 +231,11 @@ export const buyCards = (
   state.playerState[player].hand = state.playerState[player].hand.concat(chosen)
   delete state.choosingCards[player]
   // Add remaining to discard
+  state.log.push({
+    type: 'BuyCards',
+    player,
+    n: chosen.length,
+  })
   return state
 }
 

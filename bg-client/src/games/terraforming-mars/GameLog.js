@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import {Flex, Box} from 'grid-styled'
 
 import {Icon, Tag} from './components'
@@ -28,17 +28,32 @@ const ProductionChange = props => (
   </Flex>
 )
 
+const ChangeInventory = props => (
+  <Flex align="center">
+    {props.player}'s <Icon g={props.resource} />
+    went from {props.from} to {props.to}.
+  </Flex>
+)
+
 const Cede = props => <Flex>{props.player} ceded.</Flex>
 
 const Pass = props => <Flex>{props.player} passed.</Flex>
 
+const BuyCards = props => (
+  <Flex>
+    {props.player} bought {props.n} {props.n > 1 ? 'cards' : 'card'}.
+  </Flex>
+)
+
 const LOG_REGISTRY = {
   ProductionChange,
+  ChangeInventory,
   PlayCard,
   StandardProject,
   IncreaseTemperature,
   Cede,
   Pass,
+  BuyCards,
 }
 
 const LogLine = props => {
@@ -46,13 +61,32 @@ const LogLine = props => {
   return <Component {...props.line} />
 }
 
-const GameLog = props => (
-  <Box style={{fontSize: 14}}>
-    <Box py={1} style={{fontSize: 12, color: '#555'}}>
-      GAME LOG
-    </Box>
-    {props.log.map((l, i) => <LogLine key={i} line={l} />)}
-  </Box>
-)
+export default class GameLog extends Component {
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({behavior: 'smooth'})
+  }
 
-export default GameLog
+  componentDidMount() {
+    this.scrollToBottom()
+  }
+
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
+
+  render() {
+    return (
+      <Box px={2} style={{overflowY: 'scroll'}}>
+        <Box style={{fontSize: 14}}>
+          {this.props.log.map((l, i) => <LogLine key={i} line={l} />)}
+        </Box>
+        <div
+          style={{float: 'left', clear: 'both'}}
+          ref={el => {
+            this.messagesEnd = el
+          }}
+        />
+      </Box>
+    )
+  }
+}
