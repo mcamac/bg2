@@ -521,7 +521,18 @@ export const Neg = (fn: NumGetter): NumGetter => (state, action, choice) => {
   return -fn(state, action, choice)
 }
 
+const AddNextCardEffect = (nextCardEffect: NextCardEffect, ...args: any[]): ((state: GameState, action, choice, card: Card) => GameState) => {
+  return (state: GameState, action, choice, card: Card): GameState => {
+    const playerState = state.playerState[state.player]
+    playerState.nextCardEffect = [nextCardEffect, ...args]
+
+    return state
+  }
+
+}
+
 const REGISTRY = {
+  AddNextCardEffect,
   DecreaseAnyProduction,
   DecreaseAnyInventory,
   ChangeCardResource,
