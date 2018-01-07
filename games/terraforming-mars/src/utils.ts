@@ -522,7 +522,6 @@ export const Neg = (fn: NumGetter): NumGetter => (state, action, choice) => {
 }
 
 const REGISTRY = {
-  AddNextCardEffect,
   DecreaseAnyProduction,
   DecreaseAnyInventory,
   ChangeCardResource,
@@ -561,10 +560,6 @@ const REGISTRY = {
   OffsetRequirements,
   // Choices only
   KeepCards,
-}
-
-export const AddNextCardEffect = (effect: any): ((state: GameState, action, choice, card: Card) => GameState) => {
-  state.playerState[state.player].nextCardEffect
 }
 
 const fromJSON = obj => {

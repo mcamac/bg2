@@ -219,7 +219,7 @@ export const getDiscount = (played: Card[], corporation: Corporation | null, nex
   })
 
   // Examine corporation for discount
-  if (corporation.discounts) {
+  if (corporation && corporation.discounts) {
     corporation.discounts.forEach(([discountDelta, tags]) => {
       if (tags) {
         if (isSubset(tags, card.tags || [])) {
