@@ -1,4 +1,4 @@
-import * as express from 'express'
+import * as express_ from 'express'
 import {Server, createServer} from 'http'
 
 import {decodeToken} from './auth'
@@ -8,6 +8,7 @@ import {RedisStorage} from './storage/redis'
 const PORT = 3000
 const JWT_SECRET = 'aEGkGc0lejJqrQMDSWHM-31YIS6GbNP4m3wUKT7YPpyPXB_XkFAoVR-0XMGMQG7V'
 
+let express = express_
 const app = express()
 const server = new Server(app)
 const socketServer = new SocketServer(server)

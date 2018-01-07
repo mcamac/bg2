@@ -1,5 +1,5 @@
 import {omit, omitBy, pick, pull, mapValues, flatMap} from 'lodash'
-import {shuffle} from 'shuffle-seed'
+import {shuffle} from './random'
 
 import {
   Transform,
@@ -201,7 +201,12 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
   return state
 }
 
-export const getDiscount = (played: Card[], corporation: Corporation | null, nextCardEffect: any, card: Card) => {
+export const getDiscount = (
+  played: Card[],
+  corporation: Corporation | null,
+  nextCardEffect: any,
+  card: Card
+) => {
   let delta = 0
 
   // Examine played cards for discounts
@@ -225,7 +230,7 @@ export const getDiscount = (played: Card[], corporation: Corporation | null, nex
       if (tags) {
         if (isSubset(tags, card.tags || [])) {
           delta += discountDelta
-        } 
+        }
       } else {
         delta += discountDelta
       }
@@ -235,8 +240,7 @@ export const getDiscount = (played: Card[], corporation: Corporation | null, nex
   // Examine if there are any next card effects
   if (nextCardEffect) {
     let [effectName, ...args] = nextCardEffect
-    if (effectName === NextCardEffect.Discount) 
-      delta += args[0]
+    if (effectName === NextCardEffect.Discount) delta += args[0]
   }
 
   return delta
@@ -425,8 +429,7 @@ export const turnActionHandlers = {
     }
 
     // Clear any "next card effects" from the player state
-    if (playerState.nextCardEffect) 
-      playerState.nextCardEffect = null
+    if (playerState.nextCardEffect) playerState.nextCardEffect = null
 
     // After-card triggers
     state = applyAfterCardTriggers(state, card, state.player)

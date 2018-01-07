@@ -2,7 +2,7 @@ import * as r from 'rethinkdb'
 import {SocketServer} from '../socket'
 import {GameStorage, PlayerConnection, Room} from '../base'
 
-import {PowerGrid} from '../../../games/power-grid/src/index'
+// import {PowerGrid} from '../../../games/power-grid/src/index'
 import {TerraformingMars} from '../../../games/terraforming-mars/src/index'
 import {getStateAfterActions} from '../../../games/terraforming-mars/src/fixtures'
 import {cloneState} from '../../../games/terraforming-mars/src/utils'
@@ -11,7 +11,7 @@ import {IHandyRedis} from 'handy-redis/dist/generated/interface'
 import {ClientOpts} from 'redis'
 
 const GAMES = {
-  PowerGrid,
+  // PowerGrid,
   TerraformingMars,
 }
 
