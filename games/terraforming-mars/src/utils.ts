@@ -14,6 +14,7 @@ import {
   StandardProject,
   ResourceBonus,
   Corporation,
+  NextCardEffect,
 } from './types'
 import {
   isOcean,
@@ -407,7 +408,16 @@ export const AfterTile = {}
 export const GlobalTypeWithinRange = (param: GlobalType, min: number, max: number) => (
   state: GameState
 ): boolean => {
-  let offset = state.playerState[state.player].globalRequirementsOffset || 0
+  let playerState = state.playerState[state.player]
+  let offset = playerState.globalRequirementsOffset || 0
+
+  // Check nextCardEffect; add if necessary -- maybe refactor this and do a type check on the arg types?
+  if (playerState.nextCardEffect) {
+    let [effectName, ...args] = playerState.nextCardEffect
+    if (effectName === NextCardEffect.OffsetRequirements)
+      offset = offset + args[0]
+  }
+
   if (param === GlobalType.Heat) offset *= 2
   return (
     state.globalParameters[param] >= min - offset && state.globalParameters[param] <= max + offset
@@ -595,7 +605,18 @@ export const Neg = (fn: NumGetter): NumGetter => (state, action, choice) => {
   return -fn(state, action, choice)
 }
 
+const AddNextCardEffect = (nextCardEffect: NextCardEffect, ...args: any[]): ((state: GameState, action, choice, card: Card) => GameState) => {
+  return (state: GameState, action, choice, card: Card): GameState => {
+    const playerState = state.playerState[state.player]
+    playerState.nextCardEffect = [nextCardEffect, ...args]
+
+    return state
+  }
+
+}
+
 const REGISTRY = {
+  AddNextCardEffect,
   DecreaseAnyProduction,
   DecreaseAnyInventory,
   ChangeCardResource,
