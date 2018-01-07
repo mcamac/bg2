@@ -1,7 +1,7 @@
 import {keyBy} from 'lodash'
 
 import {Discount, ChangeProduction} from './utils'
-import {ResourceType, CardResource, Tag, Card, TileType} from './types'
+import {ResourceType, CardResource, Tag, Card, TileType, NextCardEffect} from './types'
 
 export const CARDS: Card[] = [
   {
@@ -2431,7 +2431,7 @@ export const CARDS: Card[] = [
     tags: ['Event'],
     vp: -1,
     effectText: 'The next card you play this generation costs 8MC less.',
-    effects: [['AddNextCardEffect', ['Discount', 8]]],
+    effects: [['AddNextCardEffect', [NextCardEffect.Discount, 8]]],
   },
   {
     name: 'Lagrange Observatory',
@@ -2551,7 +2551,7 @@ export const CARDS: Card[] = [
     tags: ['Science', 'Event'],
     effectText:
       'The next card you play this generation is +2 or -2 in global requirements, your choice.',
-    effects: [['AddNextCardEffect', ['OffsetRequirements', 2]]],
+    effects: [['AddNextCardEffect', [NextCardEffect.OffsetRequirements, 2]]],
   },
   {
     name: 'Medical Lab',

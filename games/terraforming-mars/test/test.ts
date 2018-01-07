@@ -44,13 +44,13 @@ const TEST_SEED = 'martin'
 test(t => {
   const played = ['Research Outpost'].map(C)
   const card = C('Black Polar Dust')
-  t.is(getDiscount(played, card), 1)
+  t.is(getDiscount(played, null, null, card), 1)
 })
 
 test(t => {
   const played = ['Quantum Extractor', 'Research Outpost'].map(C)
   const card = C('Optimal Aerobraking')
-  t.is(getDiscount(played, card), 3)
+  t.is(getDiscount(played, null, null, card), 3)
 })
 
 test('Production', t => {

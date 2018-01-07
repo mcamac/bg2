@@ -14,6 +14,7 @@ import {
   StandardProject,
   ResourceBonus,
   Corporation,
+  NextCardEffect,
 } from './types'
 import {isOcean, isVolcano, getTileBonus, isAdjacentToOwn, getAdjacentTiles, makeKeyFromPosition} from './tiles'
 import {getCardByName} from './cards'
@@ -323,7 +324,16 @@ export const AfterTile = {}
 export const GlobalTypeWithinRange = (param: GlobalType, min: number, max: number) => (
   state: GameState
 ): boolean => {
-  let offset = state.playerState[state.player].globalRequirementsOffset || 0
+  let playerState = state.playerState[state.player]
+  let offset = playerState.globalRequirementsOffset || 0
+
+  // Check nextCardEffect; add if necessary -- maybe refactor this and do a type check on the arg types?
+  if (playerState.nextCardEffect) {
+    let [effectName, ...args] = playerState.nextCardEffect
+    if (effectName === NextCardEffect.OffsetRequirements)
+      offset = offset + args[0]
+  }
+
   if (param === GlobalType.Heat) offset *= 2
   return (
     state.globalParameters[param] >= min - offset && state.globalParameters[param] <= max + offset
@@ -512,6 +522,7 @@ export const Neg = (fn: NumGetter): NumGetter => (state, action, choice) => {
 }
 
 const REGISTRY = {
+  AddNextCardEffect,
   DecreaseAnyProduction,
   DecreaseAnyInventory,
   ChangeCardResource,
@@ -550,6 +561,10 @@ const REGISTRY = {
   OffsetRequirements,
   // Choices only
   KeepCards,
+}
+
+export const AddNextCardEffect = (effect: any): ((state: GameState, action, choice, card: Card) => GameState) => {
+  state.playerState[state.player].nextCardEffect
 }
 
 const fromJSON = obj => {

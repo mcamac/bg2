@@ -272,3 +272,8 @@ export const enum StandardProject {
   Greenery = 'Greenery',
   City = 'City',
 }
+
+export const enum NextCardEffect {
+  Discount = 'Discount',
+  OffsetRequirements = 'OffsetRequirements'
+}

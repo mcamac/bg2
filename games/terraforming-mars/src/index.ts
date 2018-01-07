@@ -19,6 +19,8 @@ import {
   ResourcesState,
   TurnAction,
   StandardProject,
+  Corporation,
+  NextCardEffect,
 } from './types'
 import {CARDS, getCardByName} from './cards'
 import {setupInitialHands, handlePlayerChoice, isDraftDone, setupDraft} from './deck'
@@ -198,8 +200,10 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
   return state
 }
 
-export const getDiscount = (played: Card[], card: Card) => {
+export const getDiscount = (played: Card[], corporation: Corporation | null, nextCardEffect: any, card: Card) => {
   let delta = 0
+
+  // Examine played cards for discounts
   played.forEach(playedCard => {
     if (playedCard.discounts) {
       playedCard.discounts.forEach(([discountDelta, tags]) => {
@@ -213,6 +217,27 @@ export const getDiscount = (played: Card[], card: Card) => {
       })
     }
   })
+
+  // Examine corporation for discount
+  if (corporation.discounts) {
+    corporation.discounts.forEach(([discountDelta, tags]) => {
+      if (tags) {
+        if (isSubset(tags, card.tags || [])) {
+          delta += discountDelta
+        } 
+      } else {
+        delta += discountDelta
+      }
+    })
+  }
+
+  // Examine if there are any next card effects
+  if (nextCardEffect) {
+    let [effectName, ...args] = nextCardEffect
+    if (effectName === NextCardEffect.Discount) 
+      delta += args[0]
+  }
+
   return delta
 }
 
@@ -347,7 +372,8 @@ export const turnActionHandlers = {
 
     // Get discount
     const played: Card[] = playerState.played.map(getCardByName)
-    const discount = getDiscount(played, card)
+    const corporation: Corporation = getCorporationByName(playerState.corporation)
+    const discount = getDiscount(played, corporation, playerState.nextCardEffect, card)
     const actualCost = Math.max(0, card.cost - discount)
 
     const resources = {
@@ -379,6 +405,10 @@ export const turnActionHandlers = {
     if (card.effects) {
       state = applyEffects(state, action, card.effects, card)
     }
+
+    // Clear any "next card effects" from the player state
+    if (playerState.nextCardEffect) 
+      playerState.nextCardEffect = null
 
     // After-card triggers
     state = applyAfterCardTriggers(state, card, state.player)
