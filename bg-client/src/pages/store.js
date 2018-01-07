@@ -17,7 +17,11 @@ const asyncDispatchMiddleware = store => next => action => {
 
   function asyncDispatch(asyncAction) {
     // actionQueue = actionQueue.concat([asyncAction])
-    socket.send({room: 'a', action: 'ROOM_MOVE', move: asyncAction})
+    socket.send({
+      room: window.location.pathname.split('/')[2],
+      action: 'ROOM_MOVE',
+      move: asyncAction,
+    })
 
     // if (syncActivityFinished) {
     //   flushQueue()

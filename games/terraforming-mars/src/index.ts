@@ -162,6 +162,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     map: {},
     milestones: [],
     awards: [],
+    log: [],
 
     // Private
     draft: {},
@@ -195,6 +196,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
   })
 
   state = setupInitialHands(state)
+  console.log('here', state)
   return state
 }
 
@@ -314,6 +316,11 @@ export const turnActionHandlers = {
     return fundAward(state, action.award)
   },
   [TurnAction.StandardProject]: (state, action) => {
+    state.log.push({
+      type: 'StandardProject',
+      project: action.project,
+    })
+
     state = applyEffects(state, action, STANDARD_PROJECTS[action.project].effects)
     // standard project triggers
 
@@ -355,6 +362,13 @@ export const turnActionHandlers = {
       Steel: action.resources.Steel || 0,
       Titanium: action.resources.Titanium || 0,
     }
+
+    state.log.push({
+      type: 'PlayCard',
+      player: state.player,
+      card: action.card,
+      resources,
+    })
 
     const paidFor =
       resources.Money +
@@ -487,6 +501,11 @@ export const handlers = {
     // Get next player.
     if (state.actionsDone === 0) throw Error('Cannot cede without acting.')
     state = switchToNextPlayer(state)
+
+    state.log.push({
+      type: 'Cede',
+      player: action.player,
+    })
     return state
   },
 
@@ -495,6 +514,11 @@ export const handlers = {
     // Get next player.
     state.passed[state.player] = true
     state = switchToNextPlayer(state)
+
+    state.log.push({
+      type: 'Pass',
+      player: action.player,
+    })
     return state
   },
 

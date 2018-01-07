@@ -26,7 +26,16 @@ export const DecreaseAnyProduction = (delta: number, type: string) => (
   choice: {player: string},
   card: Card
 ): GameState => {
+  state.log.push({
+    type: 'ProductionChange',
+    player: choice.player,
+    resource: type,
+    from: state.playerState[choice.player].resources[type].production,
+    to: state.playerState[choice.player].resources[type].production - delta,
+  })
+
   state.playerState[choice.player].resources[type].production -= delta
+
   return state
 }
 
@@ -36,6 +45,14 @@ export const DecreaseAnyInventory = (delta: number, type: string) => (
   choice: {player: string},
   card: Card
 ): GameState => {
+  state.log.push({
+    type: 'InventoryChange',
+    player: choice.player,
+    resource: type,
+    from: state.playerState[choice.player].resources[type].count,
+    to: state.playerState[choice.player].resources[type].count - delta,
+  })
+
   state.playerState[choice.player].resources[type].count -= delta
   return state
 }
@@ -100,12 +117,21 @@ export const ChangeProduction = (n: number | NumGetter, resource: string) => (
   if (typeof n !== 'number') {
     n = n(state, action, choice)
   }
-  const playerState = state.playerState[(action && action.player) || state.player]
+  const player = (action && action.player) || state.player
+  const playerState = state.playerState[player]
   playerState.resources[resource].production += n
 
   if (resource !== ResourceType.Money && playerState.resources[resource].production < 0) {
     throw Error('Not enough production')
   }
+
+  state.log.push({
+    type: 'ProductionChange',
+    player: player,
+    resource,
+    from: playerState.resources[resource].production,
+    to: playerState.resources[resource].production + n,
+  })
 
   return state
 }
@@ -125,6 +151,13 @@ export const DrawAndChoose = (nDraw: number, nKeep: number): Transform => state 
 export const Draw = (n: number) => (state: GameState, action, choice): GameState => {
   let [drawn, newState] = draw(n, state)
   newState.playerState[state.player].hand = newState.playerState[state.player].hand.concat(drawn)
+
+  state.log.push({
+    type: 'Draw',
+    player: state.player,
+    n,
+  })
+
   return newState
 }
 
@@ -135,12 +168,27 @@ export const IncreaseTR = (n: number | any[]) => (state: GameState): GameState =
   }
   state.playerState[state.player].TR += n
   state.playerState[state.player].hasIncreasedTRThisGeneration = true
+
+  state.log.push({
+    type: 'IncreaseTR',
+    player: state.player,
+    from: state.playerState[state.player].TR - n,
+    n,
+  })
+
   return state
 }
 
 export const IncreaseResourceValue = (n: number, resource: ResourceType) => (
   state: GameState
 ): GameState => {
+  state.log.push({
+    type: 'IncreaseResourceValue',
+    player: state.player,
+    from: state.playerState[state.player].conversions[resource],
+    n,
+  })
+
   state.playerState[state.player].conversions[resource] += n
   return state
 }
@@ -153,14 +201,41 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
       effects: [['PlaceOceans']],
     })
   }
+
+  state.log.push({
+    type: 'IncreaseTemperature',
+    player: state.player,
+    from: state.globalParameters.Heat,
+    to: state.globalParameters.Heat + 2 * n,
+  })
+
   state.playerState[state.player].TR += n
   state.playerState[state.player].hasIncreasedTRThisGeneration = true
   state.globalParameters.Heat += 2 * n
+
   return state
 }
-export const RaiseOxygen = (delta: number) => {}
+
+export const RaiseOxygen = (delta: number) => (state: GameState, action, choice): GameState => {
+  state.log.push({
+    type: 'RaiseOxygen',
+    player: state.player,
+    from: state.globalParameters.Oxygen,
+    to: state.globalParameters.Oxygen + delta,
+  })
+
+  state.globalParameters.Oxygen += 1
+  state.playerState[state.player].TR += 1
+  state.playerState[state.player].hasIncreasedTRThisGeneration = true
+  return state
+}
 
 export const PlaceOceans = () => (state: GameState, action, choice): GameState => {
+  state.log.push({
+    type: 'PlaceOceans',
+    player: state.player,
+  })
+
   if (!isOcean(choice.location)) throw Error('Not an ocean tile')
   state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.location)
   state.playerState[state.player].TR += 1

@@ -231,7 +231,7 @@ export interface GameState {
     [key: string]: string[]
   }
 
-  // log(): void
+  log: any[]
 }
 
 export const enum CardResource {

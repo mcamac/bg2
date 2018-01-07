@@ -91,6 +91,7 @@ export class RedisStorage implements GameStorage {
     } catch (e) {
       console.log(e)
     }
+    // console.log('new state', newState)
     return this.updateRoom(id, room => ({
       game: newState,
     }))

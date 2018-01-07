@@ -31,6 +31,7 @@ import {
   uiCede,
 } from './reducer'
 import {Grid} from './Grid'
+import GameLog from './GameLog'
 import {Icon, Tag} from './components'
 
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
@@ -1095,11 +1096,14 @@ const TerraformingMars = props => (
     >
       Terraforming Mars
     </Box>
-    <Flex>
+    <Flex flex="1 1 auto">
       <Box w={270} style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}>
         {props.game.players.map(player => (
           <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
         ))}
+        <Box px={2}>
+          <GameLog log={props.game.log} />
+        </Box>
       </Box>
       <Box flex="1 1 auto" p={2}>
         <Flex>
