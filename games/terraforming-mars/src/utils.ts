@@ -1,4 +1,4 @@
-import {cloneDeep, pull, flatMap, sum, zip} from 'lodash'
+import {cloneDeep, pull, flatMap, sum, values, zip} from 'lodash'
 import {
   GameState,
   Transform,
@@ -461,6 +461,14 @@ export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean
   return state => true
 }
 
+export const HasPlayerCities = (minimum: number): ((state: GameState) => boolean) => {
+  return state => GetPlayerCities(state.player)(state) >= minimum
+}
+
+export const HasGreeneries = (minimum: number): ((state: GameState) => boolean) => {
+  return state => GetPlayerGreeneries(state.player)(state) >= minimum
+}
+
 /* Compute VP as a function of card resources */
 
 export const VPIfCardHasResources = (
@@ -580,6 +588,11 @@ export const GetTags = (tag: Tag, ratio: number = 1) => (state: GameState): numb
   return Math.floor(GetPlayerTags(tag, state.player)(state) / ratio)
 }
 
+export const GetPlayerGreeneries = (player: Player) => (state: GameState): number => {
+  return values(state.map).filter(tile => tile.owner === player && tile.type === TileType.Greenery)
+    .length
+}
+
 export const GetAllTags = (tag: Tag) => (state: GameState): number => {
   return sum(state.players.map(player => GetPlayerTags(tag, player)(state)))
 }
@@ -592,7 +605,6 @@ export const GetPlayerTags = (tag: Tag, player: Player) => (state: GameState): n
     getCorporationByName(state.playerState[player].corporation),
   ]
 
-  console.log('here', allPlayed)
   return (<any>flatMap(allPlayed, card => card.tags || [])).filter(t => t === tag).length
 }
 
@@ -600,8 +612,13 @@ export const GetOpponentTags = (tag: Tag): ((state: GameState) => number) => {
   return state => 0
 }
 
+export const GetPlayerCities = (player: Player) => (state: GameState): number => {
+  return values(state.map).filter(tile => tile.owner === player && tile.type === TileType.City)
+    .length
+}
+
 export const GetCities = () => (state: GameState): number => {
-  return 0
+  return values(state.map).filter(tile => tile.type === TileType.City).length
 }
 
 export const GetCitiesOnMars = (): ((state: GameState) => number) => {

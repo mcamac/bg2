@@ -34,6 +34,8 @@ import {
   applyEffects,
   applyAfterCardTriggers,
   cloneState,
+  HasGreeneries,
+  HasPlayerCities,
 } from './utils'
 import {CORPORATIONS, getCorporationByName} from './corporations'
 import {STANDARD_PROJECTS} from './projects'
@@ -285,8 +287,8 @@ const isDoneChoosingCorporations = (state: GameState): boolean => {
 
 const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
   [Milestones.Terraformer]: state => state.playerState[state.player].TR >= 35,
-  // [Milestones.Mayor]: null,
-  // [Milestones.Gardener]: null,
+  [Milestones.Mayor]: HasPlayerCities(3),
+  [Milestones.Gardener]: HasGreeneries(3),
   [Milestones.Builder]: HasTags(8, Tag.Building),
   [Milestones.Planner]: state => state.playerState[state.player].hand.length >= 16,
 }
@@ -307,7 +309,11 @@ const awardFns: {[key: string]: ((s: GameState, player: Player) => number)} = {
 }
 
 export const claimMilestone = (state: GameState, milestone: Milestones): GameState => {
-  const ok = state.milestones.length < 3 && milestoneChecks[milestone](state)
+  const ok =
+    state.milestones.length < 3 &&
+    milestoneChecks[milestone](state) &&
+    !state.milestones.find(claim => claim.milestone === milestone)
+
   if (!ok) {
     throw new Error('Cannot claim milestone')
   }
