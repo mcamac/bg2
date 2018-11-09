@@ -1,4 +1,3 @@
-import * as r from 'rethinkdb'
 import {SocketServer} from '../socket'
 import {GameStorage, PlayerConnection, Room} from '../base'
 
@@ -20,7 +19,7 @@ export class RedisStorage implements GameStorage {
   playerConnection: PlayerConnection
   client: IHandyRedis
 
-  constructor(params: r.ConnectionOptions, playerConnection: PlayerConnection) {
+  constructor(params: ClientOpts, playerConnection: PlayerConnection) {
     this.playerConnection = playerConnection
     this.playerConnection.setStorage(this)
     this.connect(params)
@@ -45,6 +44,7 @@ export class RedisStorage implements GameStorage {
     let roomStr = await this.client.get(id)
     if (!roomStr) {
       roomStr = JSON.stringify({id, g: 'TerraformingMars'})
+      console.log('getRoom', id)
       await this.client.set(id, roomStr)
     }
     return JSON.parse(roomStr)
@@ -52,8 +52,10 @@ export class RedisStorage implements GameStorage {
 
   async updateRoom(id: string, update) {
     const room = await this.getRoom(id)
+    console.log('room', id, room)
     const updated = {...room, ...update(room)}
     await this.client.set(id, JSON.stringify(updated))
+    console.log('updated', id, updated)
     this.playerConnection.notifyRoom(updated, updated.g && GAMES[updated.g].getClientState)
   }
 
@@ -75,7 +77,7 @@ export class RedisStorage implements GameStorage {
     console.log('start', room, GAMES[room.g])
     // const game = GAMES[room.g].get(room.users)
     const game = getStateAfterActions()
-    console.log('new', game)
+    console.log('new s', id, game)
     return this.updateRoom(id, room => ({
       game,
     }))

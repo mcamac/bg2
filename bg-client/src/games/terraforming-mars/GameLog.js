@@ -11,10 +11,20 @@ const PlayCard = props => (
   </Box>
 )
 
-const StandardProject = props => <Box>Standard project {props.project}.</Box>
+const StandardProject = props => (
+  <Box>
+    {props.player} did standard project {props.project}.
+  </Box>
+)
 const IncreaseTemperature = props => (
   <Box>
     Temp increased from {props.from} to {props.to}.
+  </Box>
+)
+
+const IncreaseTR = props => (
+  <Box>
+    {props.player}'s TR increased from {props.from} to {props.to} ({props.to - props.from}).
   </Box>
 )
 
@@ -31,7 +41,7 @@ const ProductionChange = props => (
 const ChangeInventory = props => (
   <Flex align="center">
     {props.player}'s <Icon g={props.resource} />
-    went from {props.from} to {props.to}.
+    went from {props.from} to {props.to} ({props.to - props.from}).
   </Flex>
 )
 
@@ -41,7 +51,13 @@ const Pass = props => <Flex>{props.player} passed.</Flex>
 
 const BuyCards = props => (
   <Flex>
-    {props.player} bought {props.n} {props.n > 1 ? 'cards' : 'card'}.
+    {props.player} bought {props.n} {props.n !== 1 ? 'cards' : 'card'}.
+  </Flex>
+)
+
+const NewGeneration = props => (
+  <Flex py={2}>
+    <b>Generation {props.n}</b>
   </Flex>
 )
 
@@ -51,9 +67,11 @@ const LOG_REGISTRY = {
   PlayCard,
   StandardProject,
   IncreaseTemperature,
+  IncreaseTR,
   Cede,
   Pass,
   BuyCards,
+  NewGeneration,
 }
 
 const LogLine = props => {

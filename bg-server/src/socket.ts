@@ -90,19 +90,22 @@ export class SocketServer implements PlayerConnection {
   notifyRoom(room, getPlayerState) {
     console.log('room change', room.id, room.users)
     if (room && room.users) {
-      room.users.filter(u => this.userConnections[u]).forEach(u => {
-        let playerRoom = {...room}
-        if (room.game && getPlayerState) {
-          playerRoom.game = getPlayerState(room.game, u)
-        }
-        if (this.userConnections[u].readyState === this.userConnections[u].OPEN)
-          this.userConnections[u].send(
-            JSON.stringify({
-              type: 'ROOM_UPDATE',
-              room: playerRoom,
-            })
-          )
-      })
+      room.users
+        .filter(u => this.userConnections[u])
+        .forEach(u => {
+          let playerRoom = {...room}
+          console.log('here', room)
+          if (room.game && getPlayerState) {
+            playerRoom.game = getPlayerState(room.game, u)
+          }
+          if (this.userConnections[u].readyState === this.userConnections[u].OPEN)
+            this.userConnections[u].send(
+              JSON.stringify({
+                type: 'ROOM_UPDATE',
+                room: playerRoom,
+              })
+            )
+        })
     }
   }
 }

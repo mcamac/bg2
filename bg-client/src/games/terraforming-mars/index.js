@@ -263,7 +263,7 @@ const MultiCost = (value, resources) => (
 )
 
 const IncreaseResourceValue = (value, resource) => (
-  <Flex align="center">
+  <Flex align="center" mr="4px">
     {withSign(value)} to <Icon g={resource} /> value
   </Flex>
 )
@@ -1086,121 +1086,128 @@ PlayedCardMatches = connect(
   })
 )(PlayedCardMatches)
 
-const TerraformingMars = props => (
-  <Wrapper direction="column">
-    <Box
-      align="center"
-      py={1}
-      px={2}
-      style={{fontFamily: 'Rubik Mono One', borderBottom: '1px solid #ddd', background: '#fafafa'}}
-    >
-      Terraforming Mars
-    </Box>
-    <Flex flex="1 1 auto">
-      <Flex
-        direction="column"
-        w={270}
-        style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}
+const TerraformingMars = props => {
+  console.log('props', props)
+  return (
+    <Wrapper direction="column">
+      <Box
+        align="center"
+        py={1}
+        px={2}
+        style={{
+          fontFamily: 'Rubik Mono One',
+          borderBottom: '1px solid #ddd',
+          background: '#fafafa',
+        }}
       >
-        {props.game.players.map(player => (
-          <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
-        ))}
+        Terraforming Mars
+      </Box>
+      <Flex flex="1 1 auto">
+        <Flex
+          direction="column"
+          w={270}
+          style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}
+        >
+          {props.game.players.map(player => (
+            <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
+          ))}
 
-        <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
-          GAME LOG
+          <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
+            GAME LOG
+          </Box>
+          <GameLog log={props.game.log} />
+        </Flex>
+        <Box flex="1 1 auto" p={2}>
+          <Flex>
+            <Box>
+              <Box style={{fontSize: 14}} mb={1}>
+                Generation {props.game.generation}
+              </Box>
+              <GlobalParams />
+              <Milestones />
+              <Awards />
+              <StandardProjects />
+            </Box>
+            <Box flex="1 1 auto" style={{textAlign: 'center'}}>
+              <ActionBar />
+              <Grid />
+            </Box>
+          </Flex>
+          <Flex>
+            <Box mr={1}>
+              {props.game.playerState[props.player].corporation && (
+                <Corporation name={props.game.playerState[props.player].corporation} collapsed />
+              )}
+              {props.game.playerState[props.player].played
+                .slice(0, 10)
+                .map(name => (
+                  <Card
+                    played
+                    key={name}
+                    name={name}
+                    collapsed
+                    resources={props.game.playerState[props.player].cardResources[name]}
+                  />
+                ))}
+            </Box>
+            <Box mr={1}>
+              {props.game.playerState[props.player].played
+                .slice(10, 20)
+                .map(name => (
+                  <Card
+                    played
+                    key={name}
+                    name={name}
+                    collapsed
+                    resources={props.game.playerState[props.player].cardResources[name]}
+                  />
+                ))}
+            </Box>
+            <Box>
+              {props.game.playerState[props.player].played
+                .slice(20)
+                .map(name => (
+                  <Card
+                    played
+                    key={name}
+                    name={name}
+                    collapsed
+                    resources={props.game.playerState[props.player].cardResources[name]}
+                  />
+                ))}
+            </Box>
+          </Flex>
         </Box>
-        <GameLog log={props.game.log} />
-      </Flex>
-      <Box flex="1 1 auto" p={2}>
-        <Flex>
-          <Box>
-            <Box style={{fontSize: 14}} mb={1}>
-              Generation {props.game.generation}
-            </Box>
-            <GlobalParams />
-            <Milestones />
-            <Awards />
-            <StandardProjects />
-          </Box>
-          <Box flex="1 1 auto" style={{textAlign: 'center'}}>
-            <ActionBar />
-            <Grid />
-          </Box>
-        </Flex>
-        <Flex>
-          <Box mr={1}>
-            {props.game.playerState[props.player].corporation && (
-              <Corporation name={props.game.playerState[props.player].corporation} collapsed />
-            )}
-            {props.game.playerState[props.player].played
-              .slice(0, 10)
-              .map(name => (
-                <Card
-                  played
-                  key={name}
-                  name={name}
-                  collapsed
-                  resources={props.game.playerState[props.player].cardResources[name]}
-                />
-              ))}
-          </Box>
-          <Box mr={1}>
-            {props.game.playerState[props.player].played
-              .slice(10, 20)
-              .map(name => (
-                <Card
-                  played
-                  key={name}
-                  name={name}
-                  collapsed
-                  resources={props.game.playerState[props.player].cardResources[name]}
-                />
-              ))}
-          </Box>
-          <Box>
-            {props.game.playerState[props.player].played
-              .slice(20)
-              .map(name => (
-                <Card
-                  played
-                  key={name}
-                  name={name}
-                  collapsed
-                  resources={props.game.playerState[props.player].cardResources[name]}
-                />
-              ))}
-          </Box>
-        </Flex>
-      </Box>
-      <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
-        {props.game.draft[props.player] && (
-          <Draft cards={props.game.draft[props.player]} player={props.player} />
-        )}
-        {props.game.choosingCorporations[props.player] && (
-          <React.Fragment>
-            <Box p={1} style={{fontSize: 12, color: '#555'}}>
-              CORPORATIONS
-            </Box>
-            <Box px={2}>
-              {props.game.choosingCorporations[props.player].map(name => (
-                <Corporation key={name} name={name} />
-              ))}
-            </Box>
-          </React.Fragment>
-        )}
-        {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
-        {props.game.choosingCards[props.player] && (
-          <CardBuy cards={props.game.choosingCards[props.player]} />
-        )}
-        {props.game.phase === 'Choices' &&
-          get(['playerState', props.player, 'choices', 0, 'type'], props.game) == 'KeepCards' && (
-            <CardBuy cards={props.game.playerState[props.player].choices[0].cards} />
+        <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
+          {props.game.draft[props.player] && (
+            <Draft cards={props.game.draft[props.player]} player={props.player} />
           )}
-        <Hand />
-      </Box>
-    </Flex>
-  </Wrapper>
-)
+          {props.game.choosingCorporations[props.player] && (
+            <React.Fragment>
+              <Box p={1} style={{fontSize: 12, color: '#555'}}>
+                CORPORATIONS
+              </Box>
+              <Box px={2}>
+                {props.game.choosingCorporations[props.player].map(name => (
+                  <Corporation key={name} name={name} />
+                ))}
+              </Box>
+            </React.Fragment>
+          )}
+          {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
+          {props.game.choosingCards[props.player] && (
+            <CardBuy cards={props.game.choosingCards[props.player]} />
+          )}
+          {props.game.phase === 'Choices' &&
+            get(['playerState', props.player, 'choices', 0, 'type'], props.game) == 'KeepCards' && (
+              <CardBuy cards={props.game.playerState[props.player].choices[0].cards} />
+            )}
+          <Hand />
+        </Box>
+      </Flex>
+    </Wrapper>
+  )
+}
 
 export default compose(
   connect(state => ({game: state.game, ui: state.ui, player: state.player})),

@@ -629,7 +629,7 @@ export const handleAction = (state: GameState, action: any) => {
   try {
     return [handlers[action.type](state, action), null, LOG]
   } catch (e) {
-    console.error(e.stack)
+    console.error('Handler error', e.stack)
     return [stateCopy, e.message, LOG || []]
   }
 }

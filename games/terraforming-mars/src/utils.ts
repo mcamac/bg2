@@ -53,15 +53,20 @@ export const DecreaseAnyInventory = (delta: number, type: string) => (
   choice: {player: string},
   card: Card
 ): GameState => {
+  const oldCount = state.playerState[choice.player].resources[type].count
+  state.playerState[choice.player].resources[type].count -= delta
+
+  if (state.playerState[choice.player].resources[type].count < 0) {
+    state.playerState[choice.player].resources[type].count = 0
+  }
+
   state.log.push({
     type: 'InventoryChange',
     player: choice.player,
     resource: type,
-    from: state.playerState[choice.player].resources[type].count,
-    to: state.playerState[choice.player].resources[type].count - delta,
+    from: oldCount,
+    to: state.playerState[choice.player].resources[type].count,
   })
-
-  state.playerState[choice.player].resources[type].count -= delta
   return state
 }
 
@@ -215,6 +220,13 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
     player: state.player,
     from: state.globalParameters.Heat,
     to: state.globalParameters.Heat + 2 * n,
+  })
+
+  state.log.push({
+    type: 'IncreaseTR',
+    player: state.player,
+    from: state.playerState[state.player].TR,
+    to: state.playerState[state.player].TR + n,
   })
 
   state.playerState[state.player].TR += n
@@ -414,8 +426,7 @@ export const GlobalTypeWithinRange = (param: GlobalType, min: number, max: numbe
   // Check nextCardEffect; add if necessary -- maybe refactor this and do a type check on the arg types?
   if (playerState.nextCardEffect) {
     let [effectName, ...args] = playerState.nextCardEffect
-    if (effectName === NextCardEffect.OffsetRequirements)
-      offset = offset + args[0]
+    if (effectName === NextCardEffect.OffsetRequirements) offset = offset + args[0]
   }
 
   if (param === GlobalType.Heat) offset *= 2
@@ -580,6 +591,8 @@ export const GetPlayerTags = (tag: Tag, player: Player) => (state: GameState): n
       .filter(card => tag === 'Event' || card.type !== 'Event'),
     getCorporationByName(state.playerState[player].corporation),
   ]
+
+  console.log('here', allPlayed)
   return (<any>flatMap(allPlayed, card => card.tags || [])).filter(t => t === tag).length
 }
 
@@ -605,14 +618,16 @@ export const Neg = (fn: NumGetter): NumGetter => (state, action, choice) => {
   return -fn(state, action, choice)
 }
 
-const AddNextCardEffect = (nextCardEffect: NextCardEffect, ...args: any[]): ((state: GameState, action, choice, card: Card) => GameState) => {
+const AddNextCardEffect = (
+  nextCardEffect: NextCardEffect,
+  ...args: any[]
+): ((state: GameState, action, choice, card: Card) => GameState) => {
   return (state: GameState, action, choice, card: Card): GameState => {
     const playerState = state.playerState[state.player]
     playerState.nextCardEffect = [nextCardEffect, ...args]
 
     return state
   }
-
 }
 
 const REGISTRY = {
@@ -629,6 +644,7 @@ const REGISTRY = {
   GetAllTags,
   ChooseX,
   Neg,
+  GetCities,
   GetX,
   GetTags,
   IncreaseTR,

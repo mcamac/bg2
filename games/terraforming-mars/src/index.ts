@@ -125,6 +125,11 @@ const resetNewGeneration: Transform = state => {
     playerState.hasIncreasedTRThisGeneration = false
     playerState.cardActionsUsedThisGeneration = {}
   })
+
+  state.log.push({
+    type: 'NewGeneration',
+    n: state.generation,
+  })
   return state
 }
 
@@ -252,6 +257,12 @@ export const buyCards = (
   chosen: string[],
   free: boolean = false
 ): GameState => {
+  state.log.push({
+    type: 'BuyCards',
+    player,
+    n: chosen.length,
+    free,
+  })
   // todo: Check subset of player
   // state.choosingCards[player]
   if (!free) {
@@ -259,12 +270,8 @@ export const buyCards = (
   }
   state.playerState[player].hand = state.playerState[player].hand.concat(chosen)
   delete state.choosingCards[player]
-  // Add remaining to discard
-  state.log.push({
-    type: 'BuyCards',
-    player,
-    n: chosen.length,
-  })
+  // todo: Add remaining to discard
+
   return state
 }
 
@@ -299,9 +306,18 @@ const awardFns: {[key: string]: ((s: GameState, player: Player) => number)} = {
     state.playerState[player].resources[ResourceType.Titanium].count,
 }
 
-const claimMilestone = (state: GameState, milestone: Milestones): GameState => {
+export const claimMilestone = (state: GameState, milestone: Milestones): GameState => {
   const ok = state.milestones.length < 3 && milestoneChecks[milestone](state)
+  if (!ok) {
+    throw new Error('Cannot claim milestone')
+  }
   state.milestones.push({player: state.player, milestone})
+
+  state.log.push({
+    type: 'ClaimMilestone',
+    player: state.player,
+    milestone,
+  })
   return state
 }
 
@@ -344,7 +360,9 @@ const switchToNextPlayer = state => {
 }
 
 export const turnActionHandlers = {
-  [TurnAction.ClaimMilestone]: (state, action) => {},
+  [TurnAction.ClaimMilestone]: (state, action) => {
+    return claimMilestone(state, action.milestone)
+  },
   [TurnAction.FundAward]: (state, action) => {
     return fundAward(state, action.award)
   },
@@ -352,6 +370,7 @@ export const turnActionHandlers = {
     state.log.push({
       type: 'StandardProject',
       project: action.project,
+      player: state.player,
     })
 
     state = applyEffects(state, action, STANDARD_PROJECTS[action.project].effects)
@@ -496,6 +515,7 @@ export const handlers = {
   },
   // During generation
   [UserAction.Action]: (state: GameState, action) => {
+    // console.log('action', state, action)
     if (action.player && action.player !== state.player) throw Error('Invalid player')
     state = turnActionHandlers[action.actionType](state, action)
 
@@ -548,14 +568,14 @@ export const handlers = {
 
   [UserAction.Pass]: (state, action) => {
     if (action.player && action.player !== state.player) throw Error('Invalid player')
-    // Get next player.
-    state.passed[state.player] = true
-    state = switchToNextPlayer(state)
 
     state.log.push({
       type: 'Pass',
       player: action.player,
     })
+
+    state.passed[state.player] = true
+    state = switchToNextPlayer(state)
     return state
   },
 
@@ -598,9 +618,8 @@ export const getClientState = (state: GameState, player: Player) => {
     'choosingCorporations',
   ]) as any
 
-  publicState.playerState = mapValues(
-    state.playerState,
-    (pstate, p) => (p === player ? pstate : omit(pstate, ['hand']))
+  publicState.playerState = mapValues(state.playerState, (pstate, p) =>
+    p === player ? pstate : omit(pstate, ['hand'])
   )
 
   const keys = ['draft', 'choosingCards', 'choosingCorporations']
