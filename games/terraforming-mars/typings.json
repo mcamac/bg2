@@ -1,6 +1,0 @@
-{
-  "globalDependencies": {
-    "index": "file:types/shuffle-seed/index.d.ts",
-    "shuffle-seed": "file:typings/shuffle-seed.d.ts"
-  }
-}
