@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@rebass/grid": "^6.0.0-4",
     "auth0-js": "^8.11.3",
     "babel-plugin-import": "^1.6.0",
     "file-loader": "^1.1.4",
@@ -25,7 +26,7 @@
     "ws": "^3.3.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.91",
+    "@types/lodash": "^4.14.118",
     "@types/react": "^16.0.31",
     "@types/recompose": "^0.24.4",
     "babel-core": "^6.26.0",

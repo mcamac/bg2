@@ -40,6 +40,8 @@ import {StandardProject, Phase} from '../../../../games/terraforming-mars/src/ty
 import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
 import AnimateOnChange from './animator'
 
+import StandardProjects from './components/StandardProjects'
+
 import cs from './index.css'
 
 console.log(CARDS)
@@ -681,37 +683,6 @@ const Awards = () => (
     ))}
   </Box>
 )
-
-const StandardProjectWrapper = styled(Flex)`
-  cursor: pointer;
-
-  &:hover {
-    background: #f5f5f5;
-  }
-`
-
-let StandardProjects = props => (
-  <Box style={{fontSize: 14}}>
-    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
-      Standard Projects
-    </Box>
-    {toPairs(STANDARD_PROJECTS).map(([key, project]) => (
-      <StandardProjectWrapper key={key} onClick={() => props.onClickProject(key)}>
-        <Box w={80} flex="1 1 auto">
-          {project.name}
-        </Box>
-        <Box>{project.cost > 0 && project.cost}</Box>
-      </StandardProjectWrapper>
-    ))}
-  </Box>
-)
-
-StandardProjects = connect(
-  () => ({}),
-  dispatch => ({
-    onClickProject: project => dispatch(startStandardProject(project)),
-  })
-)(StandardProjects)
 
 let Count = props => (
   <AnimateOnChange baseClassName="Score" animationClassName="test--bounce" animate={() => true}>
