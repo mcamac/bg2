@@ -27,7 +27,7 @@ export const isAdjacentToOwn = (state: GameState, [x, y]: Position): boolean => 
   return getAdjacentTiles([x, y])
     .map(makeKeyFromPosition)
     .map(
-      (key) =>
+      key =>
         state.map[key] &&
         state.map[key].type !== TileType.Ocean &&
         state.map[key].owner == state.player
@@ -41,4 +41,12 @@ export const getTileBonus = ([x, y]: Position): ResourceBonus[] => {
 
 export const makeKeyFromPosition = ([x, y]: Position): string => {
   return `${x},${y}`
+}
+
+export const makePositionFromKey = (s: string): Position => {
+  const position = s.split(',').map(x => parseInt(x, 10))
+  if (position.length !== 2) {
+    throw new Error('Invalid position key.')
+  }
+  return position as Position
 }

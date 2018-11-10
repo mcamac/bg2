@@ -15,6 +15,7 @@ import {
   ResourceBonus,
   Corporation,
   NextCardEffect,
+  RESOURCE_TYPES,
 } from './types'
 import {
   isOcean,
@@ -67,6 +68,38 @@ export const DecreaseAnyInventory = (delta: number, type: string) => (
     from: oldCount,
     to: state.playerState[choice.player].resources[type].count,
   })
+  return state
+}
+
+export const RoboticWorkforce = () => (
+  state: GameState,
+  action,
+  choice: {card: string; cardAction: any}
+): GameState => {
+  const cardOwner = state.players.find(
+    player => state.playerState[player].played.indexOf(choice.card) >= 0
+  )
+  if (!cardOwner) throw Error('Invalid card. Not owner.')
+
+  const card = getCardByName(choice.card)
+  if (!card.tags || card.tags.indexOf(Tag.Building) === -1) {
+    throw Error('Card is not a building.')
+  }
+
+  let clonedState = cloneState(state)
+
+  if (card.effects) {
+    clonedState = applyEffects(clonedState, choice.cardAction, card.effects, card)
+  }
+
+  // Update all players' resource production.
+  state.players.forEach(player => {
+    RESOURCE_TYPES.forEach(resource => {
+      state.playerState[player].resources[resource].production =
+        clonedState.playerState[player].resources[resource].production
+    })
+  })
+
   return state
 }
 
@@ -345,7 +378,6 @@ export const PlaceResearchOutpost = () => (state: GameState, action, choice): Ga
 }
 
 export const LandClaim = {}
-export const RoboticWorkforce = {}
 export const ArtificialLake = {}
 
 export const PlaceNuclearZone = () => (state: GameState, action, choice): GameState => {
@@ -492,6 +524,13 @@ export const VPForCardResources = (
 
 export const VPForCitiesOnMars = (ratio: number = 1): ((state: GameState) => number) => {
   return state => Math.floor(GetCitiesOnMars()(state) / ratio)
+}
+
+export const VP_REGISTRY = {
+  VPIfCardHasResources,
+  VPForTags,
+  VPForCardResources,
+  VPForCitiesOnMars,
 }
 
 /* After card triggers */
@@ -668,6 +707,7 @@ const REGISTRY = {
   IncreaseTemperature,
   IncreaseResourceValue,
   RaiseOxygen,
+  RoboticWorkforce,
   PlaceOceans,
   PlaceCity,
   PlaceSpecialCity,

@@ -95,19 +95,6 @@ test(t => {
   t.is(state.phase, Phase.Actions)
 })
 
-// Fund award
-
-test(t => {
-  let state = getInitialGameState(['a', 'b'], TEST_SEED)
-  state.player = 'a'
-  state.playerState['a'].resources[ResourceType.Money].count = 30
-
-  state = fundAward(state, Awards.Miner)
-  t.is(state.playerState['a'].resources[ResourceType.Money].count, 22)
-  state = fundAward(state, Awards.Banker)
-  t.is(state.playerState['a'].resources[ResourceType.Money].count, 8)
-})
-
 // Player state
 
 test(t => {
@@ -685,6 +672,32 @@ test('Insulation', t => {
   })
 
   t.is(state.playerState['a'].resources[ResourceType.Heat].production, 0)
+  t.is(state.playerState['a'].resources[ResourceType.Money].production, 3)
+})
+
+test('Robotic Workforce', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 9
+  state.playerState['a'].resources[ResourceType.Money].production = 0
+
+  state.playerState['a'].played = [
+    'Rad-Chem Factory',
+    'Rad-Chem Factory',
+    'Rad-Chem Factory',
+    'Rad-Chem Factory',
+    'Rad-Chem Factory',
+    'Medical Lab',
+  ]
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Robotic Workforce',
+    resources: {Money: 9},
+    choices: [{card: 'Medical Lab', cardAction: {}}],
+  })
+
   t.is(state.playerState['a'].resources[ResourceType.Money].production, 3)
 })
 

@@ -293,21 +293,8 @@ const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
   [Milestones.Planner]: state => state.playerState[state.player].hand.length >= 16,
 }
 
-const awardFns: {[key: string]: ((s: GameState, player: Player) => number)} = {
-  [Awards.Landlord]: (state, player) =>
-    Object.keys(state.map)
-      .map(key => state.map[key].owner)
-      .filter(owner => owner === player).length,
-  [Awards.Banker]: (state, player) =>
-    state.playerState[player].resources[ResourceType.Money].production,
-  [Awards.Scientist]: (state, player) => GetPlayerTags(Tag.Science, player)(state),
-  [Awards.Thermalist]: (state, player) =>
-    state.playerState[player].resources[ResourceType.Heat].count,
-  [Awards.Miner]: (state, player) =>
-    state.playerState[player].resources[ResourceType.Steel].count +
-    state.playerState[player].resources[ResourceType.Titanium].count,
-}
-
+// TODO: Milestone costs
+const MILESTONE_COSTS = [5, 10, 20]
 export const claimMilestone = (state: GameState, milestone: Milestones): GameState => {
   const ok =
     state.milestones.length < 3 &&

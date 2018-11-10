@@ -143,6 +143,11 @@ export interface MapState {
   [key: string]: Tile
 }
 
+export enum SpecialCity {
+  GanymedeColony = 'Ganymede Colony',
+  PhobosSpaceHaven = 'Phobos Space Haven',
+}
+
 export enum GlobalType {
   Oxygen = 'Oxygen',
   Heat = 'Heat',
@@ -275,5 +280,5 @@ export const enum StandardProject {
 
 export const enum NextCardEffect {
   Discount = 'Discount',
-  OffsetRequirements = 'OffsetRequirements'
+  OffsetRequirements = 'OffsetRequirements',
 }
