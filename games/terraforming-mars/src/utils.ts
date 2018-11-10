@@ -783,7 +783,8 @@ export const changeInventory = (
 
   state.playerState[player].resources[resource].count += delta
   if (state.playerState[player].resources[resource].count < 0) {
-    throw Error('Not enough resources')
+    state.playerState[player].resources[resource].count = 0
+    // todo: Should throw error?
   }
   return state
 }

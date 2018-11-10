@@ -73,7 +73,7 @@ test('Production', t => {
 test(t => {
   const state = getInitialGameState(['a', 'b', 'c', 'd'], TEST_SEED)
   t.is(state.choosingCards['a'].length, 10)
-  t.is(state.choosingCards['c'][0], "CEO's Favourite Project")
+  t.is(state.choosingCards['c'][0], 'Nitrophilic Moss')
 })
 
 // Card buying
