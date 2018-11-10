@@ -108,4 +108,10 @@ export class SocketServer implements PlayerConnection {
         })
     }
   }
+
+  notifyPlayer(room, user, message) {
+    if (!this.userConnections[user]) return
+    if (this.userConnections[user].readyState !== this.userConnections[user].OPEN) return
+    this.userConnections[user].send(JSON.stringify({...message, room}))
+  }
 }
