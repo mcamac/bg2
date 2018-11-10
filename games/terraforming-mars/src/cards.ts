@@ -1090,7 +1090,6 @@ export const CARDS: Card[] = [
     tags: ['Science'],
     effectText: 'Duplicate only the production box of one of your building cards.',
     effects: [['RoboticWorkforce']],
-    todo: true,
   },
   {
     name: 'Grass',
@@ -2577,40 +2576,40 @@ export const CARDS: Card[] = [
     effects: [['ChangeProduction', -1, ResourceType.Energy]],
     requires: [['HasTags', 3, Tag.Science]],
   },
-  {
-    name: 'Small Asteroid',
-    cost: 10,
-    type: 'Event',
-    deck: 'Promo',
-    tags: ['Space', 'Event'],
-    effectText: 'Increase temperature 1 step. Remove up to 2 plants from any player.',
-    effects: [['IncreaseTemperature', 1], ['DecreaseAnyInventory', 2, ResourceType.Plant]],
-  },
-  {
-    name: 'Self-Replicating Robots',
-    cost: 7,
-    type: 'Active',
-    deck: 'Promo',
-    actionText:
-      'Action: Reveal and place a SPACE OR BUILDING card here from hand, and place 2 resources on it, OR double the resources on a card here. Effect: Cards here may be played as if from hand with its cost reduced by the number of resources on it.',
-    effectText: 'Requires 2 science tags.',
-    todo: true,
-    requires: [['HasTags', 2, Tag.Science]],
-  },
-  {
-    name: 'Snow Algae',
-    cost: 12,
-    type: 'Active',
-    deck: 'Promo',
-    tags: ['Plant'],
-    effectText:
-      'Requires 2 oceans. Increase your plant production and your heat production 1 step each.',
-    requires: [['MinOceans', 2]],
-    effects: [
-      ['ChangeProduction', 2, ResourceType.Plant],
-      ['ChangeProduction', 1, ResourceType.Heat],
-    ],
-  },
+  // {
+  //   name: 'Small Asteroid',
+  //   cost: 10,
+  //   type: 'Event',
+  //   deck: 'Promo',
+  //   tags: ['Space', 'Event'],
+  //   effectText: 'Increase temperature 1 step. Remove up to 2 plants from any player.',
+  //   effects: [['IncreaseTemperature', 1], ['DecreaseAnyInventory', 2, ResourceType.Plant]],
+  // },
+  // {
+  //   name: 'Self-Replicating Robots',
+  //   cost: 7,
+  //   type: 'Active',
+  //   deck: 'Promo',
+  //   actionText:
+  //     'Action: Reveal and place a SPACE OR BUILDING card here from hand, and place 2 resources on it, OR double the resources on a card here. Effect: Cards here may be played as if from hand with its cost reduced by the number of resources on it.',
+  //   effectText: 'Requires 2 science tags.',
+  //   todo: true,
+  //   requires: [['HasTags', 2, Tag.Science]],
+  // },
+  // {
+  //   name: 'Snow Algae',
+  //   cost: 12,
+  //   type: 'Active',
+  //   deck: 'Promo',
+  //   tags: ['Plant'],
+  //   effectText:
+  //     'Requires 2 oceans. Increase your plant production and your heat production 1 step each.',
+  //   requires: [['MinOceans', 2]],
+  //   effects: [
+  //     ['ChangeProduction', 2, ResourceType.Plant],
+  //     ['ChangeProduction', 1, ResourceType.Heat],
+  //   ],
+  // },
 ]
 
 export const CARDS_BY_NAME = keyBy(CARDS, 'name')
