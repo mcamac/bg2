@@ -5,6 +5,7 @@ import {connect} from 'react-redux'
 import {RESOURCE_BONUSES, OCEAN_POSITIONS} from '../../../../games/terraforming-mars/src/constants'
 import {chooseTile} from './reducer'
 import {isOcean} from '../../../../games/terraforming-mars/src/tiles'
+import {PLAYER_COLORS} from './constants'
 
 const hexPoints = (x, y, radius) => {
   var points = []
@@ -23,8 +24,6 @@ const COLORS = {
   greenery: '#95F58D',
   city: '#ccc',
 }
-
-const PLAYER_COLORS = ['blue', 'red', 'cyan', 'black']
 
 let Tile = props => {
   const xc = 220 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)

@@ -47,6 +47,7 @@ import Awards from './components/Awards'
 import Milestones from './components/Milestones'
 
 import cs from './index.css'
+import {PLAYER_COLORS} from './constants'
 
 console.log(CARDS)
 
@@ -679,7 +680,8 @@ let PlayerCard = props => (
     p={2}
     style={{borderBottom: '1px solid #eee', background: props.isActive && 'rgba(0, 0, 255, 0.1)'}}
   >
-    <Flex mb={1} onClick={props.onClickPlayer}>
+    <Flex mb={1} onClick={props.onClickPlayer} align="center">
+      <Box style={{background: props.color, width: 12, height: 12}} mr={1} />
       <Box flex="1 1 auto">{props.player}</Box>
       <Flex align="center">
         <Flex
@@ -1010,8 +1012,13 @@ const TerraformingMars = props => {
           w={270}
           style={{minWidth: 270, borderRight: '1px solid #ddd', background: '#fafafa'}}
         >
-          {props.game.players.map(player => (
-            <PlayerCard key={player} player={player} state={props.game.playerState[player]} />
+          {props.game.players.map((player, i) => (
+            <PlayerCard
+              key={player}
+              color={PLAYER_COLORS[i]}
+              player={player}
+              state={props.game.playerState[player]}
+            />
           ))}
 
           <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
