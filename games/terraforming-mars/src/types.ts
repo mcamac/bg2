@@ -219,7 +219,7 @@ export interface GameState {
   actionsDone: number
   map: MapState
   deck: string[]
-  discards: Card[]
+  discard: string[]
   milestones: MilestoneClaim[]
   awards: AwardFunding[]
   globalParameters: GlobalParameters

@@ -7,6 +7,7 @@ export const draw = (n: number, state: GameState): [string[], GameState] => {
   let drawn: string[] = []
   for (let i = 0; i < n; i++) {
     drawn.push(state.deck.splice(0, 1)[0])
+    // todo: handle reshuffling of discards
   }
   return [drawn, state]
 }

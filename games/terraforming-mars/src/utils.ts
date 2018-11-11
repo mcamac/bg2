@@ -433,6 +433,22 @@ export const PlaceMohole = () => (state: GameState, action, choice): GameState =
   return state
 }
 
+export const SearchForLife = () => (state: GameState, action, choice, card): GameState => {
+  changeInventory(state, state.player, ResourceType.Money, -1)
+
+  const playerState = state.playerState[state.player]
+  let [[drawn], newState] = draw(1, state)
+
+  const drawnCard = getCardByName(drawn)
+  if (drawnCard.tags && drawnCard.tags.indexOf(Tag.Microbe) !== -1) {
+    if (!playerState.cardResources[card.name]) playerState.cardResources[card.name] = 0
+    playerState.cardResources[card.name] += 1
+  }
+
+  newState.discard.push(drawn)
+  return newState
+}
+
 export const ChooseX = effects => (state: GameState, action, choice): GameState => {
   const x = choice.x
   state = applyEffects(state, {choices: effects.map(eff => ({x}))}, effects)
@@ -748,6 +764,7 @@ const REGISTRY = {
   PlaceResearchOutpost,
   PlaceIndustrialCenter,
   PlaceNoctis,
+  SearchForLife,
   SellCards,
   Branch,
   HasTags,

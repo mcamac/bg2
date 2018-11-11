@@ -162,7 +162,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     player: players[0],
     actionsDone: 0,
     deck: shuffle(CARDS.map(card => card.name), SEED),
-    discards: [],
+    discard: [],
     globalParameters: {
       Oxygen: 0,
       Oceans: 0,

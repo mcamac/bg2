@@ -554,6 +554,26 @@ test('Arctic Algae', t => {
   t.is(state.playerState['b'].resources[ResourceType.Plant].count, 2)
 })
 
+test('Search For Life', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 1
+  state.playerState['a'].played = ['Search For Life']
+
+  state.deck[0] = 'Regolith Eaters'
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.CardAction,
+    card: 'Search For Life',
+    index: 0,
+    player: 'a',
+  })
+
+  t.is(state.playerState['a'].cardResources['Search For Life'], 1)
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 0)
+})
+
 test('Pets Trigger', t => {
   let state = getStateAfterActions()
   state.player = 'a'

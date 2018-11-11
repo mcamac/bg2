@@ -262,6 +262,13 @@ const IncreaseTR = value => (
     {typeof value === 'number' ? withSign(value) : Effect(...value)} <TR />
   </Flex>
 )
+
+const PlayedMinCost = value => (
+  <Flex align="center">
+    <Icon g="Card" />, SP ≥ {value}
+  </Flex>
+)
+
 const PlaceCity = () => (
   <div>
     <Tag name="City" />
@@ -366,7 +373,7 @@ const GetCitiesOnMars = (tag, ratio) => (
 
 const VPIfCardHasResources = (resource, count, vp) => (
   <Flex>
-    {vp} VP if at least {count} <Icon g={resource} />
+    {vp} VP if ≥ {count} <Icon g={resource} />
   </Flex>
 )
 
@@ -379,6 +386,12 @@ const CapitalCity = (resource, count, vp) => (
 const UNTerraform = () => (
   <Flex align="center">
     If <TR /> this gen, -3 <Icon g="Money" /> +1 <TR />
+  </Flex>
+)
+
+const SearchForLife = () => (
+  <Flex align="center">
+    1 <Icon g="Money" />: Reveal <Icon g="Card" />. If <Icon g="Microbe" />, +1 <Icon g="Science" />
   </Flex>
 )
 
@@ -452,6 +465,7 @@ const EFFECTS = {
   PlaceRestrictedArea,
   PlaceResearchOutpost,
   PlaceNaturalPreserve,
+  PlayedMinCost,
   MultiCost,
   RaiseOxygen,
   DecreaseAnyProduction,
@@ -480,6 +494,7 @@ const EFFECTS = {
   Neg,
   PlayedTagMatches,
   PlayedTagMatchesAny,
+  SearchForLife,
 }
 
 const CardEffects = props => {
@@ -687,7 +702,13 @@ let PlayerCard = props => (
         <Flex
           ml={1}
           align="center"
-          style={{background: '#e82f2f', color: 'white', fontWeight: 500, padding: '2px 4px'}}
+          style={{
+            fontSize: 14,
+            background: '#e82f2f',
+            color: 'white',
+            fontWeight: 500,
+            padding: '2px 4px',
+          }}
         >
           {props.state.TR}
         </Flex>
@@ -732,6 +753,9 @@ let PlayerCard = props => (
           <Count value={props.state.resources.Heat.count} /> (+{props.state.resources.Heat.production})
         </Box>
       </Flex>
+    </Flex>
+    <Flex mt={1} style={{fontSize: 13}}>
+      {props.state.corporation}
     </Flex>
   </Box>
 )

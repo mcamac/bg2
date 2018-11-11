@@ -61,7 +61,7 @@ export const CARDS: Card[] = [
     effectText: 'Oxygen must be 6% or less. 3 VPs if you have one or more science resource here.',
     resourceHeld: CardResource.Science,
     requires: [['MaxOxygen', 6]],
-    effects: [['SearchForLife']],
+    actions: [[['SearchForLife']]],
   },
   {
     name: "Inventors' Guild",
