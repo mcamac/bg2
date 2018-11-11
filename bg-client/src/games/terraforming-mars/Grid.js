@@ -39,15 +39,15 @@ let Tile = props => {
         onClick={() => props.onClick([props.x, props.y])}
         points={hexPoints(xc, yc, RADIUS)}
       />
-      {props.map[`${props.x},${props.y}`] && (
+      {tile && (
         <polygon
           stroke="black"
-          fill={COLORS[props.map[`${props.x},${props.y}`].type] || 'transparent'}
+          fill={COLORS[tile.type] || 'transparent'}
           points={hexPoints(xc, yc, RADIUS - 4)}
         />
       )}
       {tile &&
-        !isOcean([props.x, props.y]) && (
+        (!isOcean([props.x, props.y]) || tile.type === 'greenery') && (
           <rect
             x={xc - 5}
             y={yc - 5}
