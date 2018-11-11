@@ -502,6 +502,24 @@ test('Ganymede Colony', t => {
   t.is(state.map['Ganymede Colony'].owner, 'a')
 })
 
+test('Asteroid', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 14
+
+  state.playerState['b'].resources[ResourceType.Plant].count = 2
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Asteroid',
+    resources: {Money: 14},
+    choices: [null, null, {player: 'b'}],
+  })
+
+  t.is(state.playerState['b'].resources[ResourceType.Plant].count, 0)
+})
+
 test('Natural Preserve', t => {
   let state = getStateAfterActions()
   state.player = 'a'

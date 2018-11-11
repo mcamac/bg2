@@ -20,11 +20,7 @@ let StandardProjects = props => (
       Standard Projects
     </Box>
     {toPairs(STANDARD_PROJECTS).map(([key, project]) => (
-      <StandardProjectWrapper
-        flexDirection="row"
-        key={key}
-        onClick={() => props.onClickProject(key)}
-      >
+      <StandardProjectWrapper key={key} onClick={() => props.onClickProject(key)}>
         <Box w={80} flex="1 1 auto">
           {project.name}
         </Box>

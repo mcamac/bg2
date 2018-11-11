@@ -40,7 +40,11 @@ import {StandardProject, Phase} from '../../../../games/terraforming-mars/src/ty
 import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
 import AnimateOnChange from './animator'
 
+import ChooseResources from './components/ChooseResources'
 import StandardProjects from './components/StandardProjects'
+import GlobalParams from './components/GlobalParams'
+import Awards from './components/Awards'
+import Milestones from './components/Milestones'
 
 import cs from './index.css'
 
@@ -74,6 +78,8 @@ const CardWrapper = styled(Box)`
     box-shadow: 0px 1px 4px 5px ${props => CARD_COLORS[props.type] || '#aaa'};
   }
 `
+
+const signed = n => (n > 0 ? `+${n}` : `${n}`)
 
 const requiresByType = (type, count, tag) => {
   if (type === 'MinHeat')
@@ -116,6 +122,15 @@ const requiresByType = (type, count, tag) => {
     return (
       <Flex align="center">
         {count >= 2 && count} <Tag name={tag} />
+      </Flex>
+    )
+  else if (type === 'MinProduction')
+    return (
+      <Flex align="center">
+        {count >= 2 && count}{' '}
+        <Flex px="2px" style={{background: '#8a5d5d', color: '#eee'}} align="center">
+          <Icon g={tag} />
+        </Flex>
       </Flex>
     )
   return type
@@ -163,14 +178,14 @@ const ChangeAnyCardResource = (value, resource) => (
 
 const DecreaseAnyProduction = (value, resource) => (
   <Flex mr="4px" style={{background: '#8a5d5d', color: '#eee', padding: 3}}>
-    Remove any {value}
+    - any {value}
     <Icon g={resource} />
   </Flex>
 )
 
 const DecreaseAnyInventory = (value, resource) => (
   <Flex>
-    Remove any
+    - any
     {value}
     <Icon g={resource} />
   </Flex>
@@ -242,9 +257,9 @@ const TR = () => (
 )
 
 const IncreaseTR = value => (
-  <div>
-    {withSign(value)} <TR />
-  </div>
+  <Flex align="center">
+    {typeof value === 'number' ? withSign(value) : Effect(...value)} <TR />
+  </Flex>
 )
 const PlaceCity = () => (
   <div>
@@ -295,9 +310,20 @@ const PlaceLavaFlows = () => <Flex align="center">Place Lava Flows on Volcano.</
 const PlaceRestrictedArea = () => <Flex align="center">Place Restricted Area.</Flex>
 const PlaceResearchOutpost = () => <Flex align="center">Place Research Outpost.</Flex>
 
-const VPForCardResources = (resource, count) => (
+const VPForCardResources = (resource, count) =>
+  count >= 1 ? (
+    <Flex>
+      1 VP / {count} <Icon g={resource} />
+    </Flex>
+  ) : (
+    <Flex>
+      {Math.floor(1 / count)} VP / <Icon g={resource} />
+    </Flex>
+  )
+
+const VPForCitiesOnMars = count => (
   <Flex>
-    1 VP / {count} <Icon g={resource} />
+    1 VP / {count} <Icon g="City" /> on Mars
   </Flex>
 )
 
@@ -310,6 +336,12 @@ const VPForTags = tag => (
 const GetTags = (tag, ratio) => (
   <Flex ailgn="center">
     1 / {ratio && ratio} <Tag name={tag} />
+  </Flex>
+)
+
+const GetOpponentTags = (tag, ratio) => (
+  <Flex ailgn="center">
+    1 / {ratio && ratio} opp. <Tag name={tag} />
   </Flex>
 )
 
@@ -434,8 +466,10 @@ const EFFECTS = {
   VPForTags,
   VPForCardResources,
   VPIfCardHasResources,
+  VPForCitiesOnMars,
   CapitalCity,
   GetTags,
+  GetOpponentTags,
   GetCities,
   GetCitiesOnMars,
   UNTerraform,
@@ -632,58 +666,6 @@ let Corporation = props => (
 Corporation = withProps(props => ({corp: getCorporationByName(props.name)}))(Corporation)
 export {Corporation}
 
-let GlobalParams = props => (
-  <Box style={{fontSize: 14}} mb={3}>
-    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
-      Globals
-    </Box>
-    {['Oceans', 'Heat', 'Oxygen'].map(param => (
-      <Flex key={param}>
-        <Box w={80} flex="1 1 auto">
-          {param}
-        </Box>
-        <Box>{props.params[param]} (9 left)</Box>
-      </Flex>
-    ))}
-  </Box>
-)
-
-GlobalParams = connect(state => ({
-  params: state.game.globalParameters,
-}))(GlobalParams)
-
-const Milestones = () => (
-  <Box style={{fontSize: 14}} mb={3}>
-    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
-      Milestones
-    </Box>
-    {['Oceans', 'Temp', 'Oxygen'].map(param => (
-      <Flex key={param}>
-        <Box w={80} flex="1 1 auto" style={{color: '#aaa'}}>
-          Not chosen
-        </Box>
-        <Box>a</Box>
-      </Flex>
-    ))}
-  </Box>
-)
-
-const Awards = () => (
-  <Box style={{fontSize: 14}} mb={3}>
-    <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
-      Awards
-    </Box>
-    {['Oceans', 'Temp', 'Oxygen'].map(param => (
-      <Flex key={param}>
-        <Box w={80} flex="1 1 auto" style={{color: '#aaa'}}>
-          Not chosen
-        </Box>
-        <Box>a</Box>
-      </Flex>
-    ))}
-  </Box>
-)
-
 let Count = props => (
   <AnimateOnChange baseClassName="Score" animationClassName="test--bounce" animate={() => true}>
     {props.value}
@@ -713,7 +695,7 @@ let PlayerCard = props => (
       <Flex mr={1}>
         <Tag name="Money" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Money.count} /> (+{props.state.resources.Money.production})
+          <Count value={props.state.resources.Money.count} /> ({signed(props.state.resources.Money.production)})
         </Box>
       </Flex>
       <Flex mr={1}>
@@ -865,65 +847,6 @@ GameChoicesBar = connect(
   }),
   dispatch => bindActionCreators({onDone: uiSubmitChoice}, dispatch)
 )(GameChoicesBar)
-
-const ResourceInput = styled.input`
-  width: 30px;
-  font-size: 1em;
-  text-align: right;
-  margin: 0 4px;
-`
-
-let ChooseResources = props => (
-  <React.Fragment>
-    Cost: {props.card.cost} (total {props.total})
-    <Flex mr={1} align="center">
-      <Tag name="Money" />
-      <ResourceInput value={props.count.money} onChange={e => props.setMoney(e.target.value)} />
-      <Box>({props.resources.Money.count})</Box>
-    </Flex>
-    <Flex mr={1} align="center">
-      <Tag name="Steel" />
-      <ResourceInput value={props.count.steel} onChange={e => props.setSteel(e.target.value)} />
-      ({props.resources.Steel.count})
-    </Flex>
-    <Flex mr={1} align="center">
-      <Tag name="Titanium" />
-      <ResourceInput
-        value={props.count.titanium}
-        onChange={e => props.setTitanium(e.target.value)}
-      />
-      ({props.resources.Titanium.count})
-    </Flex>
-    <Button onClick={props.onSubmit}>Play</Button>
-  </React.Fragment>
-)
-
-ChooseResources = compose(
-  withStateHandlers(() => ({count: {money: 0, titanium: 0, steel: 0}}), {
-    setMoney: state => money => ({...state, count: {...state.count, money}}),
-    setSteel: state => steel => ({...state, count: {...state.count, steel}}),
-    setTitanium: state => titanium => ({...state, count: {...state.count, titanium}}),
-  }),
-  withProps(props => ({
-    total: 1 * props.count.money + 2 * props.count.steel + 3 * props.count.titanium,
-  })),
-  connect(
-    state => ({
-      card: getCardByName(state.ui.action.card),
-      resources: state.game.playerState[state.player].resources,
-    }),
-    (dispatch, props) => ({
-      onSubmit: () =>
-        dispatch(
-          uiSetCardCost({
-            Money: parseInt(props.count.money) || 0,
-            Titanium: parseInt(props.count.titanium) || 0,
-            Steel: parseInt(props.count.steel) || 0,
-          })
-        ),
-    })
-  )
-)(ChooseResources)
 
 let ActionBar = props => (
   <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">

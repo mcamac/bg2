@@ -91,8 +91,8 @@ export class RedisStorage implements GameStorage {
     try {
       newState = GAMES[room.g].reducer(state, {...move, player})
     } catch (e) {
-      console.log(e)
-      this.playerConnection.notifyPlayer(id, player, {type: 'MOVE_ERROR', error: e})
+      console.log('error x', e)
+      this.playerConnection.notifyPlayer(id, player, {type: 'MOVE_ERROR', error: e.message})
     }
     // console.log('new state', newState)
     return this.updateRoom(id, room => ({

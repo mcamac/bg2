@@ -24,6 +24,7 @@ export const CARDS: Card[] = [
     effectText:
       'Requires that you have titanium production. Decrease any titanium production 1 step and increase your own 1 step.',
     effects: [['DecreaseAnyProduction', 1, 'Titanium'], ['ChangeProduction', 1, 'Titanium']],
+    requires: [['MinProduction', 1, ResourceType.Titanium]],
   },
   {
     name: 'Deep Well Heating',
@@ -797,6 +798,7 @@ export const CARDS: Card[] = [
       ['DecreaseAnyProduction', 1, ResourceType.Steel],
       ['ChangeProduction', 1, ResourceType.Steel],
     ],
+    requires: [['MinProduction', 1, ResourceType.Steel]],
   },
   {
     name: 'Mineral Deposit',
@@ -2319,7 +2321,7 @@ export const CARDS: Card[] = [
     vp: 1,
     effectText: 'Requires 2 cities in play. Increase your MC production 1 step.',
     effects: [['ChangeProduction', 1, ResourceType.Money]],
-    requires: [['HasCitiesOnMars', 1]],
+    requires: [['HasCities', 2]],
   },
   {
     name: 'Aquifer Pumping',

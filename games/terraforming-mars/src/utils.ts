@@ -29,6 +29,21 @@ import {getCardByName} from './cards'
 import {draw} from './deck'
 import {getCorporationByName} from './corporations'
 
+// export const MultiCost = (cost: number, otherResources: ResourceType[]) => (
+//   state: GameState,
+//   action,
+//   choice: {resources: any}
+// ): GameState => {
+//   let resources = {
+//     Money: choice.resources.Money || 0,
+//   }
+//   otherResources.forEach(resource => {
+//     resources[resource] = choice.resources[resource]
+//   })
+
+//   return state
+// }
+
 export const DecreaseAnyProduction = (delta: number, type: string) => (
   state: GameState,
   action,
@@ -168,7 +183,7 @@ export const ChangeProduction = (n: number | NumGetter, resource: string) => (
   playerState.resources[resource].production += n
 
   if (resource !== ResourceType.Money && playerState.resources[resource].production < 0) {
-    throw Error('Not enough production')
+    throw Error(`Not enough ${resource} production`)
   }
 
   state.log.push({
@@ -313,7 +328,7 @@ export const PlaceSpecialCity = (name: string) => (state: GameState, action, cho
 
 export const PlaceMiningArea = () => (state: GameState, action, choice): GameState => {
   const bonus = getTileBonus(choice.location)
-  if (bonus.indexOf(ResourceBonus.Steel) < 0 && bonus.indexOf(ResourceBonus.Titanium) < 0)
+  if (bonus.indexOf(ResourceBonus.Steel) === -1 && bonus.indexOf(ResourceBonus.Titanium) === -1)
     throw Error('Invalid tile for mining area')
   if (!isAdjacentToOwn(state, choice.location)) throw Error('Not adjacent to own tile.')
 
@@ -483,10 +498,21 @@ export const MinOceans = (thresh: number) =>
 export const MaxOceans = (thresh: number) =>
   GlobalTypeWithinRange(GlobalType.Oceans, -Infinity, thresh)
 
+export const MinProduction = (thresh: number, resource: ResourceType) => (
+  state: GameState
+): boolean => {
+  const playerState = state.playerState[state.player]
+  return playerState.resources[resource].production >= thresh
+}
+
 /* Card Tag Requirement Check */
 
 export const HasTags = (minimum: number, tag: Tag): ((state: GameState) => boolean) => {
   return state => GetTags(tag)(state) >= minimum
+}
+
+export const HasCities = (minimum: number): ((state: GameState) => boolean) => {
+  return state => GetCities()(state) >= minimum
 }
 
 export const HasCitiesOnMars = (minimum: number): ((state: GameState) => boolean) => {
@@ -802,7 +828,9 @@ const REQUIREMENTS_REGISTRY = {
   MinHeat,
   MaxHeat,
   HasTags,
+  HasCities,
   HasCitiesOnMars,
+  MinProduction,
 }
 
 const fromJSONRequires = obj => {

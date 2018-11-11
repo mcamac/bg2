@@ -1,24 +1,14 @@
 import {combineReducers} from 'redux'
 import {get} from 'lodash'
 
-import {
-  TerraformingMars,
-  handleAction,
-} from '../../../../games/terraforming-mars/src/index'
-import {
-  UserAction,
-  TurnAction,
-  TileType,
-} from '../../../../games/terraforming-mars/src/types'
+import {TerraformingMars, handleAction} from '../../../../games/terraforming-mars/src/index'
+import {UserAction, TurnAction, TileType} from '../../../../games/terraforming-mars/src/types'
 import {
   getStateAfterActions,
   getStateBeforeDraft,
 } from '../../../../games/terraforming-mars/src/fixtures'
 import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
-import {
-  getCardByName,
-  CARDS,
-} from '../../../../games/terraforming-mars/src/cards'
+import {getCardByName, CARDS} from '../../../../games/terraforming-mars/src/cards'
 import {cloneState} from '../../../../games/terraforming-mars/src/utils'
 
 export const draftChoice = (card, player) => ({
@@ -142,31 +132,15 @@ const NEEDS_CHOICE = {
   PlaceOceans: () => ({type: 'tile', tileType: TileType.Ocean}),
   PlaceGreenery: () => ({type: 'tile', tileType: TileType.Greenery}),
   PlaceGreeneryOnOcean: () => ({type: 'tile', tileType: TileType.Greenery}),
-  PlaceNaturalPreserve: () => ({
-    type: 'tile',
-    tileType: TileType.NaturalPreserve,
-  }),
+  PlaceNaturalPreserve: () => ({type: 'tile', tileType: TileType.NaturalPreserve}),
   PlaceCity: () => ({type: 'tile', tileType: TileType.City}),
-  PlaceIndustrialCenter: () => ({
-    type: 'tile',
-    tileType: TileType.IndustrialCenter,
-  }),
+  PlaceIndustrialCenter: () => ({type: 'tile', tileType: TileType.IndustrialCenter}),
   PlaceResearchOutpost: () => ({type: 'tile', tileType: TileType.City}),
-  SellCards: () => ({
-    type: 'cards',
-    text: 'Choose cards to sell.',
-    chosen: {},
-    confirm: true,
-  }),
-  DecreaseAnyProduction: () => ({
-    type: 'player',
-    text: 'Choose player to remove ...',
-  }),
-  DecreaseAnyInventory: () => ({
-    type: 'player',
-    text: 'Choose player to remove ...',
-  }),
+  SellCards: () => ({type: 'cards', text: 'Choose cards to sell.', chosen: {}, confirm: true}),
+  DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
+  DecreaseAnyInventory: () => ({type: 'player', text: 'Choose player to remove ...'}),
   ChooseX: () => ({type: 'number'}),
+  MultiCost: () => ({type: 'cost'}),
   ChangeAnyCardResource: (count, resource) => ({
     type: 'playedCard',
     resource,
@@ -244,10 +218,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
 
     if (action.type === 'UI_SUBMIT_CHOICE') {
       const chosen = Object.keys(state.chosen).filter(key => state.chosen[key])
-      action.asyncDispatch({
-        type: UserAction.Choices,
-        choices: [{cards: chosen}],
-      })
+      action.asyncDispatch({type: UserAction.Choices, choices: [{cards: chosen}]})
       return UI_STATE
     }
   }
@@ -257,10 +228,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
     get(game.playerState, [player, 'choices', 0, 'type']) === 'PlaceOcean'
   ) {
     if (action.type === 'UI_CHOOSE_TILE') {
-      action.asyncDispatch({
-        type: UserAction.Choices,
-        choices: [{location: action.tile}],
-      })
+      action.asyncDispatch({type: UserAction.Choices, choices: [{location: action.tile}]})
     }
   }
 
@@ -306,11 +274,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       if (!nextChoice) {
         // Action is done -- send.
         console.log('Card Action', {...newAction, choices: []})
-        action.asyncDispatch({
-          ...newAction,
-          choices: [],
-          type: UserAction.Action,
-        })
+        action.asyncDispatch({...newAction, choices: [], type: UserAction.Action})
         return state
       }
       return {
@@ -363,10 +327,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
 
     if (action.type === 'UI_HEAT_TEMPERATURE') {
       /// Raise heat
-      action.asyncDispatch({
-        type: UserAction.Action,
-        actionType: TurnAction.RaiseHeat,
-      })
+      action.asyncDispatch({type: UserAction.Action, actionType: TurnAction.RaiseHeat})
       return UI_STATE
     }
   }
@@ -428,9 +389,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       newChoices = [
         ...state.choices,
         {
-          cards: Object.keys(state.choice.chosen).filter(
-            key => state.choice.chosen[key]
-          ),
+          cards: Object.keys(state.choice.chosen).filter(key => state.choice.chosen[key]),
         },
       ]
     }
@@ -456,7 +415,9 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
 }
 
 export const reducer = (state = <any>{}, action) => {
-  if (action.type === 'SERVER_MESSAGE' && action.data.room) {
+  if (action.type === 'SERVER_MESSAGE' && action.data.type === 'MOVE_ERROR') {
+    console.warn('MOVE_ERROR', action.data.error)
+  } else if (action.type === 'SERVER_MESSAGE' && action.data.room) {
     return {
       game: action.data.room.game,
       player: location.hash.slice(1),
