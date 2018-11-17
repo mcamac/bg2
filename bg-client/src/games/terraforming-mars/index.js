@@ -889,6 +889,10 @@ let ActionBar = props => (
     {props.ui.phase === 'Choices' && <ChoicesBar />}
     {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
     {props.game.phase === 'Draft' && <DraftStatus />}
+    {props.ui.choice &&
+      props.ui.choice.type === 'player' && (
+        <Button onClick={props.onChooseNoPlayer}>No Player</Button>
+      )}
     {props.ui.phase !== 'Game' && <Button onClick={props.onCancel}>Cancel</Button>}
   </Flex>
 )
@@ -897,6 +901,7 @@ ActionBar = connect(
   state => ({ui: state.ui, game: state.game}),
   dispatch => ({
     onCancel: () => dispatch(uiCancel()),
+    onChooseNoPlayer: () => dispatch(uiChoosePlayer(null)),
   })
 )(ActionBar)
 

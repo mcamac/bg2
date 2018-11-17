@@ -49,17 +49,23 @@ let ChooseResources = props => (
 )
 
 ChooseResources = compose(
-  withStateHandlers(() => ({count: {money: 0, titanium: 0, steel: 0}}), {
+  connect(state => ({
+    card: getCardByName(state.ui.action.card),
+    resourceValues: state.game.playerState[state.player].conversions,
+  })),
+  withStateHandlers(props => ({count: {money: props.card.cost, titanium: 0, steel: 0}}), {
     setMoney: state => money => ({...state, count: {...state.count, money}}),
     setSteel: state => steel => ({...state, count: {...state.count, steel}}),
     setTitanium: state => titanium => ({...state, count: {...state.count, titanium}}),
   }),
   withProps(props => ({
-    total: 1 * props.count.money + 2 * props.count.steel + 3 * props.count.titanium,
+    total:
+      1 * props.count.money +
+      props.resourceValues['Steel'] * props.count.steel +
+      props.resourceValues['Titanium'] * props.count.titanium,
   })),
   connect(
     state => ({
-      card: getCardByName(state.ui.action.card),
       resources: state.game.playerState[state.player].resources,
     }),
     (dispatch, props) => ({

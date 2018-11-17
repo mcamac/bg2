@@ -1130,7 +1130,7 @@ export const CARDS: Card[] = [
     effectText: 'Decrease your MC production 1 step and increase your energy production 2 steps.',
     effects: [
       ['ChangeProduction', -1, ResourceType.Money],
-      ['ChangeInventory', 2, ResourceType.Energy],
+      ['ChangeProduction', 2, ResourceType.Energy],
     ],
   },
   {

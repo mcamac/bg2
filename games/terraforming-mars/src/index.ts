@@ -154,7 +154,7 @@ const INITIAL_RESOURCES: ResourcesState = {
 export const getInitialGameState = (players: Player[], seed: string = SEED): GameState => {
   let state = {
     phase: Phase.ChoosingCorporations,
-    generation: 0,
+    generation: 1,
     players,
     firstPlayer: players[0],
     playerState: <{[key: string]: PlayerState}>{},

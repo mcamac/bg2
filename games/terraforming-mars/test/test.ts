@@ -695,6 +695,23 @@ test('Research Outpost', t => {
   t.is(state.map['-1,1'].owner, 'a')
 })
 
+test('Restricted Area: Place', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Money].count = 11
+  state.globalParameters.Heat = 4
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.PlayCard,
+    card: 'Restricted Area',
+    resources: {Money: 11},
+    choices: [{location: [-1, 1]}],
+  })
+
+  t.is(state.map['-1,1'].owner, 'a')
+})
+
 test('Insulation', t => {
   let state = getStateAfterActions()
   state.player = 'a'
@@ -1088,7 +1105,7 @@ test('Turn Passing', t => {
   })
 
   // New generation
-  t.is(state.generation, 1)
+  t.is(state.generation, 2)
   t.is(state.firstPlayer, 'b')
 
   // Ecoline
@@ -1134,7 +1151,7 @@ test('Turn Ceding', t => {
   })
 
   // New generation
-  t.is(state.generation, 1)
+  t.is(state.generation, 2)
   t.is(state.firstPlayer, 'b')
 
   // Ecoline
@@ -1183,7 +1200,7 @@ test('Turn Ceding after 2 actions', t => {
   })
 
   // New generation
-  t.is(state.generation, 1)
+  t.is(state.generation, 2)
   t.is(state.firstPlayer, 'b')
 
   // Ecoline
@@ -1208,7 +1225,7 @@ test('New Generation: Drafting', t => {
   })
 
   // New generation
-  t.is(state.generation, 1)
+  t.is(state.generation, 2)
   t.is(state.firstPlayer, 'b')
   // Ecoline
   t.is(state.playerState['a'].resources[ResourceType.Plant].count, 5)

@@ -29,6 +29,20 @@ export const getStateAfterActions = () => {
   return state
 }
 
+export const getSoloStateAfterActions = () => {
+  let state = getInitialGameState(['a'], TEST_SEED)
+  state.firstPlayer = 'a'
+
+  handleAction(state, {
+    type: UserAction.CorpAndCardsChoice,
+    player: 'a',
+    corporation: 'Beginner Corporation',
+    cards: state.choosingCards['a'], // ALL THE CARDS FOR FREE!!!
+  })
+
+  return state
+}
+
 export const getStateBeforeDraft = () => {
   const state = getStateAfterActions()
 

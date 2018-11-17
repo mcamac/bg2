@@ -50,6 +50,10 @@ export const DecreaseAnyProduction = (delta: number, type: string) => (
   choice: {player: string},
   card: Card
 ): GameState => {
+  if (!choice.player) {
+    return state
+  }
+
   state.log.push({
     type: 'ProductionChange',
     player: choice.player,
@@ -69,6 +73,10 @@ export const DecreaseAnyInventory = (delta: number, type: string) => (
   choice: {player: string},
   card: Card
 ): GameState => {
+  if (!choice.player) {
+    return state
+  }
+
   const oldCount = state.playerState[choice.player].resources[type].count
   state.playerState[choice.player].resources[type].count -= delta
 
@@ -333,7 +341,11 @@ export const PlaceMiningArea = () => (state: GameState, action, choice): GameSta
   if (!isAdjacentToOwn(state, choice.location)) throw Error('Not adjacent to own tile.')
 
   state = placeTile(state, {owner: state.player, type: TileType.MiningArea}, choice.location)
-  state = ChangeProduction(1, choice.resource)(state)
+
+  const resource =
+    bonus.indexOf(ResourceBonus.Titanium) !== -1 ? ResourceType.Titanium : ResourceType.Steel
+
+  state = ChangeProduction(1, resource)(state)
   return state
 }
 
@@ -343,7 +355,11 @@ export const PlaceMiningRights = () => (state: GameState, action, choice): GameS
     throw Error('Invalid tile for mining area')
 
   state = placeTile(state, {owner: state.player, type: TileType.MiningArea}, choice.location)
-  state = ChangeProduction(1, choice.resource)(state)
+
+  const resource =
+    bonus.indexOf(ResourceBonus.Titanium) !== -1 ? ResourceType.Titanium : ResourceType.Steel
+
+  state = ChangeProduction(1, resource)(state)
   return state
 }
 
@@ -389,6 +405,11 @@ export const PlaceResearchOutpost = () => (state: GameState, action, choice): Ga
   })
 
   state = placeTile(state, {owner: state.player, type: TileType.City}, choice.location)
+  return state
+}
+
+export const PlaceRestrictedArea = () => (state: GameState, action, choice): GameState => {
+  state = placeTile(state, {owner: state.player, type: TileType.RestrictedArea}, choice.location)
   return state
 }
 
@@ -762,6 +783,7 @@ const REGISTRY = {
   PlaceMiningRights,
   PlaceNaturalPreserve,
   PlaceResearchOutpost,
+  PlaceRestrictedArea,
   PlaceIndustrialCenter,
   PlaceNoctis,
   SearchForLife,

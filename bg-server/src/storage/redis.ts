@@ -3,7 +3,7 @@ import {GameStorage, PlayerConnection, Room} from '../base'
 
 // import {PowerGrid} from '../../../games/power-grid/src/index'
 import {TerraformingMars} from '../../../games/terraforming-mars/src/index'
-import {getStateAfterActions} from '../../../games/terraforming-mars/src/fixtures'
+import {getSoloStateAfterActions} from '../../../games/terraforming-mars/src/fixtures'
 import {cloneState} from '../../../games/terraforming-mars/src/utils'
 import {createHandyClient} from 'handy-redis'
 import {IHandyRedis} from 'handy-redis/dist/generated/interface'
@@ -76,7 +76,7 @@ export class RedisStorage implements GameStorage {
     const room = (await this.getRoom(id)) as any
     console.log('start', room, GAMES[room.g])
     // const game = GAMES[room.g].get(room.users)
-    const game = getStateAfterActions()
+    const game = getSoloStateAfterActions()
     console.log('new s', id, game)
     return this.updateRoom(id, room => ({
       game,
