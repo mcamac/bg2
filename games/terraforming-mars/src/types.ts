@@ -129,6 +129,7 @@ export const enum TileType {
   RestrictedArea = 'restrictedArea',
   CommercialDistrict = 'commercialDistrict',
   NaturalPreserve = 'naturalPreserve',
+  LandClaim = 'landClaim',
 }
 
 export interface Tile {

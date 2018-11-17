@@ -76,7 +76,7 @@ export class RedisStorage implements GameStorage {
     const room = (await this.getRoom(id)) as any
     console.log('start', room, GAMES[room.g])
     // const game = GAMES[room.g].get(room.users)
-    const game = getSoloStateAfterActions()
+    const game = getSoloStateAfterActions(id)
     console.log('new s', id, game)
     return this.updateRoom(id, room => ({
       game,

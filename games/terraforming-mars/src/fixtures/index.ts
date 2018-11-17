@@ -29,8 +29,8 @@ export const getStateAfterActions = () => {
   return state
 }
 
-export const getSoloStateAfterActions = () => {
-  let state = getInitialGameState(['a'], TEST_SEED)
+export const getSoloStateAfterActions = (seed: string) => {
+  let state = getInitialGameState(['a'], seed || TEST_SEED)
   state.firstPlayer = 'a'
 
   handleAction(state, {

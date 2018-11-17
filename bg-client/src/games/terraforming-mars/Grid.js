@@ -6,6 +6,7 @@ import {RESOURCE_BONUSES, OCEAN_POSITIONS} from '../../../../games/terraforming-
 import {chooseTile} from './reducer'
 import {isOcean} from '../../../../games/terraforming-mars/src/tiles'
 import {PLAYER_COLORS} from './constants'
+import Icon from './components/Icon'
 
 const hexPoints = (x, y, radius) => {
   var points = []
@@ -17,7 +18,9 @@ const hexPoints = (x, y, radius) => {
   }
   return points.join(' ')
 }
-const RADIUS = 28
+const WIDTH = 400
+const HEIGHT = 400
+const RADIUS = 24
 
 const COLORS = {
   ocean: 'blue',
@@ -26,8 +29,8 @@ const COLORS = {
 }
 
 let Tile = props => {
-  const xc = 220 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
-  const yc = 210 + 3 / 2 * RADIUS * -props.y
+  const xc = WIDTH / 2 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
+  const yc = HEIGHT / 2 + 3 / 2 * RADIUS * -props.y
   const tile = props.map[`${props.x},${props.y}`]
   return (
     <g>
@@ -63,7 +66,7 @@ let Tile = props => {
 Tile = withState('hovered', 'setHovered', false)(Tile)
 
 let Grid = props => (
-  <svg width={440} height={420}>
+  <svg width={WIDTH} height={HEIGHT}>
     <g>
       {range(-4, 5).map(row =>
         range(Math.max(-4, -4 - row), Math.min(4, 4 - row) + 1).map(col => (

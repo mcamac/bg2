@@ -48,6 +48,7 @@ import Milestones from './components/Milestones'
 
 import cs from './index.css'
 import {PLAYER_COLORS} from './constants'
+import TagCounts from './components/TagCounts'
 
 console.log(CARDS)
 
@@ -312,6 +313,7 @@ const PlaceGreeneryOnOcean = () => (
 )
 
 const PlaceNaturalPreserve = () => <Flex align="center">Place Natural Preserve.</Flex>
+const PlaceIndustrialCenter = () => <Flex align="center">Place tile adjacent to city.</Flex>
 const PlaceNuclearZone = () => <Flex align="center">Place Nuclear Zone.</Flex>
 const PlaceMohole = () => <Flex align="center">Place Mohole on Ocean.</Flex>
 const PlaceLavaFlows = () => <Flex align="center">Place Lava Flows on Volcano.</Flex>
@@ -409,6 +411,7 @@ const ChooseX = effects => (
 )
 
 const GetX = () => 'X'
+const LandClaim = () => 'Land Claim'
 
 const Neg = effect => (
   <Flex align="center">
@@ -426,7 +429,6 @@ const PlayedTagMatches = tags => (
             <Tag name={tag} />
           </React.Fragment>
         ))}{' '}
-        /
       </React.Fragment>
     ))}
   </Flex>
@@ -465,6 +467,8 @@ const EFFECTS = {
   PlaceRestrictedArea,
   PlaceResearchOutpost,
   PlaceNaturalPreserve,
+  PlaceIndustrialCenter,
+  LandClaim,
   PlayedMinCost,
   MultiCost,
   RaiseOxygen,
@@ -875,7 +879,7 @@ GameChoicesBar = connect(
 )(GameChoicesBar)
 
 let ActionBar = props => (
-  <Flex py={1} px={2} mx={2} style={{background: '#eee'}} align="center" justify="center">
+  <Flex py={1} style={{background: '#eee', fontSize: 13}} align="center" justify="center">
     <Flex mr="3px" style={{fontSize: '0.8em'}}>
       {props.ui.phase}
     </Flex>
@@ -1023,18 +1027,28 @@ const TerraformingMars = props => {
   console.log('props', props)
   return (
     <Wrapper direction="column">
-      <Box
+      <Flex
         align="center"
-        py={1}
-        px={2}
         style={{
-          fontFamily: 'Rubik Mono One',
-          borderBottom: '1px solid #ddd',
           background: '#fafafa',
+          borderBottom: '1px solid #ddd',
         }}
       >
-        Terraforming Mars
-      </Box>
+        <Box
+          align="center"
+          py={1}
+          px={2}
+          style={{
+            fontFamily: 'Rubik Mono One',
+          }}
+        >
+          Terraforming Mars
+        </Box>
+
+        <Box style={{fontSize: 14}} mb={1}>
+          Generation {props.game.generation}
+        </Box>
+      </Flex>
       <Flex flex="1 1 auto">
         <Flex
           direction="column"
@@ -1049,30 +1063,25 @@ const TerraformingMars = props => {
               state={props.game.playerState[player]}
             />
           ))}
-
-          <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
-            GAME LOG
-          </Box>
-          <GameLog log={props.game.log} />
         </Flex>
         <Box flex="1 1 auto" p={2}>
+          <ActionBar />
           <Flex>
             <Box>
-              <Box style={{fontSize: 14}} mb={1}>
-                Generation {props.game.generation}
-              </Box>
               <GlobalParams />
               <Milestones />
               <Awards />
               <StandardProjects />
             </Box>
             <Box flex="1 1 auto" style={{textAlign: 'center'}}>
-              <ActionBar />
               <Grid />
             </Box>
           </Flex>
           <Flex>
             <Box mr={1}>
+              <Box>
+                <TagCounts />
+              </Box>
               {props.game.playerState[props.player].corporation && (
                 <Corporation name={props.game.playerState[props.player].corporation} collapsed />
               )}
@@ -1142,6 +1151,16 @@ const TerraformingMars = props => {
             )}
           <Hand />
         </Box>
+        <Flex
+          direction="column"
+          w={270}
+          style={{minWidth: 270, borderLeft: '1px solid #ddd', background: '#fafafa'}}
+        >
+          <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
+            GAME LOG
+          </Box>
+          <GameLog log={props.game.log} />
+        </Flex>
       </Flex>
     </Wrapper>
   )

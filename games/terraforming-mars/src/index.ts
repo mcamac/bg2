@@ -161,7 +161,7 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     passed: {},
     player: players[0],
     actionsDone: 0,
-    deck: shuffle(CARDS.map(card => card.name), SEED),
+    deck: shuffle(CARDS.map(card => card.name), seed),
     discard: [],
     globalParameters: {
       Oxygen: 0,
@@ -177,10 +177,10 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
     draft: {},
     choosingCards: {},
     choosingCorporations: {},
-    seed: SEED,
+    seed,
   }
 
-  const shuffled = shuffle(CORPORATIONS, SEED)
+  const shuffled = shuffle(CORPORATIONS, seed)
 
   state.players.forEach((player, i) => {
     state.choosingCorporations[player] = shuffled.splice(2 * i, 2).map(c => c.name)
@@ -329,13 +329,21 @@ const haveAllPassed = state => {
   return state.players.map(player => state.passed[player]).every(x => x)
 }
 
-const switchToNextPlayer = state => {
+const switchToNextPlayer = (state: GameState) => {
   if (haveAllPassed(state)) {
-    // Generation over.
+    // Generation over
     state = generationProduction(state)
     state = resetNewGeneration(state)
     state = setupDraft(state)
     state.phase = Phase.Draft
+
+    if (state.players.length === 1) {
+      // Skip draft in solo mode.
+      state.draft[state.player].taken = state.draft[state.player].queued[0]
+      state.draft[state.player].queued = []
+      state = startActions(state)
+    }
+
     return state
   }
   const playerIndex = state.players.indexOf(state.player)

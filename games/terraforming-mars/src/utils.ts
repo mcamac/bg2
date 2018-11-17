@@ -24,6 +24,7 @@ import {
   isAdjacentToOwn,
   getAdjacentTiles,
   makeKeyFromPosition,
+  isAdjacentToType,
 } from './tiles'
 import {getCardByName} from './cards'
 import {draw} from './deck'
@@ -198,8 +199,8 @@ export const ChangeProduction = (n: number | NumGetter, resource: string) => (
     type: 'ProductionChange',
     player: player,
     resource,
-    from: playerState.resources[resource].production,
-    to: playerState.resources[resource].production + n,
+    from: playerState.resources[resource].production - n,
+    to: playerState.resources[resource].production,
   })
 
   return state
@@ -264,6 +265,7 @@ export const IncreaseResourceValue = (n: number, resource: ResourceType) => (
 
 export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
   if (state.globalParameters.Heat < 0 && state.globalParameters.Heat + 2 * n >= 0) {
+    // todo: should be part of state machine
     // Player gets to place an ocean
     state.playerState[state.player].choices.push({
       type: 'PlaceOcean',
@@ -271,11 +273,14 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
     })
   }
 
+  const from = state.globalParameters.Heat
+  const to = state.globalParameters.Heat + 2 * n
+
   state.log.push({
     type: 'IncreaseTemperature',
     player: state.player,
-    from: state.globalParameters.Heat,
-    to: state.globalParameters.Heat + 2 * n,
+    from,
+    to,
   })
 
   state.log.push({
@@ -287,9 +292,19 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
 
   state.playerState[state.player].TR += n
   state.playerState[state.player].hasIncreasedTRThisGeneration = true
-  state.globalParameters.Heat += 2 * n
 
-  return state
+  let newState = state
+  if (from < -24 && -24 <= to) {
+    newState = ChangeProduction(1, ResourceType.Heat)(state)
+  }
+
+  if (from < -20 && -20 <= to) {
+    newState = ChangeProduction(1, ResourceType.Heat)(state)
+  }
+
+  newState.globalParameters.Heat = to
+
+  return newState
 }
 
 export const RaiseOxygen = (delta: number) => (state: GameState, action, choice): GameState => {
@@ -365,6 +380,9 @@ export const PlaceMiningRights = () => (state: GameState, action, choice): GameS
 
 export const PlaceIndustrialCenter = () => (state: GameState, action, choice): GameState => {
   // todo: check adjacency
+  if (!isAdjacentToType(state, choice.location, TileType.City)) {
+    throw Error('Not adjacent to city.')
+  }
   return placeTile(state, {owner: state.player, type: TileType.IndustrialCenter}, choice.location)
 }
 
@@ -413,7 +431,10 @@ export const PlaceRestrictedArea = () => (state: GameState, action, choice): Gam
   return state
 }
 
-export const LandClaim = {}
+export const LandClaim = () => (state: GameState, action, choice): GameState => {
+  state = placeTile(state, {owner: state.player, type: TileType.LandClaim}, choice.location)
+  return state
+}
 export const ArtificialLake = {}
 
 export const PlaceNuclearZone = () => (state: GameState, action, choice): GameState => {
@@ -782,10 +803,12 @@ const REGISTRY = {
   PlaceMiningArea,
   PlaceMiningRights,
   PlaceNaturalPreserve,
+  PlaceNuclearZone,
   PlaceResearchOutpost,
   PlaceRestrictedArea,
   PlaceIndustrialCenter,
   PlaceNoctis,
+  LandClaim,
   SearchForLife,
   SellCards,
   Branch,
@@ -944,7 +967,12 @@ const placeTile = (state: GameState, tile: Tile, position: Position): GameState 
   const [x, y] = position
 
   const key = makeKeyFromPosition(position)
-  if (state.map[key]) throw Error('Tile location taken.')
+  if (state.map[key]) {
+    // Check for land claim belonging to current player.
+    if (!(state.map[key].owner === state.player && state.map[key].type === TileType.LandClaim)) {
+      throw Error('Tile location taken.')
+    }
+  }
   state.map[key] = tile
   // todo: check restrictions on tiles
   const bonuses = getTileBonus(position)

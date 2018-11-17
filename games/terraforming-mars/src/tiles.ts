@@ -23,6 +23,13 @@ export const getAdjacentTiles = ([x, y]: Position): Position[] => {
   return ADJACENT_OFFSETS.map(([dx, dy]) => [x + dx, y + dy] as Position).filter(isValid)
 }
 
+export const isAdjacentToType = (state: GameState, [x, y]: Position, type: TileType): boolean => {
+  return getAdjacentTiles([x, y])
+    .map(makeKeyFromPosition)
+    .map(key => state.map[key] && state.map[key].type === type)
+    .some(x => x)
+}
+
 export const isAdjacentToOwn = (state: GameState, [x, y]: Position): boolean => {
   return getAdjacentTiles([x, y])
     .map(makeKeyFromPosition)

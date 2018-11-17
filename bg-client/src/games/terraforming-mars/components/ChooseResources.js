@@ -18,7 +18,7 @@ const Button = styled(Box)`
 
 const ResourceInput = styled.input`
   width: 30px;
-  font-size: 1em;
+  font-size: 13px;
   text-align: right;
   margin: 0 4px;
 `
