@@ -63,7 +63,7 @@ export const CORPORATIONS: Corporation[] = [
     ],
     afterTileTriggers: [
       [[ResourceBonus.Steel], [['ChangeProduction', 1, ResourceType.Steel]]],
-      [[ResourceBonus.Titanium], [['ChangeProduction', 1, ResourceType.Steel]]],
+      [[ResourceBonus.Titanium], [['ChangeProduction', 1, ResourceType.Titanium]]],
     ],
   },
   {

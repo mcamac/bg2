@@ -94,7 +94,7 @@ export default class GameLog extends Component {
 
   render() {
     return (
-      <Box px={2} style={{overflowY: 'scroll'}}>
+      <Box px={2} pb={2} style={{overflowY: 'scroll'}}>
         <Box style={{fontSize: 13}}>
           {this.props.log.map((l, i) => <LogLine key={i} line={l} />)}
         </Box>

@@ -1,9 +1,9 @@
-import {Card, Corporation} from './index'
 import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
 import {
   CORPORATIONS,
   getCorporationByName,
 } from '../../../../games/terraforming-mars/src/corporations'
+import {Card, Corporation} from './components/Card'
 
 const CardBrowser = props => (
   <div style={{fontFamily: 'Rubik', width: 270}}>
