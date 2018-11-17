@@ -1,43 +1,30 @@
-import React, {Fragment, Component} from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {
-  compose,
-  pure,
-  branch,
-  renderNothing,
-  withProps,
-  withState,
-  withStateHandlers,
-} from 'recompose'
+import {compose, pure, branch, renderNothing} from 'recompose'
 import {toPairs, get, reverse} from 'lodash/fp'
 
 import {
   reducer,
   draftChoice,
-  startStandardProject,
   uiClickCard,
   uiCancel,
-  uiSetCardCost,
   uiChoosePlayer,
   uiSubmitChoice,
   uiPlantGreenery,
   uiHeatTemperature,
-  uiCardAction,
   uiPass,
   uiSubmitBuyChoice,
   uiCede,
 } from './reducer'
 import {Grid} from './Grid'
 import GameLog from './GameLog'
-import {Icon, Tag} from './components'
+import {Tag} from './components'
 
-import {CARDS, getCardByName} from '../../../../games/terraforming-mars/src/cards'
-import {getCorporationByName} from '../../../../games/terraforming-mars/src/corporations'
-import {StandardProject, Phase} from '../../../../games/terraforming-mars/src/types'
-import {STANDARD_PROJECTS} from '../../../../games/terraforming-mars/src/projects'
+import {getCardByName} from '../../../../games/terraforming-mars/src/cards'
+import {Phase} from '../../../../games/terraforming-mars/src/types'
 import AnimateOnChange from './animator'
 
 import ChooseResources from './components/ChooseResources'
@@ -52,35 +39,9 @@ import TagCounts from './components/TagCounts'
 import Card from './components/Card/Card'
 import {Corporation} from './components/Card'
 
-console.log(CARDS)
-
 const Wrapper = styled(Flex)`
   font-family: Rubik;
   height: 100%;
-`
-
-const CARD_COLORS = {
-  Active: '#c1e4f9',
-  Event: '#ffc0c0',
-  Automated: '#95F58D',
-  Corporation: '#e3e3e3',
-}
-
-const CardWrapper = styled(Box)`
-  background: ${props => CARD_COLORS[props.type || (props.corporation && 'Corporation')]};
-  border: ${props => props.selected && '1px solid black'};
-  min-width: 250px;
-  font-size: 13px;
-  margin-bottom: 5px;
-  box-shadow: 0px 1px 1px 1px #eee;
-  box-sizing: border-box;
-  cursor: pointer;
-
-  transition: 0.2s all;
-
-  &:hover {
-    box-shadow: 0px 1px 4px 5px ${props => CARD_COLORS[props.type] || '#aaa'};
-  }
 `
 
 const signed = n => (n > 0 ? `+${n}` : `${n}`)
@@ -333,7 +294,7 @@ Draft = connect(
 let Hand = props => (
   <React.Fragment>
     <Box p={1} style={{fontSize: 12, color: '#555'}}>
-      HAND
+      HAND ({props.game.playerState[props.player].hand.length})
     </Box>
     <Box px={2}>
       {props.game.playerState[props.player].hand.map(name => (
@@ -431,6 +392,7 @@ const TerraformingMars = props => {
         style={{
           background: '#fafafa',
           borderBottom: '1px solid #ddd',
+          minHeight: 36,
         }}
       >
         <Box
@@ -462,7 +424,38 @@ const TerraformingMars = props => {
               state={props.game.playerState[player]}
             />
           ))}
+
+          <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
+            GAME LOG
+          </Box>
+          <GameLog log={props.game.log} />
         </Flex>
+        <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
+          {props.game.draft[props.player] && (
+            <Draft cards={props.game.draft[props.player]} player={props.player} />
+          )}
+          {props.game.choosingCorporations[props.player] && (
+            <React.Fragment>
+              <Box p={1} style={{fontSize: 12, color: '#555'}}>
+                CORPORATIONS
+              </Box>
+              <Box px={2}>
+                {props.game.choosingCorporations[props.player].map(name => (
+                  <Corporation key={name} name={name} />
+                ))}
+              </Box>
+            </React.Fragment>
+          )}
+          {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
+          {props.game.choosingCards[props.player] && (
+            <CardBuy cards={props.game.choosingCards[props.player]} />
+          )}
+          {props.game.phase === 'Choices' &&
+            get(['playerState', props.player, 'choices', 0, 'type'], props.game) == 'KeepCards' && (
+              <CardBuy cards={props.game.playerState[props.player].choices[0].cards} />
+            )}
+          <Hand />
+        </Box>
         <Box flex="1 1 auto" p={2}>
           <ActionBar />
           <Flex>
@@ -479,6 +472,12 @@ const TerraformingMars = props => {
 
           <Box>
             <TagCounts />
+          </Box>
+        </Box>
+
+        <Box>
+          <Box p={1} style={{fontSize: 12, color: '#555'}}>
+            PLAYED
           </Box>
           <Flex>
             <Box mr={1}>
@@ -525,33 +524,8 @@ const TerraformingMars = props => {
             </Box>
           </Flex>
         </Box>
-        <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
-          {props.game.draft[props.player] && (
-            <Draft cards={props.game.draft[props.player]} player={props.player} />
-          )}
-          {props.game.choosingCorporations[props.player] && (
-            <React.Fragment>
-              <Box p={1} style={{fontSize: 12, color: '#555'}}>
-                CORPORATIONS
-              </Box>
-              <Box px={2}>
-                {props.game.choosingCorporations[props.player].map(name => (
-                  <Corporation key={name} name={name} />
-                ))}
-              </Box>
-            </React.Fragment>
-          )}
-          {get(['choice', 'type'], props.ui) === 'playedCard' && <PlayedCardMatches />}
-          {props.game.choosingCards[props.player] && (
-            <CardBuy cards={props.game.choosingCards[props.player]} />
-          )}
-          {props.game.phase === 'Choices' &&
-            get(['playerState', props.player, 'choices', 0, 'type'], props.game) == 'KeepCards' && (
-              <CardBuy cards={props.game.playerState[props.player].choices[0].cards} />
-            )}
-          <Hand />
-        </Box>
-        <Flex
+
+        {/* <Flex
           direction="column"
           w={270}
           style={{minWidth: 270, borderLeft: '1px solid #ddd', background: '#fafafa'}}
@@ -560,7 +534,7 @@ const TerraformingMars = props => {
             GAME LOG
           </Box>
           <GameLog log={props.game.log} />
-        </Flex>
+        </Flex> */}
       </Flex>
     </Wrapper>
   )
