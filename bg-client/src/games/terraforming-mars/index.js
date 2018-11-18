@@ -475,52 +475,24 @@ const TerraformingMars = props => {
           </Box>
         </Box>
 
-        <Box>
-          <Box p={1} style={{fontSize: 12, color: '#555'}}>
+        <Box px={2} style={{background: '#fafafa'}}>
+          <Box py={1} style={{fontSize: 12, color: '#555'}}>
             PLAYED
           </Box>
           <Flex>
-            <Box mr={1}>
+            <Box>
               {props.game.playerState[props.player].corporation && (
                 <Corporation name={props.game.playerState[props.player].corporation} collapsed />
               )}
-              {props.game.playerState[props.player].played
-                .slice(0, 10)
-                .map(name => (
-                  <Card
-                    played
-                    key={name}
-                    name={name}
-                    collapsed
-                    resources={props.game.playerState[props.player].cardResources[name]}
-                  />
-                ))}
-            </Box>
-            <Box mr={1}>
-              {props.game.playerState[props.player].played
-                .slice(10, 20)
-                .map(name => (
-                  <Card
-                    played
-                    key={name}
-                    name={name}
-                    collapsed
-                    resources={props.game.playerState[props.player].cardResources[name]}
-                  />
-                ))}
-            </Box>
-            <Box>
-              {props.game.playerState[props.player].played
-                .slice(20)
-                .map(name => (
-                  <Card
-                    played
-                    key={name}
-                    name={name}
-                    collapsed
-                    resources={props.game.playerState[props.player].cardResources[name]}
-                  />
-                ))}
+              {props.game.playerState[props.player].played.map(name => (
+                <Card
+                  played
+                  key={name}
+                  name={name}
+                  collapsed
+                  resources={props.game.playerState[props.player].cardResources[name]}
+                />
+              ))}
             </Box>
           </Flex>
         </Box>

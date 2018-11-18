@@ -17,9 +17,9 @@ const StandardProject = props => (
   </Box>
 )
 const IncreaseTemperature = props => (
-  <Box>
-    Temp increased from {props.from} to {props.to}.
-  </Box>
+  <Flex align="center">
+    <Icon g="Temp" /> increased from {props.from} to {props.to}.
+  </Flex>
 )
 
 const IncreaseTR = props => (

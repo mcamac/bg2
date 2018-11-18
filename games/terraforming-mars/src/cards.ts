@@ -888,7 +888,10 @@ export const CARDS: Card[] = [
       [
         [
           'Choice',
-          [['ChangeInventory', 1, ResourceType.Plant], ['ChangeInventory', 1, ResourceType.Steel]],
+          [
+            [['ChangeInventory', -1, ResourceType.Plant]],
+            [['ChangeInventory', -1, ResourceType.Steel]],
+          ],
         ],
         ['ChangeInventory', 7, ResourceType.Money],
       ],
@@ -1026,7 +1029,7 @@ export const CARDS: Card[] = [
       ['IncreaseTemperature', 2],
       ['PlaceOceans'],
       ['PlaceOceans'],
-      ['DecreaseAnyProduction', 6, ResourceType.Plant],
+      ['DecreaseAnyInventory', 6, ResourceType.Plant],
     ],
   },
   {
@@ -1432,7 +1435,10 @@ export const CARDS: Card[] = [
     effects: [
       [
         'Choice',
-        [['ChangeProduction', 1, ResourceType.Plant], ['ChangeProduction', 2, ResourceType.Energy]],
+        [
+          [['ChangeProduction', 1, ResourceType.Plant]],
+          [['ChangeProduction', 2, ResourceType.Energy]],
+        ],
       ],
     ],
   },

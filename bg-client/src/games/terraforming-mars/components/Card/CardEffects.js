@@ -38,7 +38,7 @@ const ChangeAnyCardResource = (value, resource) => (
   <Flex align="center">
     <Box>{withSign(value)}</Box>
     {typeof resource === 'string' ? <Icon g={resource} /> : resource}
-    <Box> any card</Box>
+    {resource === null ? ' resource on ' : null} <Box> any card</Box>
   </Flex>
 )
 
@@ -99,12 +99,19 @@ const RoboticWorkforce = () => (
 )
 
 const Choice = (choices, card) => (
-  <Flex align="center">
+  <Flex align="center" mr={1}>
     <Box mr="4px">One of:</Box>
-    {choices.map(
-      ([effect, ...args], i) =>
-        EFFECTS[effect] && <Box key={i}> {EFFECTS[effect](...args, card)}</Box>
-    )}
+    (
+    {choices.map((effects, j) => (
+      <Flex align="center">
+        {effects.map(
+          ([effect, ...args], i) =>
+            EFFECTS[effect] && <Box key={i}> {EFFECTS[effect](...args, card)}</Box>
+        )}
+        {j !== choices.length - 1 ? ' OR ' : ''}
+      </Flex>
+    ))}
+    )
   </Flex>
 )
 
@@ -176,6 +183,11 @@ const PlaceGreeneryOnOcean = () => (
   </Flex>
 )
 
+const PlaceMiningRights = () => (
+  <Flex align="center">
+    Place on tile w/ <Icon g="Steel" /> or <Icon g="Titanium" />. +1 prod of that
+  </Flex>
+)
 const PlaceNaturalPreserve = () => <Flex align="center">Place Natural Preserve.</Flex>
 const PlaceIndustrialCenter = () => <Flex align="center">Place tile adjacent to city.</Flex>
 const PlaceNuclearZone = () => <Flex align="center">Place Nuclear Zone.</Flex>
@@ -183,9 +195,17 @@ const PlaceMohole = () => <Flex align="center">Place Mohole on Ocean.</Flex>
 const PlaceLavaFlows = () => <Flex align="center">Place Lava Flows on Volcano.</Flex>
 const PlaceRestrictedArea = () => <Flex align="center">Place Restricted Area.</Flex>
 const PlaceResearchOutpost = () => <Flex align="center">Place Research Outpost.</Flex>
+const PlaceCommercialDistrict = () => <Flex align="center">Place special tile.</Flex>
+const PlaceUrbanizedArea = () => (
+  <Flex align="center">
+    Place <Icon g="City" /> adj. to 2 <Icon g="City" />
+  </Flex>
+)
 
-const VPForCardResources = (resource, count) =>
-  count >= 1 ? (
+const CommercialDistrict = () => '1VP/adj. city'
+
+const VPForCardResources = (resource, count = 1) =>
+  count > 1 ? (
     <Flex>
       1 VP / {count} <Icon g={resource} />
     </Flex>
@@ -204,6 +224,12 @@ const VPForCitiesOnMars = count => (
 const VPForTags = tag => (
   <Flex>
     1 VP / <Tag name={tag} />
+  </Flex>
+)
+
+const GetAllTags = (tag, ratio) => (
+  <Flex ailgn="center">
+    1 / all {ratio && ratio} <Tag name={tag} />
   </Flex>
 )
 
@@ -258,6 +284,12 @@ const UNTerraform = () => (
 const SearchForLife = () => (
   <Flex align="center">
     1 <Icon g="Money" />: Reveal <Icon g="Card" />. If <Icon g="Microbe" />, +1 <Icon g="Science" />
+  </Flex>
+)
+
+const AddNextCardEffect = effect => (
+  <Flex align="center">
+    next <Icon g="Card" />: <pre>{JSON.stringify(effect, null, 2)}</pre>
   </Flex>
 )
 
@@ -330,8 +362,12 @@ export const EFFECTS = {
   PlaceGreeneryOnOcean,
   PlaceRestrictedArea,
   PlaceResearchOutpost,
+  PlaceMiningRights,
   PlaceNaturalPreserve,
   PlaceIndustrialCenter,
+  PlaceCommercialDistrict,
+  PlaceUrbanizedArea,
+  CommercialDistrict,
   LandClaim,
   PlayedMinCost,
   MultiCost,
@@ -351,6 +387,7 @@ export const EFFECTS = {
   VPIfCardHasResources,
   VPForCitiesOnMars,
   CapitalCity,
+  GetAllTags,
   GetTags,
   GetOpponentTags,
   GetCities,
@@ -363,6 +400,7 @@ export const EFFECTS = {
   PlayedTagMatches,
   PlayedTagMatchesAny,
   SearchForLife,
+  AddNextCardEffect,
 }
 
 export const Effect = (effect, ...args) =>

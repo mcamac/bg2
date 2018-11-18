@@ -449,7 +449,7 @@ export const turnActionHandlers = {
     }
 
     // Clear any "next card effects" from the player state
-    if (playerState.nextCardEffect) playerState.nextCardEffect = null
+    if (playerState.nextCardEffect) playerState.nextCardEffect = []
 
     // After-card triggers
     state = applyAfterCardTriggers(state, card, state.player)

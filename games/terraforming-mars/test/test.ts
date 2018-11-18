@@ -574,6 +574,25 @@ test('Search For Life', t => {
   t.is(state.playerState['a'].resources[ResourceType.Money].count, 0)
 })
 
+test('Electro Catapult', t => {
+  let state = getStateAfterActions()
+  state.player = 'a'
+  state.playerState['a'].resources[ResourceType.Steel].count = 1
+  state.playerState['a'].resources[ResourceType.Money].count = 0
+  state.playerState['a'].played = ['Electro Catapult']
+
+  handleAction(state, {
+    type: UserAction.Action,
+    actionType: TurnAction.CardAction,
+    card: 'Electro Catapult',
+    index: 0,
+    choices: [{index: 1}],
+    player: 'a',
+  })
+
+  t.is(state.playerState['a'].resources[ResourceType.Money].count, 7)
+})
+
 test('Pets Trigger', t => {
   let state = getStateAfterActions()
   state.player = 'a'
