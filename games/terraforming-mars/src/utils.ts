@@ -30,20 +30,27 @@ import {getCardByName} from './cards'
 import {draw} from './deck'
 import {getCorporationByName} from './corporations'
 
-// export const MultiCost = (cost: number, otherResources: ResourceType[]) => (
-//   state: GameState,
-//   action,
-//   choice: {resources: any}
-// ): GameState => {
-//   let resources = {
-//     Money: choice.resources.Money || 0,
-//   }
-//   otherResources.forEach(resource => {
-//     resources[resource] = choice.resources[resource]
-//   })
+export const MultiCost = (cost: number, otherResources: ResourceType[]) => (
+  state: GameState,
+  action,
+  choice: {resources: any}
+): GameState => {
+  let resources = {
+    Money: choice.resources.Money || 0,
+  }
+  otherResources.forEach(resource => {
+    resources[resource] = choice.resources[resource]
+  })
 
-//   return state
-// }
+  // todo: check cost
+
+  let newState = state
+  ;[ResourceType.Money, ...otherResources].forEach(resource => {
+    newState = changeInventory(state, state.player, resource, -resources[resource])
+  })
+
+  return newState
+}
 
 export const DecreaseAnyProduction = (delta: number, type: string) => (
   state: GameState,
@@ -266,15 +273,18 @@ export const IncreaseResourceValue = (n: number, resource: ResourceType) => (
 export const IncreaseTemperature = (n: number) => (state: GameState, action, choice): GameState => {
   if (state.globalParameters.Heat < 0 && state.globalParameters.Heat + 2 * n >= 0) {
     // todo: should be part of state machine
-    // Player gets to place an ocean
-    state.playerState[state.player].choices.push({
-      type: 'PlaceOcean',
-      effects: [['PlaceOceans']],
-    })
+    // Player gets to place an ocean if any left.
+    if (state.globalParameters.Oceans < 9) {
+      state.playerState[state.player].choices.push({
+        type: 'PlaceOcean',
+        effects: [['PlaceOceans']],
+      })
+    }
   }
 
   const from = state.globalParameters.Heat
-  const to = state.globalParameters.Heat + 2 * n
+  const to = Math.min(state.globalParameters.Heat + 2 * n, 8)
+  const steps = Math.floor((to - from) / 2)
 
   state.log.push({
     type: 'IncreaseTemperature',
@@ -287,10 +297,10 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
     type: 'IncreaseTR',
     player: state.player,
     from: state.playerState[state.player].TR,
-    to: state.playerState[state.player].TR + n,
+    to: state.playerState[state.player].TR + steps,
   })
 
-  state.playerState[state.player].TR += n
+  state.playerState[state.player].TR += steps
   state.playerState[state.player].hasIncreasedTRThisGeneration = true
 
   let newState = state
@@ -332,6 +342,9 @@ export const PlaceOceans = () => (state: GameState, action, choice): GameState =
   state.playerState[state.player].TR += 1
   state.playerState[state.player].hasIncreasedTRThisGeneration = true
   state.globalParameters.Oceans += 1
+
+  state.globalParameters.Oceans = Math.min(state.globalParameters.Oceans, 9)
+
   return state
 }
 
@@ -815,6 +828,7 @@ const REGISTRY = {
   OffsetRequirements,
   // Choices only
   KeepCards,
+  MultiCost,
 }
 
 const fromJSON = obj => {

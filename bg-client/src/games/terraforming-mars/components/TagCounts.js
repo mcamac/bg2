@@ -33,7 +33,7 @@ export default connect(state => {
   played.forEach(card => {
     if (card.tags) {
       card.tags.forEach(tag => {
-        if (TAGS.indexOf(tag) !== -1) {
+        if (TAGS.indexOf(tag) !== -1 && (tag === 'Event' || card.tags.indexOf('Event') === -1)) {
           tagCounts[tag] += 1
         }
       })

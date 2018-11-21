@@ -210,6 +210,7 @@ let ChoicesBar = props => (
     {props.card}:
     <pre style={{maxWidth: 400, overflowX: 'scroll'}}>{JSON.stringify(props.choice)}</pre>
     {props.choice.type === 'number' && <Input />}
+    {props.choice.type === 'cost' && <ChooseResources cost={props.choice.cost} />}
     {props.choice.confirm && <Button onClick={props.onDone}>Done</Button>}
   </React.Fragment>
 )

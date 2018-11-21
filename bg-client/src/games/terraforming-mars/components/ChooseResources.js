@@ -25,7 +25,7 @@ const ResourceInput = styled.input`
 
 let ChooseResources = props => (
   <React.Fragment>
-    Cost: {props.card.cost} (total {props.total})
+    Cost: {props.cost} (total {props.total})
     <Flex mr={1} align="center">
       <Tag name="Money" />
       <ResourceInput value={props.count.money} onChange={e => props.setMoney(e.target.value)} />
@@ -49,11 +49,11 @@ let ChooseResources = props => (
 )
 
 ChooseResources = compose(
-  connect(state => ({
-    card: getCardByName(state.ui.action.card),
+  connect((state, props) => ({
+    cost: props.cost || getCardByName(state.ui.action.card).cost,
     resourceValues: state.game.playerState[state.player].conversions,
   })),
-  withStateHandlers(props => ({count: {money: props.card.cost, titanium: 0, steel: 0}}), {
+  withStateHandlers(props => ({count: {money: props.cost, titanium: 0, steel: 0}}), {
     setMoney: state => money => ({...state, count: {...state.count, money}}),
     setSteel: state => steel => ({...state, count: {...state.count, steel}}),
     setTitanium: state => titanium => ({...state, count: {...state.count, titanium}}),

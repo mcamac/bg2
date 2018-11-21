@@ -50,13 +50,17 @@ let Tile = props => {
         />
       )}
       {tile &&
-        (!isOcean([props.x, props.y]) || tile.type === 'greenery') && (
+        tile.type !== 'ocean' && (
           <rect
             x={xc - 5}
             y={yc - 5}
             width={10}
             height={10}
-            fill={PLAYER_COLORS[props.players.indexOf(tile.owner)]}
+            fill={
+              tile.owner !== '__NEUTRAL'
+                ? PLAYER_COLORS[props.players.indexOf(tile.owner)]
+                : 'black'
+            }
           />
         )}
     </g>

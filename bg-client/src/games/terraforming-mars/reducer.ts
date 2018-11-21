@@ -132,6 +132,7 @@ const NEEDS_CHOICE = {
   PlaceOceans: () => ({type: 'tile', tileType: TileType.Ocean}),
   PlaceGreenery: () => ({type: 'tile', tileType: TileType.Greenery}),
   PlaceGreeneryOnOcean: () => ({type: 'tile', tileType: TileType.Greenery}),
+  PlaceMohole: () => ({type: 'tile', tileType: TileType.MoholeArea}),
   PlaceNaturalPreserve: () => ({type: 'tile', tileType: TileType.NaturalPreserve}),
   PlaceCity: () => ({type: 'tile', tileType: TileType.City}),
   PlaceIndustrialCenter: () => ({type: 'tile', tileType: TileType.IndustrialCenter}),
@@ -144,7 +145,7 @@ const NEEDS_CHOICE = {
   DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
   DecreaseAnyInventory: () => ({type: 'player', text: 'Choose player to remove ...'}),
   ChooseX: () => ({type: 'number'}),
-  MultiCost: () => ({type: 'cost'}),
+  MultiCost: (cost, resourceTypes) => ({type: 'cost', cost, resourceTypes}),
   ChangeAnyCardResource: (count, resource) => ({
     type: 'playedCard',
     resource,
@@ -394,6 +395,15 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
         ...state.choices,
         {
           cards: Object.keys(state.choice.chosen).filter(key => state.choice.chosen[key]),
+        },
+      ]
+    }
+
+    if (state.choice.type === 'cost' && action.type === 'UI_SET_CARD_COST') {
+      newChoices = [
+        ...state.choices,
+        {
+          resources: action.resources,
         },
       ]
     }

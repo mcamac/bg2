@@ -1,5 +1,5 @@
 import {getInitialGameState} from '../index'
-import {UserAction, ResourceType} from '../types'
+import {UserAction, ResourceType, TileType} from '../types'
 import {handleAction} from '../index'
 
 const TEST_SEED = 'martin'
@@ -32,6 +32,9 @@ export const getStateAfterActions = () => {
 export const getSoloStateAfterActions = (seed: string) => {
   let state = getInitialGameState(['a'], seed || TEST_SEED)
   state.firstPlayer = 'a'
+
+  // todo: place two cities and greeneries randomly
+  state.map['-2,2'] = {type: TileType.City, owner: '__NEUTRAL'}
 
   handleAction(state, {
     type: UserAction.CorpAndCardsChoice,
