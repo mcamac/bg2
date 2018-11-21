@@ -1077,7 +1077,7 @@ export const CARDS: Card[] = [
     type: 'Automated',
     deck: 'Corporate',
     tags: ['Building'],
-    vp: ['CommericalDistrict'],
+    vp: ['CommercialDistrict'],
     placeTiles: true,
     effectText:
       'Decrease your energy production 1 step and increase your MC production 4 steps. Place [the commercial district] tile. 1 VP PER ADJACENT CITY TILE.',
@@ -2155,7 +2155,7 @@ export const CARDS: Card[] = [
     type: 'Active',
     deck: 'Corporate',
     actionText: '[Effect: ]Opponents may not remove your [plants, animals or microbes]',
-    effects: [['ApplyStatus', 'ProtectedHabitats']],
+    effects: [['ProtectedHabitats']],
   },
   {
     name: 'Protected Valley',
