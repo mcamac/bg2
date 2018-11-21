@@ -475,7 +475,7 @@ const TerraformingMars = props => {
           </Box>
         </Box>
 
-        <Box px={2} style={{background: '#fafafa'}}>
+        <Box px={2} style={{background: '#fafafa', overflowY: 'scroll'}}>
           <Box py={1} style={{fontSize: 12, color: '#555'}}>
             PLAYED
           </Box>
@@ -490,6 +490,7 @@ const TerraformingMars = props => {
                   key={name}
                   name={name}
                   collapsed
+                  isUsed={props.game.playerState[props.player].cardActionsUsedThisGeneration[name]}
                   resources={props.game.playerState[props.player].cardResources[name]}
                 />
               ))}

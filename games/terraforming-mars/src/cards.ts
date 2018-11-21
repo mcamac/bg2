@@ -842,7 +842,7 @@ export const CARDS: Card[] = [
     effectText:
       'Decrease your energy production 1 step and increase your steel production 2 steps.',
     effects: [
-      ['ChangeProduction', 1, ResourceType.Energy],
+      ['ChangeProduction', -1, ResourceType.Energy],
       ['ChangeProduction', 2, ResourceType.Steel],
     ],
   },

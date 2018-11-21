@@ -27,7 +27,7 @@ let CardActions = props => (
         onClick={props.enabled && (() => props.onAction(i))}
       >
         <Box mr="4px" style={{color: '#555'}}>
-          ACTION:
+          ACTION{props.isUsed && ' (Used)'}:
         </Box>
         {action.map(([effect, ...args], j) => (
           <Box key={j} align="center">

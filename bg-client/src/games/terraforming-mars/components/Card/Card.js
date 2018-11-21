@@ -27,7 +27,12 @@ let Card = props => (
       <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
     </Flex>
     {props.card.actions && (
-      <CardActions enabled={props.played} actions={props.card.actions} card={props.card} />
+      <CardActions
+        isUsed={props.isUsed}
+        enabled={props.played}
+        actions={props.card.actions}
+        card={props.card}
+      />
     )}
     <Flex px="5px" mt="5px" direction="column">
       <Flex align="center">
@@ -41,6 +46,12 @@ let Card = props => (
         )}
         {props.card.afterTileTriggers && (
           <CardTileTriggers triggers={props.card.afterTileTriggers} card={props.card} />
+        )}
+        {props.resources && (
+          <Box>
+            {props.resources && typeof props.resources === 'number' && props.resources}{' '}
+            <Icon g={props.card.resourceHeld} />
+          </Box>
         )}
         {props.card.vp && <CardVP card={props.card} />}
       </Flex>

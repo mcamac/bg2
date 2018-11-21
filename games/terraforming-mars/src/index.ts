@@ -443,13 +443,13 @@ export const turnActionHandlers = {
     playerState.played.push(cardName)
     pull(playerState.hand, cardName)
 
+    // Clear any "next card effects" from the player state
+    if (playerState.nextCardEffect) playerState.nextCardEffect = []
+
     // Card effects (read choices)
     if (card.effects) {
       state = applyEffects(state, action, card.effects, card)
     }
-
-    // Clear any "next card effects" from the player state
-    if (playerState.nextCardEffect) playerState.nextCardEffect = []
 
     // After-card triggers
     state = applyAfterCardTriggers(state, card, state.player)

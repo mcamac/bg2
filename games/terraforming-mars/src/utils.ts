@@ -379,7 +379,6 @@ export const PlaceMiningRights = () => (state: GameState, action, choice): GameS
 }
 
 export const PlaceIndustrialCenter = () => (state: GameState, action, choice): GameState => {
-  // todo: check adjacency
   if (!isAdjacentToType(state, choice.location, TileType.City)) {
     throw Error('Not adjacent to city.')
   }
@@ -387,7 +386,7 @@ export const PlaceIndustrialCenter = () => (state: GameState, action, choice): G
 }
 
 export const PlaceGreenery = () => (state: GameState, action, choice): GameState => {
-  // todo: check adjacency
+  // todo: check adjacency (if possible)
   state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
   state.globalParameters.Oxygen += 1
   state.playerState[state.player].TR += 1
