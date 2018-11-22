@@ -4,7 +4,6 @@ import {connect} from 'react-redux'
 import {compose, branch, renderNothing} from 'recompose'
 
 import GameLobby from './GameLobby'
-import {db} from '../firebase'
 import PowerGrid from '../games/power-grid'
 import TerraformingMars from '../games/terraforming-mars/index'
 
@@ -17,20 +16,9 @@ class Game extends Component {
 }
 
 export default compose(
-  connect(
-    (state, props) => ({
-      lobby: state.lobby,
-      game: get(['lobby', 'game'], state),
-    }),
-    (dispatch, props) => ({
-      onFirebaseUpdate: data => {
-        dispatch({
-          type: 'FIREBASE_UPDATE',
-          data,
-          room: props.match.params.uid,
-        })
-      },
-    })
-  ),
+  connect((state, props) => ({
+    lobby: state.lobby,
+    game: get(['lobby', 'game'], state),
+  })),
   branch(props => !props.lobby, renderNothing)
 )(Game)

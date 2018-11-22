@@ -7,7 +7,6 @@ import pg, {
 import {cloneDeep, get, set, unset} from 'lodash/fp'
 const INITIAL_STATE = getInitialState(['monsk', 'viz'])
 import {socket} from '../../network'
-import {db} from '../../firebase'
 
 export const gameReducer = (state = INITIAL_STATE, action, lobby) => {
   if (handlers[action.type]) {
