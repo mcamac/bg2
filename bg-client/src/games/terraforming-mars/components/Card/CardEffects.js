@@ -34,11 +34,11 @@ const ChangeCardResource = (value, card) => (
   </Flex>
 )
 
-const ChangeAnyCardResource = (value, resource) => (
+const ChangeAnyCardResource = (value, resource, min) => (
   <Flex align="center">
-    <Box>{withSign(value)}</Box>
-    {typeof resource === 'string' ? <Icon g={resource} /> : resource}
-    {resource === null ? ' resource on ' : null} <Box> any card</Box>
+    <Box>{withSign(value)}</Box> {typeof resource === 'string' ? <Icon g={resource} /> : resource}
+    {resource === null ? ' res. on ' : null} <Box> any card</Box>
+    {min ? ` with at least ${min} res.` : null}
   </Flex>
 )
 

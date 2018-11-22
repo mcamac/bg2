@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
+import {pure} from 'recompose'
 
 const events = {
   start: [
@@ -92,7 +93,7 @@ class AnimateOnChange extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('here', nextProps.animate(nextProps))
+    // console.log('here', nextProps.animate(nextProps))
     this.setState({animate: nextProps.animate(nextProps)})
   }
 
@@ -121,3 +122,9 @@ AnimateOnChange.propTypes = {
 }
 
 export default AnimateOnChange
+
+export const Count = pure(props => (
+  <AnimateOnChange baseClassName="Score" animationClassName="test--bounce" animate={() => true}>
+    {props.value}
+  </AnimateOnChange>
+))

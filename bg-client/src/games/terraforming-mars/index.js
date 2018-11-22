@@ -25,7 +25,7 @@ import {Tag} from './components'
 
 import {getCardByName} from '../../../../games/terraforming-mars/src/cards'
 import {Phase} from '../../../../games/terraforming-mars/src/types'
-import AnimateOnChange from './animator'
+import {Count} from './animator'
 
 import ChooseResources from './components/ChooseResources'
 import StandardProjects from './components/StandardProjects'
@@ -45,14 +45,6 @@ const Wrapper = styled(Flex)`
 `
 
 const signed = n => (n > 0 ? `+${n}` : `${n}`)
-
-let Count = props => (
-  <AnimateOnChange baseClassName="Score" animationClassName="test--bounce" animate={() => true}>
-    {props.value}
-  </AnimateOnChange>
-)
-
-Count = pure(Count)
 
 let PlayerCard = props => (
   <Box
@@ -137,7 +129,8 @@ PlayerCard = connect(
   })
 )(PlayerCard)
 
-const Button = styled(Box)`
+const Button = styled.button`
+  font-size: 1em;
   padding: 3px 8px;
   margin-left: 8px;
   cursor: pointer;
@@ -407,9 +400,21 @@ const TerraformingMars = props => {
           Terraforming Mars
         </Box>
 
-        <Box style={{fontSize: 14}} mb={1}>
+        <Flex align="center" style={{fontSize: 14, flex: '1 1 auto'}}>
           Generation {props.game.generation}
-        </Box>
+        </Flex>
+        <Flex px={2} align="center">
+          Debug
+          <Button
+            onClick={() =>
+              window.socket.send({
+                room: window.location.pathname.split('/')[2],
+                action: 'ROOM_START',
+              })}
+          >
+            Reset
+          </Button>
+        </Flex>
       </Flex>
       <Flex flex="1 1 auto">
         <Flex

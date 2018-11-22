@@ -318,16 +318,20 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
 }
 
 export const RaiseOxygen = (delta: number) => (state: GameState, action, choice): GameState => {
+  const from = state.globalParameters.Oxygen
+  const to = Math.min(state.globalParameters.Oxygen + delta, 14)
+  const change = to - from
+
   state.log.push({
     type: 'RaiseOxygen',
     player: state.player,
-    from: state.globalParameters.Oxygen,
-    to: state.globalParameters.Oxygen + delta,
+    from,
+    to,
   })
 
-  state.globalParameters.Oxygen += 1
-  state.playerState[state.player].TR += 1
-  state.playerState[state.player].hasIncreasedTRThisGeneration = true
+  state.globalParameters.Oxygen = to
+  state.playerState[state.player].TR += change
+  state.playerState[state.player].hasIncreasedTRThisGeneration = change > 0
   return state
 }
 
