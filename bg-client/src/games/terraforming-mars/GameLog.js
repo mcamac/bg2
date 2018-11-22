@@ -46,8 +46,13 @@ const ChangeInventory = props => (
 )
 
 const Cede = props => <Flex>{props.player} ceded.</Flex>
-
 const Pass = props => <Flex>{props.player} passed.</Flex>
+
+const CorpChoice = props => (
+  <Flex>
+    {props.player} chose {props.corporation}.
+  </Flex>
+)
 
 const BuyCards = props => (
   <Flex>
@@ -62,6 +67,7 @@ const NewGeneration = props => (
 )
 
 const LOG_REGISTRY = {
+  CorpChoice,
   ProductionChange,
   ChangeInventory,
   PlayCard,

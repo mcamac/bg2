@@ -489,6 +489,12 @@ export const handlers = {
     state.playerState[action.player].resources[ResourceType.Money].count = corporation.startingMoney
     delete state.choosingCorporations[action.player]
 
+    state.log.push({
+      type: 'CorpChoice',
+      player: action.player,
+      corporation: corporation.name,
+    })
+
     // Buy and possibly pay for cards
     const cardsAreFree = corporation.name === 'Beginner Corporation'
     state = buyCards(state, action.player, action.cards, cardsAreFree)
