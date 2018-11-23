@@ -74,3 +74,9 @@ export const calculatePlayerVP = (state: GameState, player: Player) => {
 
   return vp
 }
+
+export const getVP = (state: GameState) => {
+  const vp = {}
+  state.players.forEach(player => (vp[player] = calculatePlayerVP(state, player)))
+  return vp
+}

@@ -164,6 +164,8 @@ export const enum Phase {
   Draft = 'Draft',
   FinalGreenery = 'FinalGreenery',
 
+  Finished = 'Finished',
+
   // User choices to be made.
   Choices = 'Choices',
 }
@@ -208,6 +210,8 @@ export interface AwardFunding {
 export interface GameState {
   phase: string
   generation: number
+  isLastGeneration: boolean
+  isOver: boolean
   players: Player[]
   firstPlayer: Player
   playerState: {
@@ -238,6 +242,8 @@ export interface GameState {
   }
 
   log: any[]
+
+  vp?: any
 }
 
 export const enum CardResource {

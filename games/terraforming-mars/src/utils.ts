@@ -317,7 +317,7 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
   return newState
 }
 
-export const RaiseOxygen = (delta: number) => (state: GameState, action, choice): GameState => {
+export const RaiseOxygen = (delta: number) => (state: GameState, action?, choice?): GameState => {
   const from = state.globalParameters.Oxygen
   const to = Math.min(state.globalParameters.Oxygen + delta, 14)
   const change = to - from
@@ -405,9 +405,7 @@ export const PlaceIndustrialCenter = () => (state: GameState, action, choice): G
 export const PlaceGreenery = () => (state: GameState, action, choice): GameState => {
   // todo: check adjacency (if possible)
   state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
-  state.globalParameters.Oxygen += 1
-  state.playerState[state.player].TR += 1
-  state.playerState[state.player].hasIncreasedTRThisGeneration = true
+  state = RaiseOxygen(1)(state)
   return state
 }
 
@@ -419,9 +417,7 @@ export const KeepCards = cards => (state: GameState, action, choice): GameState 
 export const PlaceGreeneryOnOcean = () => (state: GameState, action, choice): GameState => {
   if (!isOcean(choice.location)) throw Error('Not an ocean tile.')
   state = placeTile(state, {owner: state.player, type: TileType.Greenery}, choice.location)
-  state.globalParameters.Oxygen += 1
-  state.playerState[state.player].TR += 1
-  state.playerState[state.player].hasIncreasedTRThisGeneration = true
+  state = RaiseOxygen(1)(state)
   return state
 }
 

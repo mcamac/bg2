@@ -337,6 +337,30 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       return UI_STATE
     }
   }
+
+  if (game.phase === 'FinalGreenery') {
+    if (action.type === 'UI_PLANT_GREENERY') {
+      const [choices, nextChoice] = getNextChoice([['PlaceGreenery']], [])
+      return {
+        ...state,
+        phase: 'Choices',
+        choiceSource: 'Greenery',
+        choice: nextChoice,
+        choices,
+        effects: [['PlaceGreenery']],
+        action: {
+          type: UserAction.Action,
+          actionType: TurnAction.PlantGreenery,
+        },
+      }
+    }
+
+    if (action.type === 'UI_PASS') {
+      action.asyncDispatch({type: UserAction.Pass})
+      return state
+    }
+  }
+
   if (state.phase === 'CardCost') {
     if (action.type === 'UI_SET_CARD_COST') {
       const card = getCardByName(state.action.card)

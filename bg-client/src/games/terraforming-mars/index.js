@@ -242,6 +242,7 @@ let ActionBar = props => (
     </Flex>
     {props.game.phase === 'Choices' && <GameChoicesBar />}
     {props.game.phase === 'Actions' && props.ui.phase === 'Game' && <ActionsStatus />}
+    {props.game.phase === 'FinalGreenery' && props.ui.phase === 'Game' && <ActionsStatus />}
     {props.game.phase === 'CardBuying' && <CardBuyingStatus />}
     {props.ui.phase === 'CardCost' && <ChooseResources />}
     {props.ui.phase === 'Choices' && <ChoicesBar />}

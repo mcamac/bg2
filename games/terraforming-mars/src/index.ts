@@ -39,6 +39,7 @@ import {
 } from './utils'
 import {CORPORATIONS, getCorporationByName} from './corporations'
 import {STANDARD_PROJECTS} from './projects'
+import {getVP} from './vp'
 
 const c = (...args: Transform[]): Transform => (state, action) => {
   let newState = state
@@ -155,6 +156,9 @@ export const getInitialGameState = (players: Player[], seed: string = SEED): Gam
   let state = {
     phase: Phase.ChoosingCorporations,
     generation: 1,
+    isLastGeneration: false,
+    isOver: false,
+
     players,
     firstPlayer: players[0],
     playerState: <{[key: string]: PlayerState}>{},
@@ -331,9 +335,22 @@ const haveAllPassed = state => {
 
 const switchToNextPlayer = (state: GameState) => {
   if (haveAllPassed(state)) {
+    if (state.phase === Phase.FinalGreenery) {
+      state.isOver = true
+      state.phase = Phase.Finished
+      state.vp = getVP(state)
+      return state
+    }
+
     // Generation over
     state = generationProduction(state)
     state = resetNewGeneration(state)
+
+    if (state.isLastGeneration) {
+      state.phase = Phase.FinalGreenery
+      return state
+    }
+
     state = setupDraft(state)
     state.phase = Phase.Draft
 
@@ -532,6 +549,15 @@ export const handlers = {
       return state
     }
 
+    // Check endgame conditions.
+    if (
+      state.globalParameters.Oceans === 9 &&
+      state.globalParameters.Heat === 8 &&
+      state.globalParameters.Oxygen === 14
+    ) {
+      state.isLastGeneration = true
+    }
+
     state.actionsDone++
     if (state.actionsDone === 2) {
       // Get next player.
@@ -574,6 +600,8 @@ export const handlers = {
   },
 
   [UserAction.Pass]: (state, action) => {
+    if (!(state.phase === Phase.Actions || state.phase === Phase.FinalGreenery))
+      throw Error('Invalid phase')
     if (action.player && action.player !== state.player) throw Error('Invalid player')
 
     state.log.push({
