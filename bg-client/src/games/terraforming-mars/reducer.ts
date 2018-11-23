@@ -140,6 +140,7 @@ const NEEDS_CHOICE = {
   PlaceRestrictedArea: () => ({type: 'tile', tileType: TileType.RestrictedArea}),
   PlaceMiningRights: () => ({type: 'tile', tileType: TileType.MiningRights}),
   PlaceNuclearZone: () => ({type: 'tile', tileType: TileType.NuclearZone}),
+  PlaceLavaFlows: () => ({type: 'tile', tileType: TileType.LavaFlows}),
   LandClaim: () => ({type: 'tile', tileType: TileType.LandClaim}),
   SellCards: () => ({type: 'cards', text: 'Choose cards to sell.', chosen: {}, confirm: true}),
   DecreaseAnyProduction: () => ({type: 'player', text: 'Choose player to remove ...'}),
