@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Router, Route, Switch} from 'react-router-dom'
 import {Provider} from 'react-redux'
+import {hot} from 'react-hot-loader'
 import store from './pages/store'
 import history from './history'
 
@@ -46,4 +47,4 @@ class App extends Component {
   }
 }
 
-export default App
+export default hot(module)(App)
