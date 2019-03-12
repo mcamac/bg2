@@ -41,13 +41,13 @@ import {getStateAfterActions} from '../src/fixtures'
 const TEST_SEED = 'martin'
 
 // Discounts
-test(t => {
+test('Discounts: Research Outpost', t => {
   const played = ['Research Outpost'].map(C)
   const card = C('Black Polar Dust')
   t.is(getDiscount(played, null, null, card), 1)
 })
 
-test(t => {
+test('Discounts: Stacking', t => {
   const played = ['Quantum Extractor', 'Research Outpost'].map(C)
   const card = C('Optimal Aerobraking')
   t.is(getDiscount(played, null, null, card), 3)
@@ -69,16 +69,13 @@ test('Production', t => {
   t.deepEqual(state.playerState['a'].resources[ResourceType.Energy].count, 2)
 })
 
-// Initial state
-test(t => {
+test('Initial State', t => {
   const state = getInitialGameState(['a', 'b', 'c', 'd'], TEST_SEED)
   t.is(state.choosingCards['a'].length, 10)
   t.is(state.choosingCards['c'][0], 'Nitrophilic Moss')
 })
 
-// Card buying
-
-test(t => {
+test('Card Buying', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.playerState['a'].resources[ResourceType.Money].count = 30
   state.playerState['b'].resources[ResourceType.Money].count = 30
@@ -95,9 +92,7 @@ test(t => {
   t.is(state.phase, Phase.Actions)
 })
 
-// Player state
-
-test(t => {
+test('Player state', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   const client = getClientState(state, 'a')
 
@@ -109,7 +104,7 @@ test(t => {
 
 // Playing cards: checking card requirements
 
-test(t => {
+test('Playing cards: Requirements', t => {
   // Make sure returns "true" if there is no requirements
   let testCardNoRequirements = {
     cost: 0,
@@ -843,7 +838,7 @@ test('Algae (fail)', t => {
 
 // Effects
 
-test(t => {
+test('Effects', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30

@@ -8,7 +8,7 @@ const TEST_SEED = 'martin'
 
 // Fund award
 
-test(t => {
+test('Fund award', t => {
   let state = getInitialGameState(['a', 'b'], TEST_SEED)
   state.player = 'a'
   state.playerState['a'].resources[ResourceType.Money].count = 30

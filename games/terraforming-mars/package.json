@@ -7,10 +7,10 @@
     "shuffle-seed": "^1.1.6"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.91",
-    "@types/node": "^8.5.2",
-    "ava": "^0.23.0",
-    "typescript": "^2.6.2"
+    "@types/lodash": "^4.14.123",
+    "@types/node": "^11.11.2",
+    "ava": "^1.3.1",
+    "typescript": "^3.3.3333"
   },
   "scripts": {
     "test": "tsc && ava ./test/*.js"

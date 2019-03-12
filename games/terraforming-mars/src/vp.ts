@@ -53,10 +53,10 @@ export const calculatePlayerVP = (state: GameState, player: Player) => {
   vp += GetPlayerGreeneries(player)(state)
 
   // VP from cities.
-  toPairs(state.map).forEach((key, tile) => {
+  toPairs(state.map).forEach(([key, tile]) => {
     if (key === SpecialCity.GanymedeColony || key === SpecialCity.PhobosSpaceHaven) return
 
-    if (tile.player === player && tile.type === TileType.City) {
+    if (tile.owner === player && tile.type === TileType.City) {
       // vp += player
       const adjacentPositions = getAdjacentTiles(makePositionFromKey(key))
       const adjacentTiles = adjacentPositions.map(pos => state.map[makeKeyFromPosition(pos)])
