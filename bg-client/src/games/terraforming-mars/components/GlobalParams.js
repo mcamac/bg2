@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {Count} from '../animator'
 
 let GlobalParams = props => (
-  <Box style={{fontSize: 14}} mb={3}>
+  <Box style={{fontSize: 14}} mb={2}>
     <Box mb="3px" style={{borderBottom: '1px solid #555'}}>
       Globals
     </Box>

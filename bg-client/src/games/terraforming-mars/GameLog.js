@@ -60,9 +60,21 @@ const BuyCards = props => (
   </Flex>
 )
 
+const Draw = props => (
+  <Flex>
+    {props.player} drew {props.n} {props.n !== 1 ? 'cards' : 'card'}.
+  </Flex>
+)
+
 const NewGeneration = props => (
   <Flex py={2}>
     <b>Generation {props.n}</b>
+  </Flex>
+)
+
+const PlaceOceans = props => (
+  <Flex>
+    {props.player} placed {props.n || 1} {(props.n || 1) === 1 ? 'ocean' : 'oceans'}.
   </Flex>
 )
 
@@ -76,8 +88,10 @@ const LOG_REGISTRY = {
   IncreaseTR,
   Cede,
   Pass,
+  Draw,
   BuyCards,
   NewGeneration,
+  PlaceOceans,
 }
 
 const LogLine = props => {

@@ -15,6 +15,8 @@ export const OCEAN_POSITIONS: Position[] = [
   [4, -4],
 ]
 
+export const MAX_OCEANS = 9
+
 export const VOLCANO_POSITIONS: Position[] = [[-4, 0], [-4, 1], [-4, 2], [-3, 3]]
 
 export const RESOURCE_BONUSES = {

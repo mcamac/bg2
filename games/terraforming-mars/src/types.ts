@@ -268,6 +268,14 @@ export const enum Milestones {
   Planner = 'Planner',
 }
 
+export const MILESTONES = [
+  Milestones.Terraformer,
+  Milestones.Mayor,
+  Milestones.Gardener,
+  Milestones.Builder,
+  Milestones.Planner,
+]
+
 export const enum Awards {
   Landlord = 'Landlord',
   Banker = 'Banker',
@@ -275,6 +283,14 @@ export const enum Awards {
   Thermalist = 'Thermalist',
   Miner = 'Miner',
 }
+
+export const AWARDS = [
+  Awards.Landlord,
+  Awards.Banker,
+  Awards.Scientist,
+  Awards.Thermalist,
+  Awards.Miner,
+]
 
 export const enum StandardProject {
   SellPatents = 'SellPatents',

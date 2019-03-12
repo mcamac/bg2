@@ -17,7 +17,7 @@ const TAGS = [
 ]
 
 const TagCounts = props => (
-  <Flex>
+  <Flex style={{flexWrap: 'wrap', maxWidth: 240}}>
     {TAGS.map(tag => (
       <Flex mr={1}>
         <Tag name={tag} /> {props.counts[tag]}

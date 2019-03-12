@@ -477,14 +477,14 @@ const TerraformingMars = props => {
             </Box>
           </Flex>
 
-          <Box>
-            <TagCounts />
-          </Box>
         </Box>
 
         <Box px={2} style={{background: '#fafafa', overflowY: 'scroll'}}>
           <Box py={1} style={{fontSize: 12, color: '#555'}}>
             PLAYED
+          </Box>
+          <Box mb={1}>
+            <TagCounts />
           </Box>
           <Flex>
             <Box>

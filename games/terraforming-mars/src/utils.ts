@@ -29,6 +29,7 @@ import {
 import {getCardByName} from './cards'
 import {draw} from './deck'
 import {getCorporationByName} from './corporations'
+import {MAX_OCEANS} from './constants'
 
 export const MultiCost = (cost: number, otherResources: ResourceType[]) => (
   state: GameState,
@@ -274,7 +275,7 @@ export const IncreaseTemperature = (n: number) => (state: GameState, action, cho
   if (state.globalParameters.Heat < 0 && state.globalParameters.Heat + 2 * n >= 0) {
     // todo: should be part of state machine
     // Player gets to place an ocean if any left.
-    if (state.globalParameters.Oceans < 9) {
+    if (state.globalParameters.Oceans < MAX_OCEANS) {
       state.playerState[state.player].choices.push({
         type: 'PlaceOcean',
         effects: [['PlaceOceans']],
@@ -342,12 +343,16 @@ export const PlaceOceans = () => (state: GameState, action, choice): GameState =
   })
 
   if (!isOcean(choice.location)) throw Error('Not an ocean tile')
+  if (state.globalParameters.Oceans >= MAX_OCEANS) {
+    return state
+  }
+
   state = placeTile(state, {owner: state.player, type: TileType.Ocean}, choice.location)
   state.playerState[state.player].TR += 1
   state.playerState[state.player].hasIncreasedTRThisGeneration = true
   state.globalParameters.Oceans += 1
 
-  state.globalParameters.Oceans = Math.min(state.globalParameters.Oceans, 9)
+  state.globalParameters.Oceans = Math.min(state.globalParameters.Oceans, MAX_OCEANS)
 
   return state
 }
@@ -515,7 +520,7 @@ export const Choice = (args: any[]) => (state: GameState, action, choice): GameS
   return state
 }
 
-export const Branch = (predicate: ((state: GameState) => boolean), ifTrue, ifFalse) => (
+export const Branch = (predicate: (state: GameState) => boolean, ifTrue, ifFalse) => (
   state: GameState,
   action
 ): GameState => {
