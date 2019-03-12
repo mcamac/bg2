@@ -78,6 +78,13 @@ const PlaceOceans = props => (
   </Flex>
 )
 
+const RaiseOxygen = props => (
+
+  <Flex>
+    {props.player} raised <Icon g='Oxygen' /> from {props.from} to {props.to}.
+  </Flex>
+)
+
 const LOG_REGISTRY = {
   CorpChoice,
   ProductionChange,
@@ -85,6 +92,7 @@ const LOG_REGISTRY = {
   PlayCard,
   StandardProject,
   IncreaseTemperature,
+  RaiseOxygen,
   IncreaseTR,
   Cede,
   Pass,

@@ -42,13 +42,12 @@ let Tile = props => {
   const tile = props.map[`${props.x},${props.y}`]
   const bonuses = RESOURCE_BONUSES[`${props.x},${props.y}`]
   return (
-    <g>
+    <g onClick={() => props.onClick([props.x, props.y])}>
       <polygon
         stroke="black"
         fill={props.hovered ? '#eee' : isOcean([props.x, props.y]) ? '#daf1ff' : 'transparent'}
         onMouseEnter={() => props.setHovered(true)}
         onMouseLeave={() => props.setHovered(false)}
-        onClick={() => props.onClick([props.x, props.y])}
         points={hexPoints(xc, yc, RADIUS)}
       />
       {!tile && bonuses && bonuses.map((bonus, i) => <text fill='#999' x={xc + i * 12 - 12} y={yc} style={{fontFamily: 'icomoon'}} dangerouslySetInnerHTML={{__html: BONUS_TO_ICON[bonus]}}>
