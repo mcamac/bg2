@@ -38,9 +38,13 @@ const TAG_COLORS = {
   Money: 'yellow',
 }
 
+const NAME_ALIAS = {
+  Power: 'Energy'
+}
+
 const Tag = props => (
   <Circle color={TAG_COLORS[props.name] || 'blue'}>
-    <Icon g={props.name} style={{marginTop: 2}} />
+    <Icon g={NAME_ALIAS[props.name] || props.name} style={{marginTop: 2}} />
   </Circle>
 )
 
