@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   devtool: 'source-map',
   entry: {
-    app: ['babel-polyfill', 'react-hot-loader/patch', './src/index'],
+    app: ['@babel/polyfill', 'react-hot-loader/patch', './src/index'],
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -16,7 +16,7 @@ module.exports = {
   },
   module: {
     rules: [
-      {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
+      {test: /\.js$/, exclude: /node_modules/, loaders: ['babel-loader', 'react-hot-loader/webpack']},
       {test: /\.(png|svg)$/, loader: 'file-loader'},
       {
         test: /\.css$/,
@@ -41,7 +41,7 @@ module.exports = {
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.entry = {
-    app: ['babel-polyfill', './src/index'],
+    app: ['@babel/polyfill', './src/index'],
   }
 
   module.exports.plugins.push(new UglifyJSPlugin())
