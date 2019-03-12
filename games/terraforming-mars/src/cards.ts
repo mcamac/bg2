@@ -652,8 +652,8 @@ export const CARDS: Card[] = [
       [
         'Choice',
         [
-          ['ChangeAnyCardResource', 2, CardResource.Animals],
-          ['DecreaseAnyInventory', 5, ResourceType.Plant],
+          [['ChangeAnyCardResource', 2, CardResource.Animals]],
+          [['DecreaseAnyInventory', 5, ResourceType.Plant]],
         ],
       ],
     ],
@@ -1515,9 +1515,9 @@ export const CARDS: Card[] = [
       [
         'Choice',
         [
-          ['DecreaseAnyInventory', 3, ResourceType.Titanium],
-          ['DecreaseAnyInventory', 4, ResourceType.Steel],
-          ['DecreaseAnyInventory', 7, ResourceType.Money],
+          [['DecreaseAnyInventory', 3, ResourceType.Titanium]],
+          [['DecreaseAnyInventory', 4, ResourceType.Steel]],
+          [['DecreaseAnyInventory', 7, ResourceType.Money]],
         ],
       ],
     ],
@@ -2373,8 +2373,8 @@ export const CARDS: Card[] = [
       [
         'Choice',
         [
-          ['ChangeInventory', 4, ResourceType.Plant],
-          ['ChangeAnyCardResource', 2, CardResource.Animals],
+          [['ChangeInventory', 4, ResourceType.Plant]],
+          [['ChangeAnyCardResource', 2, CardResource.Animals]],
         ],
       ],
     ],
