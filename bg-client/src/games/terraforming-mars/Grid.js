@@ -2,7 +2,8 @@ import {range} from 'lodash/fp'
 import {withState} from 'recompose'
 import {connect} from 'react-redux'
 
-import {RESOURCE_BONUSES, OCEAN_POSITIONS} from '../../../../games/terraforming-mars/src/constants'
+import {ResourceBonus} from '../../../../games/terraforming-mars/src/types'
+import {RESOURCE_BONUSES} from '../../../../games/terraforming-mars/src/constants'
 import {chooseTile} from './reducer'
 import {isOcean} from '../../../../games/terraforming-mars/src/tiles'
 import {PLAYER_COLORS} from './constants'
@@ -28,10 +29,18 @@ const COLORS = {
   city: '#ccc',
 }
 
+const BONUS_TO_ICON = {
+  [ResourceBonus.Steel]: '&#xe901',
+  [ResourceBonus.Titanium]: '&#xe905',
+  [ResourceBonus.Plant]: '&#xe906',
+  [ResourceBonus.Card]: '&#xe913',
+}
+
 let Tile = props => {
   const xc = WIDTH / 2 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
   const yc = HEIGHT / 2 + 3 / 2 * RADIUS * -props.y
   const tile = props.map[`${props.x},${props.y}`]
+  const bonuses = RESOURCE_BONUSES[`${props.x},${props.y}`]
   return (
     <g>
       <polygon
@@ -42,6 +51,9 @@ let Tile = props => {
         onClick={() => props.onClick([props.x, props.y])}
         points={hexPoints(xc, yc, RADIUS)}
       />
+      {!tile && bonuses && bonuses.map((bonus, i) => <text fill='#999' x={xc + i * 12 - 12} y={yc} style={{fontFamily: 'icomoon'}} dangerouslySetInnerHTML={{__html: BONUS_TO_ICON[bonus]}}>
+        </text>)
+      }
       {tile && (
         <polygon
           stroke="black"

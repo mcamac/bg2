@@ -1,5 +1,4 @@
-import React, {Fragment, Component} from 'react'
-import styled from 'styled-components'
+import React from 'react'
 import {Flex, Box} from 'grid-styled'
 import {connect} from 'react-redux'
 import {compose, pure, withProps} from 'recompose'

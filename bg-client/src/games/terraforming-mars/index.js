@@ -468,8 +468,8 @@ const TerraformingMars = props => {
           <Flex>
             <Box>
               <GlobalParams />
-              <Milestones />
-              <Awards />
+              {props.game.players.length > 1 && <Milestones />}
+              {props.game.players.length > 1 && <Awards />}
               <StandardProjects />
             </Box>
             <Box flex="1 1 auto" style={{textAlign: 'center'}}>
@@ -504,17 +504,6 @@ const TerraformingMars = props => {
             </Box>
           </Flex>
         </Box>
-
-        {/* <Flex
-          direction="column"
-          w={270}
-          style={{minWidth: 270, borderLeft: '1px solid #ddd', background: '#fafafa'}}
-        >
-          <Box px={2} py={1} style={{fontSize: 12, color: '#555'}}>
-            GAME LOG
-          </Box>
-          <GameLog log={props.game.log} />
-        </Flex> */}
       </Flex>
     </Wrapper>
   )
