@@ -38,7 +38,7 @@ const ChangeAnyCardResource = (value, resource, min) => (
   <Flex align="center">
     <Box>{withSign(value)}</Box> {typeof resource === 'string' ? <Icon g={resource} /> : resource}
     {resource === null ? ' res. on ' : null} <Box> any card</Box>
-    {min ? ` with at least ${min} res.` : null}
+    {typeof min === 'number' ? ` with at least ${min} res.` : null}
   </Flex>
 )
 

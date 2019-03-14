@@ -251,9 +251,9 @@ export const CARDS: Card[] = [
       [
         'Choice',
         [
-          ['ChangeInventory', 3, ResourceType.Plant],
-          ['ChangeAnyCardResource', 3, CardResource.Microbes],
-          ['ChangeAnyCardResource', 2, 'Animals'],
+          [['ChangeInventory', 3, ResourceType.Plant]],
+          [['ChangeAnyCardResource', 3, CardResource.Microbes]],
+          [['ChangeAnyCardResource', 2, 'Animals']],
         ],
       ],
       ['PlaceOceans'],
@@ -960,7 +960,12 @@ export const CARDS: Card[] = [
       'Effect: When you play a plant, microbe, or an animal tag, including this, gain 1 plant or add 1 resource TO THAT CARD.',
     afterCardTriggers: [
       ['PlayedTagMatches', [[Tag.Plant], [Tag.Microbe], [Tag.Animal]]],
-      [['Choice', [['ChangeInventory', 1, ResourceType.Plant], ['ChangePlayedCardResource', 1]]]],
+      [
+        [
+          'Choice',
+          [[['ChangeInventory', 1, ResourceType.Plant]], [['ChangePlayedCardResource', 1]]],
+        ],
+      ],
     ],
   },
   {
@@ -2316,7 +2321,7 @@ export const CARDS: Card[] = [
     resourceHeld: CardResource.Science,
     afterCardTriggers: [
       ['PlayedTagMatches', [[Tag.Science]]],
-      [['Choice', [['ChangeCardResource', 1], [['ChangeCardResource', -1], ['Draw', 1]]]]],
+      [['Choice', [[['ChangeCardResource', 1]], [['ChangeCardResource', -1], ['Draw', 1]]]]],
     ],
   },
   {
