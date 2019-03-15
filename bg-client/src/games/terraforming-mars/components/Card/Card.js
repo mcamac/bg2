@@ -35,8 +35,11 @@ let Card = props => (
     )}
     <Flex px="5px" mt="5px" direction="column">
       <Flex align="center">
-        {props.card.effects &&
-          !props.collapsed && <CardEffects effects={props.card.effects} card={props.card} />}
+          {props.card.effects &&
+            !props.collapsed && 
+            <Flex mr={1} align='center'>
+                <CardEffects effects={props.card.effects} card={props.card} />
+            </Flex>}
         {props.card.discounts && (
           <CardDiscounts discounts={props.card.discounts} card={props.card} />
         )}

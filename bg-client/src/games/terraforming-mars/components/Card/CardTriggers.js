@@ -4,7 +4,7 @@ import {Flex, Box} from 'grid-styled'
 import CardEffects from './CardEffects'
 
 export const CardTriggers = props => (
-  <Flex ml={1} flex="1 1 auto" align="center">
+  <Flex flex="1 1 auto" align="center">
     {[props.triggers].map(([cond, effects], i) => (
       <Flex key={i} align="center">
         <CardEffects effects={[cond]} card={props.card} />:
@@ -16,7 +16,7 @@ export const CardTriggers = props => (
 
 export const CardTileTriggers = props => {
   return (
-    <Flex ml={1} flex="1 1 auto" align="center">
+    <Flex flex="1 1 auto" align="center">
       {props.triggers.map(([[type, yours], effects], i) => (
         <Flex key={i} align="center">
           when {yours ? 'your' : 'any'} {type}:

@@ -6,7 +6,7 @@ import Tag from '../Tag'
 import {withSign} from './utils'
 
 const CardDiscounts = props => (
-  <Flex ml={1} flex="1 1 auto" align="center">
+  <Flex flex="1 1 auto" align="center">
     {props.discounts.map(([discount, tags], i) => (
       <Flex align="center">
         <Flex>{withSign(-discount)} </Flex>
