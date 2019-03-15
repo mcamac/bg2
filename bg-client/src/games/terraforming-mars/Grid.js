@@ -20,7 +20,8 @@ const hexPoints = (x, y, radius) => {
   return points.join(' ')
 }
 const WIDTH = 400
-const HEIGHT = 400
+const HEIGHT_MAIN = 400
+const HEIGHT = 600
 const RADIUS = 24
 
 const COLORS = {
@@ -38,9 +39,10 @@ const BONUS_TO_ICON = {
 
 let Tile = props => {
   const xc = WIDTH / 2 + props.y * RADIUS * (Math.sqrt(3) / 2) + props.x * RADIUS * Math.sqrt(3)
-  const yc = HEIGHT / 2 + 3 / 2 * RADIUS * -props.y
-  const tile = props.map[`${props.x},${props.y}`]
-  const bonuses = RESOURCE_BONUSES[`${props.x},${props.y}`]
+  const yc = HEIGHT_MAIN / 2 + 3 / 2 * RADIUS * -props.y
+  const tileKey = props.name || `${props.x},${props.y}`
+  const tile = props.map[tileKey]
+  const bonuses = RESOURCE_BONUSES[tileKey]
   return (
     <g onClick={() => props.onClick([props.x, props.y])}>
       <polygon
@@ -95,6 +97,26 @@ let Grid = props => (
           />
         ))
       )}
+    </g>
+    <g>
+    <Tile
+      y={-6}
+      x={0}
+      name='Phobos Space Haven'
+      onClick={props.onClickTile}
+      players={props.players}
+      map={props.map}
+    />
+    <text x={75} y={450} fontSize={10} textAnchor='middle'>Phobos S.H.</text>
+    <Tile
+      y={-6}
+      x={6}
+      name='Ganymede Colony'
+      onClick={props.onClickTile}
+      players={props.players}
+      map={props.map}
+    />
+    <text x={325} y={450} fontSize={10} textAnchor='middle'>Ganymede C.</text>
     </g>
   </svg>
 )
