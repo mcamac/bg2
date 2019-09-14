@@ -289,7 +289,7 @@ const isDoneChoosingCorporations = (state: GameState): boolean => {
   return state.players.map(player => !state.choosingCorporations[player]).every(x => x)
 }
 
-const milestoneChecks: {[key: string]: ((s: GameState) => boolean)} = {
+const milestoneChecks: {[key: string]: (s: GameState) => boolean} = {
   [Milestones.Terraformer]: state => state.playerState[state.player].TR >= 35,
   [Milestones.Mayor]: HasPlayerCities(3),
   [Milestones.Gardener]: HasGreeneries(3),
@@ -478,7 +478,7 @@ export const turnActionHandlers = {
     const cardActions = card.actions
     if (!cardActions || !cardActions[action.index]) throw Error('Invalid action.')
     if (state.playerState[state.player].cardActionsUsedThisGeneration[action.card])
-      throw Error('Card already used.')
+      throw Error('Card action already used.')
 
     const effects = cardActions[action.index]
 

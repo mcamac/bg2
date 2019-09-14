@@ -93,8 +93,9 @@ export const uiChoosePlayer = player => ({
   player,
 })
 
-export const uiSubmitChoice = () => ({
+export const uiSubmitChoice = choice => ({
   type: 'UI_SUBMIT_CHOICE',
+  choice,
 })
 
 export const uiSubmitBuyChoice = () => ({
@@ -152,6 +153,7 @@ const NEEDS_CHOICE = {
     resource,
     text: 'Choose a card to remove ...',
   }),
+  Choice: choices => ({type: 'choice', choices}),
 }
 
 interface UIState {
@@ -277,6 +279,7 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
       }
 
       const [choices, nextChoice] = getNextChoice(effects, [])
+      console.log(effects, 'choices', choices, nextChoice)
       if (!nextChoice) {
         // Action is done -- send.
         console.log('Card Action', {...newAction, choices: []})
@@ -431,6 +434,10 @@ const ui = (state = UI_STATE, action, game = <any>{}, player) => {
           resources: action.resources,
         },
       ]
+    }
+
+    if (state.choice.type === 'choice' && action.type === 'UI_SUBMIT_CHOICE') {
+      newChoices = [...state.choices, action.choice]
     }
 
     if (newChoices) {

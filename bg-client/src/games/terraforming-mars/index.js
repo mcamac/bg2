@@ -38,6 +38,7 @@ import {PLAYER_COLORS} from './constants'
 import TagCounts from './components/TagCounts'
 import Card from './components/Card/Card'
 import {Corporation} from './components/Card'
+import CardEffects, {Effect} from './components/Card/CardEffects'
 
 const Wrapper = styled(Flex)`
   font-family: Rubik;
@@ -217,6 +218,13 @@ let ChoicesBar = props => (
   <React.Fragment>
     {props.card}:
     <pre style={{maxWidth: 400, overflowX: 'scroll'}}>{JSON.stringify(props.choice)}</pre>
+    {props.choice.type === 'choice' &&
+      props.choice.choices.map((choice, i) => (
+        <Button onClick={() => props.onDone({index: i})}>
+          {' '}
+          <CardEffects effects={choice} key={i} />{' '}
+        </Button>
+      ))}
     {props.choice.type === 'number' && <Input />}
     {props.choice.type === 'cost' && <ChooseResources cost={props.choice.cost} />}
     {props.choice.confirm && <Button onClick={props.onDone}>Done</Button>}
@@ -228,7 +236,9 @@ ChoicesBar = connect(
     choice: get(['ui', 'choice'], state),
     card: get(['ui', 'action', 'card'], state),
   }),
-  dispatch => bindActionCreators({onDone: uiSubmitChoice}, dispatch)
+  dispatch => ({
+    onDone: choice => dispatch(uiSubmitChoice(choice)),
+  })
 )(ChoicesBar)
 
 let GameChoicesBar = props => (
