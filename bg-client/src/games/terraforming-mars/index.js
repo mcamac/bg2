@@ -42,6 +42,15 @@ import {Corporation} from './components/Card'
 const Wrapper = styled(Flex)`
   font-family: Rubik;
   height: 100%;
+
+  .icon-Money {
+    margin-top: -1px;
+    font-size: 17px;
+  }
+
+  .icon-Energy {
+    font-size: 16px !important;
+  }
 `
 
 const signed = n => (n > 0 ? `+${n}` : `${n}`)
@@ -74,19 +83,22 @@ let PlayerCard = props => (
       <Flex mr={1}>
         <Tag name="Money" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Money.count} /> ({signed(props.state.resources.Money.production)})
+          <Count value={props.state.resources.Money.count} /> (
+          {signed(props.state.resources.Money.production)})
         </Box>
       </Flex>
       <Flex mr={1}>
         <Tag name="Steel" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Steel.count} /> (+{props.state.resources.Steel.production})
+          <Count value={props.state.resources.Steel.count} /> (+
+          {props.state.resources.Steel.production})
         </Box>
       </Flex>
       <Flex>
         <Tag name="Titanium" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Titanium.count} /> (+{props.state.resources.Titanium.production})
+          <Count value={props.state.resources.Titanium.count} /> (+
+          {props.state.resources.Titanium.production})
         </Box>
       </Flex>
     </Flex>
@@ -94,19 +106,22 @@ let PlayerCard = props => (
       <Flex mr={1} onClick={props.onClickPlant}>
         <Tag name="Plant" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Plant.count} /> (+{props.state.resources.Plant.production})
+          <Count value={props.state.resources.Plant.count} /> (+
+          {props.state.resources.Plant.production})
         </Box>
       </Flex>
       <Flex mr={1}>
         <Tag name="Energy" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Energy.count} /> (+{props.state.resources.Energy.production})
+          <Count value={props.state.resources.Energy.count} /> (+
+          {props.state.resources.Energy.production})
         </Box>
       </Flex>
       <Flex onClick={props.onClickHeat}>
         <Tag name="Heat" />
         <Box ml="3px" style={{fontSize: 13}}>
-          <Count value={props.state.resources.Heat.count} /> (+{props.state.resources.Heat.production})
+          <Count value={props.state.resources.Heat.count} /> (+
+          {props.state.resources.Heat.production})
         </Box>
       </Flex>
     </Flex>
@@ -248,10 +263,9 @@ let ActionBar = props => (
     {props.ui.phase === 'Choices' && <ChoicesBar />}
     {props.game.phase === 'ChoosingCorporations' && <ChoosingCorporationsStatus />}
     {props.game.phase === 'Draft' && <DraftStatus />}
-    {props.ui.choice &&
-      props.ui.choice.type === 'player' && (
-        <Button onClick={props.onChooseNoPlayer}>No Player</Button>
-      )}
+    {props.ui.choice && props.ui.choice.type === 'player' && (
+      <Button onClick={props.onChooseNoPlayer}>No Player</Button>
+    )}
     {props.ui.phase !== 'Game' && <Button onClick={props.onCancel}>Cancel</Button>}
   </Flex>
 )
@@ -411,7 +425,8 @@ const TerraformingMars = props => {
               window.socket.send({
                 room: window.location.pathname.split('/')[2],
                 action: 'ROOM_START',
-              })}
+              })
+            }
           >
             Reset
           </Button>
@@ -437,7 +452,14 @@ const TerraformingMars = props => {
           </Box>
           <GameLog log={props.game.log} />
         </Flex>
-        <Box style={{borderLeft: '1px solid #ddd', overflowY: 'scroll', background: '#fafafa'}}>
+        <Box
+          style={{
+            borderLeft: '1px solid #ddd',
+            overflowY: 'scroll',
+            background: '#fafafa',
+            maxWidth: 350,
+          }}
+        >
           {props.game.draft[props.player] && (
             <Draft cards={props.game.draft[props.player]} player={props.player} />
           )}
@@ -476,7 +498,6 @@ const TerraformingMars = props => {
               <Grid />
             </Box>
           </Flex>
-
         </Box>
 
         <Box px={2} style={{background: '#fafafa', overflowY: 'scroll'}}>

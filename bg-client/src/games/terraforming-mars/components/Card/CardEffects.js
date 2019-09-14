@@ -105,9 +105,8 @@ const RoboticWorkforce = () => (
 )
 
 const Choice = (choices, card) => (
-  <Flex align="center" mr={1}>
-    <Box mr="4px">One of:</Box>
-    (
+  <Flex align="center" mr={1} wrap="wrap">
+    <Box mr="4px">One of:</Box>(
     {choices.map((effects, j) => (
       <Flex align="center">
         {effects.map(

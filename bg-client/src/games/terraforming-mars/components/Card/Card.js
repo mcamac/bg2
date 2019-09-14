@@ -23,7 +23,11 @@ let Card = props => (
       <Box flex="1 1 auto" style={{textAlign: 'right'}}>
         {props.name}
       </Box>
-      <Flex ml={5}>{(props.card.tags || []).map(tag => <Tag key={tag} name={tag} />)}</Flex>
+      <Flex ml={5}>
+        {(props.card.tags || []).map(tag => (
+          <Tag key={tag} name={tag} />
+        ))}
+      </Flex>
     </Flex>
     {props.card.actions && (
       <CardActions
@@ -34,12 +38,12 @@ let Card = props => (
       />
     )}
     <Flex px="5px" mt="5px" direction="column">
-      <Flex align="center">
-          {props.card.effects &&
-            !props.collapsed && 
-            <Flex mr={1} align='center'>
-                <CardEffects effects={props.card.effects} card={props.card} />
-            </Flex>}
+      <Flex align="center" wrap="wrap">
+        {props.card.effects && !props.collapsed && (
+          <Flex mr={1} align="center">
+            <CardEffects effects={props.card.effects} card={props.card} />
+          </Flex>
+        )}
         {props.card.discounts && (
           <CardDiscounts discounts={props.card.discounts} card={props.card} />
         )}
@@ -61,6 +65,9 @@ let Card = props => (
   </CardWrapper>
 )
 
-Card = compose(pure, withProps(props => ({card: getCardByName(props.name)})))(Card)
+Card = compose(
+  pure,
+  withProps(props => ({card: getCardByName(props.name)}))
+)(Card)
 
 export default Card
